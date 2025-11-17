@@ -16,15 +16,15 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
   readonly ownerTable: string;
   readonly ownerId: string;
   readonly filename: string;
-  readonly filesizeByte: number | null;
-  readonly storageName: string | null;
-  readonly presignUrl: string | null;
-  readonly isPublic: boolean | null;
-  readonly createdAt: Date | null;
-  readonly updatedAt: Date | null;
-  readonly mimeType: string | null;
-  readonly extension: string | null;
-  readonly checksum: string | null;
+  readonly filesizeByte: number;
+  readonly storageName: string;
+  readonly presignUrl: string;
+  readonly isPublic: boolean;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+  readonly mimeType: string;
+  readonly extension: string;
+  readonly checksum: string;
   readonly expireAt: Date | null;
 
   constructor(plain: StoredFilePlain) {

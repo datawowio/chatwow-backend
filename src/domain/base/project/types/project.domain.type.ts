@@ -1,14 +1,14 @@
 import type { DBModel } from '@infra/db/db.common';
 import type { Projects } from '@infra/db/db.d';
 
-import type { Plain } from '@shared/common/common.type';
+import type { Plain, Serialized } from '@shared/common/common.type';
 
 import type { Project } from '../project.domain';
 
 export type ProjectPg = DBModel<Projects>;
 export type ProjectPlain = Plain<Project>;
 
-export type ProjectJson = ProjectPlain;
+export type ProjectJson = Serialized<ProjectPlain>;
 
 export type ProjectNewData = {
   projectName: string;

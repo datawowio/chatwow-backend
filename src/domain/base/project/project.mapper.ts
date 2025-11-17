@@ -1,4 +1,5 @@
 import myDayjs from '@shared/common/common.dayjs';
+import { toDate } from '@shared/common/common.transformer';
 
 import { Project } from './project.domain';
 import type {
@@ -43,8 +44,8 @@ export class ProjectMapper {
   static fromJson(json: ProjectJson): Project {
     const plain: ProjectPlain = {
       id: json.id,
-      createdAt: json.createdAt,
-      updatedAt: json.updatedAt,
+      createdAt: toDate(json.createdAt),
+      updatedAt: toDate(json.updatedAt),
       projectName: json.projectName,
       projectDescription: json.projectDescription,
       projectGuidelineMd: json.projectGuidelineMd,
@@ -81,8 +82,8 @@ export class ProjectMapper {
   static toJson(project: Project): ProjectJson {
     return {
       id: project.id,
-      createdAt: project.createdAt,
-      updatedAt: project.updatedAt,
+      createdAt: project.createdAt.toISOString(),
+      updatedAt: project.updatedAt.toISOString(),
       projectName: project.projectName,
       projectDescription: project.projectDescription,
       projectGuidelineMd: project.projectGuidelineMd,

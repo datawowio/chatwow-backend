@@ -47,3 +47,11 @@ export type CommandInterface = {
   find?(...body: unknown[]): Promise<unknown>;
   save(...entity: unknown[]): Promise<void>;
 };
+
+export type Serialized<T> = {
+  [K in keyof T]: T[K] extends Date
+    ? string
+    : T[K] extends Date | null
+      ? string | null
+      : T[K];
+};

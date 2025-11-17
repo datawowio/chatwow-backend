@@ -11,7 +11,8 @@ import type {
 
 export class ProjectAISummary extends DomainEntity<ProjectAISummaryPg> {
   readonly id: string;
-  readonly createdAt: Date | null;
+  readonly projectId: string;
+  readonly createdAt: Date;
   readonly aiSummaryMd: string;
 
   constructor(plain: ProjectAISummaryPlain) {
@@ -38,6 +39,9 @@ export class ProjectAISummary extends DomainEntity<ProjectAISummaryPg> {
     const plain: ProjectAISummaryPlain = {
       id: this.id,
       createdAt: this.createdAt,
+
+      // update
+      projectId: isDefined(data.projectId) ? data.projectId : this.projectId,
       aiSummaryMd: isDefined(data.aiSummaryMd)
         ? data.aiSummaryMd
         : this.aiSummaryMd,

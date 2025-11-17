@@ -1,3 +1,5 @@
+import { toDate } from '@shared/common/common.transformer';
+
 import { ProjectAISummary } from './project-ai-summary.domain';
 import type {
   ProjectAISummaryJson,
@@ -9,7 +11,8 @@ export class ProjectAISummaryMapper {
   static fromPg(pg: ProjectAISummaryPg): ProjectAISummary {
     const plain: ProjectAISummaryPlain = {
       id: pg.id,
-      createdAt: pg.created_at ? new Date(pg.created_at) : null,
+      projectId: pg.project_id,
+      createdAt: toDate(pg.created_at),
       aiSummaryMd: pg.ai_summary_md,
     };
 
@@ -23,6 +26,7 @@ export class ProjectAISummaryMapper {
   static fromPlain(plainData: ProjectAISummaryPlain): ProjectAISummary {
     const plain: ProjectAISummaryPlain = {
       id: plainData.id,
+      projectId: plainData.projectId,
       createdAt: plainData.createdAt,
       aiSummaryMd: plainData.aiSummaryMd,
     };
@@ -33,7 +37,8 @@ export class ProjectAISummaryMapper {
   static fromJson(json: ProjectAISummaryJson): ProjectAISummary {
     const plain: ProjectAISummaryPlain = {
       id: json.id,
-      createdAt: json.createdAt,
+      projectId: json.projectId,
+      createdAt: toDate(json.createdAt),
       aiSummaryMd: json.aiSummaryMd,
     };
 
@@ -43,9 +48,8 @@ export class ProjectAISummaryMapper {
   static toPg(projectAISummary: ProjectAISummary): ProjectAISummaryPg {
     return {
       id: projectAISummary.id,
-      created_at: projectAISummary.createdAt
-        ? projectAISummary.createdAt.toISOString()
-        : null,
+      project_id: projectAISummary.projectId,
+      created_at: projectAISummary.createdAt.toISOString(),
       ai_summary_md: projectAISummary.aiSummaryMd,
     };
   }
@@ -53,6 +57,7 @@ export class ProjectAISummaryMapper {
   static toPlain(projectAISummary: ProjectAISummary): ProjectAISummaryPlain {
     return {
       id: projectAISummary.id,
+      projectId: projectAISummary.projectId,
       createdAt: projectAISummary.createdAt,
       aiSummaryMd: projectAISummary.aiSummaryMd,
     };
@@ -61,7 +66,8 @@ export class ProjectAISummaryMapper {
   static toJson(projectAISummary: ProjectAISummary): ProjectAISummaryJson {
     return {
       id: projectAISummary.id,
-      createdAt: projectAISummary.createdAt,
+      projectId: projectAISummary.projectId,
+      createdAt: projectAISummary.createdAt.toISOString(),
       aiSummaryMd: projectAISummary.aiSummaryMd,
     };
   }

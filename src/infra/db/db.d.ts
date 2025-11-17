@@ -19,8 +19,9 @@ export type UserStatus = "ACTIVE" | "INACTIVE" | "PENDING_REGISTRATION";
 
 export interface ProjectAiSummaries {
   ai_summary_md: Generated<string>;
-  created_at: string | null;
+  created_at: Generated<string>;
   id: string;
+  project_id: string;
 }
 
 export interface ProjectDocuments {
@@ -40,28 +41,28 @@ export interface Projects {
 }
 
 export interface StoredFiles {
-  checksum: string | null;
-  created_at: string | null;
+  checksum: string;
+  created_at: Generated<string>;
   expire_at: string | null;
-  extension: string | null;
+  extension: string;
   filename: string;
-  filesize_byte: string | null;
+  filesize_byte: string;
   id: string;
-  is_public: Generated<boolean | null>;
+  is_public: Generated<boolean>;
   key_path: string;
-  mime_type: string | null;
+  mime_type: string;
   owner_id: string;
   owner_table: string;
-  presign_url: string | null;
+  presign_url: string;
   ref_name: string;
-  storage_name: Generated<string | null>;
-  updated_at: string | null;
+  storage_name: Generated<string>;
+  updated_at: Generated<string>;
 }
 
 export interface UserGroupProjects {
   id: string;
-  project_id: string | null;
-  user_group_id: string | null;
+  project_id: string;
+  user_group_id: string;
 }
 
 export interface UserGroups {
@@ -73,7 +74,7 @@ export interface UserGroups {
 export interface UserGroupUsers {
   id: string;
   user_group_id: string | null;
-  user_id: string | null;
+  user_id: string;
 }
 
 export interface Users {

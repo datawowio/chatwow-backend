@@ -1,3 +1,5 @@
+import { toDate } from '@shared/common/common.transformer';
+
 import { StoredFile } from './stored-file.domain';
 import type {
   StoredFileJson,
@@ -14,16 +16,16 @@ export class StoredFileMapper {
       ownerTable: pg.owner_table,
       ownerId: pg.owner_id,
       filename: pg.filename,
-      filesizeByte: pg.filesize_byte ? Number(pg.filesize_byte) : null,
+      filesizeByte: Number(pg.filesize_byte),
       storageName: pg.storage_name,
       presignUrl: pg.presign_url,
       isPublic: pg.is_public,
-      createdAt: pg.created_at ? new Date(pg.created_at) : null,
-      updatedAt: pg.updated_at ? new Date(pg.updated_at) : null,
+      createdAt: toDate(pg.created_at),
+      updatedAt: toDate(pg.updated_at),
       mimeType: pg.mime_type,
       extension: pg.extension,
       checksum: pg.checksum,
-      expireAt: pg.expire_at ? new Date(pg.expire_at) : null,
+      expireAt: pg.expire_at ? toDate(pg.expire_at) : null,
     };
 
     return new StoredFile(plain);
@@ -68,12 +70,12 @@ export class StoredFileMapper {
       storageName: json.storageName,
       presignUrl: json.presignUrl,
       isPublic: json.isPublic,
-      createdAt: json.createdAt,
-      updatedAt: json.updatedAt,
+      createdAt: toDate(json.createdAt),
+      updatedAt: toDate(json.updatedAt),
       mimeType: json.mimeType,
       extension: json.extension,
       checksum: json.checksum,
-      expireAt: json.expireAt,
+      expireAt: json.expireAt ? toDate(json.expireAt) : null,
     };
 
     return new StoredFile(plain);
@@ -87,14 +89,12 @@ export class StoredFileMapper {
       owner_table: storedFile.ownerTable,
       owner_id: storedFile.ownerId,
       filename: storedFile.filename,
-      filesize_byte: storedFile.filesizeByte
-        ? String(storedFile.filesizeByte)
-        : null,
+      filesize_byte: storedFile.filesizeByte.toString(),
       storage_name: storedFile.storageName,
       presign_url: storedFile.presignUrl,
       is_public: storedFile.isPublic,
-      created_at: storedFile.createdAt?.toISOString() || null,
-      updated_at: storedFile.updatedAt?.toISOString() || null,
+      created_at: storedFile.createdAt.toISOString(),
+      updated_at: storedFile.updatedAt.toISOString(),
       mime_type: storedFile.mimeType,
       extension: storedFile.extension,
       checksum: storedFile.checksum,
@@ -135,12 +135,12 @@ export class StoredFileMapper {
       storageName: storedFile.storageName,
       presignUrl: storedFile.presignUrl,
       isPublic: storedFile.isPublic,
-      createdAt: storedFile.createdAt,
-      updatedAt: storedFile.updatedAt,
+      createdAt: storedFile.createdAt.toISOString(),
+      updatedAt: storedFile.updatedAt.toISOString(),
       mimeType: storedFile.mimeType,
       extension: storedFile.extension,
       checksum: storedFile.checksum,
-      expireAt: storedFile.expireAt,
+      expireAt: storedFile.expireAt ? storedFile.expireAt.toISOString() : null,
     };
   }
 

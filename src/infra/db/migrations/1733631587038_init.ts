@@ -110,7 +110,9 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('project_ai_summaries')
     .addColumn('id', 'uuid', (col) => col.primaryKey())
-    .addColumn('created_at', 'timestamptz')
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
     .addColumn('project_id', 'uuid', (col) =>
       col.notNull().references('projects.id').onDelete('cascade'),
     )
@@ -128,15 +130,19 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('owner_table', 'text', (col) => col.notNull())
     .addColumn('owner_id', 'uuid', (col) => col.notNull())
     .addColumn('filename', 'text', (col) => col.notNull())
-    .addColumn('filesize_byte', 'int8')
-    .addColumn('storage_name', 'text', (col) => col.defaultTo('s3'))
-    .addColumn('presign_url', 'text')
-    .addColumn('is_public', 'boolean', (col) => col.defaultTo(false))
-    .addColumn('created_at', 'timestamptz')
-    .addColumn('updated_at', 'timestamptz')
-    .addColumn('mime_type', 'text')
-    .addColumn('extension', 'text')
-    .addColumn('checksum', 'text')
+    .addColumn('filesize_byte', 'int8', (col) => col.notNull())
+    .addColumn('storage_name', 'text', (col) => col.notNull().defaultTo('s3'))
+    .addColumn('presign_url', 'text', (col) => col.notNull())
+    .addColumn('is_public', 'boolean', (col) => col.notNull().defaultTo(false))
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('updated_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('mime_type', 'text', (col) => col.notNull())
+    .addColumn('extension', 'text', (col) => col.notNull())
+    .addColumn('checksum', 'text', (col) => col.notNull())
     .addColumn('expire_at', 'timestamptz')
     .execute();
 

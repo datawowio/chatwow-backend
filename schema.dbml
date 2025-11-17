@@ -48,7 +48,7 @@ Table "user_groups" {
 
 Table "user_group_users" {
   "id" uuid [pk, not null]
-  "user_id" uuid
+  "user_id" uuid [not null]
   "user_group_id" uuid
 }
 
@@ -64,8 +64,8 @@ Table "projects" {
 
 Table "user_group_projects" {
   "id" uuid [pk, not null]
-  "project_id" uuid
-  "user_group_id" uuid
+  "project_id" uuid [not null]
+  "user_group_id" uuid [not null]
 }
 
 Table "project_documents" {
@@ -76,7 +76,8 @@ Table "project_documents" {
 
 Table "project_ai_summaries" {
   "id" uuid [pk, not null]
-  "created_at" timestamptz
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "project_id" uuid [not null]
   "ai_summary_md" text [not null, default: '']
 }
 
@@ -87,21 +88,23 @@ Table "stored_files" {
   "owner_table" text [not null]
   "owner_id" uuid [not null]
   "filename" text [not null]
-  "filesize_byte" int8
-  "storage_name" text [default: 's3']
-  "presign_url" text
-  "is_public" bool [default: false]
-  "created_at" timestamptz
-  "updated_at" timestamptz
-  "mime_type" text
-  "extension" text
-  "checksum" text
+  "filesize_byte" int8 [not null]
+  "storage_name" text [not null, default: 's3']
+  "presign_url" text [not null]
+  "is_public" bool [not null, default: false]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "mime_type" text [not null]
+  "extension" text [not null]
+  "checksum" text [not null]
   "expire_at" timestamptz
 
   Indexes {
     (ref_name, owner_table, owner_id) [type: btree, name: "stored_files_ref_owner_idx"]
   }
 }
+
+Ref "project_ai_summaries_project_id_fkey":"projects"."id" < "project_ai_summaries"."project_id" [delete: cascade]
 
 Ref "user_group_projects_project_id_fkey":"projects"."id" < "user_group_projects"."project_id" [delete: cascade]
 

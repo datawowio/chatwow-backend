@@ -8,11 +8,12 @@ import type {
   UserGroupProjectPlain,
   UserGroupProjectUpdateData,
 } from './types/user-group-project.domain.type';
+import { UserGroupProjectMapper } from './user-group-project.mapper';
 
 export class UserGroupProject extends DomainEntity<UserGroupProjectPg> {
   readonly id: string;
-  readonly projectId: string | null;
-  readonly userGroupId: string | null;
+  readonly projectId: string;
+  readonly userGroupId: string;
 
   constructor(plain: UserGroupProjectPlain) {
     super();
@@ -20,11 +21,11 @@ export class UserGroupProject extends DomainEntity<UserGroupProjectPg> {
   }
 
   static new(data: UserGroupProjectNewData) {
-    return {
+    return UserGroupProjectMapper.fromPlain({
       id: uuidV7(),
-      projectId: data.projectId || null,
-      userGroupId: data.userGroupId || null,
-    } as UserGroupProjectPlain;
+      projectId: data.projectId,
+      userGroupId: data.userGroupId,
+    });
   }
 
   static newBulk(data: UserGroupProjectNewData[]) {
