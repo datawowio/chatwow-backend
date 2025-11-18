@@ -32,6 +32,7 @@ export interface ProjectDocuments {
 
 export interface Projects {
   created_at: Generated<string>;
+  current_project_ai_summary_id: string | null;
   id: string;
   project_description: Generated<string>;
   project_guideline_md: Generated<string>;
@@ -41,7 +42,7 @@ export interface Projects {
 }
 
 export interface StoredFiles {
-  checksum: string;
+  checksum: string | null;
   created_at: Generated<string>;
   expire_at: string | null;
   extension: string;
@@ -73,7 +74,15 @@ export interface UserGroups {
 
 export interface UserGroupUsers {
   id: string;
-  user_group_id: string | null;
+  user_group_id: string;
+  user_id: string;
+}
+
+export interface UserOtps {
+  created_at: Generated<string>;
+  expire_at: string;
+  id: string;
+  otp: string;
   user_id: string;
 }
 
@@ -96,5 +105,6 @@ export interface DB {
   user_group_projects: UserGroupProjects;
   user_group_users: UserGroupUsers;
   user_groups: UserGroups;
+  user_otps: UserOtps;
   users: Users;
 }

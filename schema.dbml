@@ -40,6 +40,18 @@ Table "users" {
   "line_uid" text
 }
 
+Table "user_otps" {
+  "id" uuid [pk, not null]
+  "otp" text [unique, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "user_id" uuid [not null]
+  "expire_at" timestamptz [not null]
+
+  Indexes {
+    otp [type: btree, name: "user_otps_otp"]
+  }
+}
+
 Table "user_groups" {
   "id" uuid [pk, not null]
   "group_name" text [not null]
@@ -49,7 +61,7 @@ Table "user_groups" {
 Table "user_group_users" {
   "id" uuid [pk, not null]
   "user_id" uuid [not null]
-  "user_group_id" uuid
+  "user_group_id" uuid [not null]
 }
 
 Table "projects" {
@@ -60,6 +72,7 @@ Table "projects" {
   "project_status" project_status [not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "current_project_ai_summary_id" uuid
 }
 
 Table "user_group_projects" {
@@ -96,7 +109,7 @@ Table "stored_files" {
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "mime_type" text [not null]
   "extension" text [not null]
-  "checksum" text [not null]
+  "checksum" text
   "expire_at" timestamptz
 
   Indexes {
@@ -106,6 +119,8 @@ Table "stored_files" {
 
 Ref "project_ai_summaries_project_id_fkey":"projects"."id" < "project_ai_summaries"."project_id" [delete: cascade]
 
+Ref "projects_current_project_ai_summary_id_fkey":"project_ai_summaries"."id" < "projects"."current_project_ai_summary_id" [delete: set null]
+
 Ref "user_group_projects_project_id_fkey":"projects"."id" < "user_group_projects"."project_id" [delete: cascade]
 
 Ref "user_group_projects_user_group_id_fkey":"user_groups"."id" < "user_group_projects"."user_group_id" [delete: cascade]
@@ -113,3 +128,5 @@ Ref "user_group_projects_user_group_id_fkey":"user_groups"."id" < "user_group_pr
 Ref "user_group_users_user_group_id_fkey":"user_groups"."id" < "user_group_users"."user_group_id" [delete: cascade]
 
 Ref "user_group_users_user_id_fkey":"users"."id" < "user_group_users"."user_id" [delete: cascade]
+
+Ref "user_otps_user_id_fkey":"users"."id" < "user_otps"."user_id" [delete: cascade]

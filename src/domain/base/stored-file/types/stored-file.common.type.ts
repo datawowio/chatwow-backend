@@ -7,3 +7,8 @@ export type StoredFileQueryOptions = {
     ownerId?: string;
   };
 };
+
+export type GetPresignUploadUrlOpts = {
+  ownerTable: string;
+  ownerId: string;
+};

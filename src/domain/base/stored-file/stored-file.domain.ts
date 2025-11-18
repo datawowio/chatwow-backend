@@ -1,7 +1,10 @@
-import { uuidV7 } from '@shared/common/common.crypto';
+import { getFileExtension } from '@shared/common/common.buffer';
+import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
+import { StoredFileMapper } from './stored-file.mapper';
+import { getStoredFilesIdFromKey } from './stored-file.util';
 import type {
   StoredFileNewData,
   StoredFilePg,
@@ -18,14 +21,14 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
   readonly filename: string;
   readonly filesizeByte: number;
   readonly storageName: string;
-  readonly presignUrl: string;
   readonly isPublic: boolean;
   readonly createdAt: Date;
   readonly updatedAt: Date;
-  readonly mimeType: string;
   readonly extension: string;
-  readonly checksum: string;
+  readonly checksum: string | null;
+  readonly presignUrl: string | null;
   readonly expireAt: Date | null;
+  readonly mimeType: string | null;
 
   constructor(plain: StoredFilePlain) {
     super();
@@ -33,24 +36,24 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
   }
 
   static new(data: StoredFileNewData) {
-    return {
-      id: uuidV7(),
-      refName: data.refName,
-      keyPath: data.keyPath,
+    return StoredFileMapper.fromPlain({
+      id: getStoredFilesIdFromKey(data.keyPath),
+      refName: data.refName || 'DEFAULT',
       ownerTable: data.ownerTable,
       ownerId: data.ownerId,
       filename: data.filename,
-      filesizeByte: data.filesizeByte || null,
+      filesizeByte: data.filesizeByte,
       storageName: data.storageName || 's3',
-      presignUrl: data.presignUrl || null,
       isPublic: data.isPublic || false,
       createdAt: new Date(),
       updatedAt: new Date(),
-      mimeType: data.mimeType || null,
-      extension: data.extension || null,
-      checksum: data.checksum || null,
+      extension: getFileExtension(data.filename),
+      checksum: null,
       expireAt: data.expireAt || null,
-    } as StoredFilePlain;
+      keyPath: data.keyPath,
+      presignUrl: null,
+      mimeType: null,
+    });
   }
 
   static newBulk(data: StoredFileNewData[]) {
@@ -63,31 +66,33 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
   edit(data: StoredFileUpdateData) {
     const plain: StoredFilePlain = {
       id: this.id,
-      refName: isDefined(data.refName) ? data.refName : this.refName,
-      keyPath: isDefined(data.keyPath) ? data.keyPath : this.keyPath,
-      ownerTable: isDefined(data.ownerTable)
-        ? data.ownerTable
-        : this.ownerTable,
-      ownerId: isDefined(data.ownerId) ? data.ownerId : this.ownerId,
-      filename: isDefined(data.filename) ? data.filename : this.filename,
-      filesizeByte: isDefined(data.filesizeByte)
-        ? data.filesizeByte
-        : this.filesizeByte,
-      storageName: isDefined(data.storageName)
-        ? data.storageName
-        : this.storageName,
-      presignUrl: isDefined(data.presignUrl)
-        ? data.presignUrl
-        : this.presignUrl,
-      isPublic: isDefined(data.isPublic) ? data.isPublic : this.isPublic,
+      ownerTable: this.ownerTable,
+      ownerId: this.ownerId,
+      storageName: this.storageName,
+      presignUrl: this.presignUrl,
       createdAt: this.createdAt,
-      updatedAt: new Date(),
-      mimeType: isDefined(data.mimeType) ? data.mimeType : this.mimeType,
-      extension: isDefined(data.extension) ? data.extension : this.extension,
-      checksum: isDefined(data.checksum) ? data.checksum : this.checksum,
+      updatedAt: myDayjs().toDate(),
+      mimeType: this.mimeType,
+      checksum: this.checksum,
+      filesizeByte: this.filesizeByte,
+
+      // dependency update
+      extension: isDefined(data.filename)
+        ? getFileExtension(data.filename)
+        : this.extension,
+
+      // updated fields
+      keyPath: isDefined(data.keyPath) ? data.keyPath : this.keyPath,
+      filename: isDefined(data.filename) ? data.filename : this.filename,
+      refName: isDefined(data.refName) ? data.refName : this.refName,
       expireAt: isDefined(data.expireAt) ? data.expireAt : this.expireAt,
+      isPublic: isDefined(data.isPublic) ? data.isPublic : this.isPublic,
     };
 
     Object.assign(this, plain);
+  }
+
+  isFileChanged() {
+    return this.keyPath !== this.pgState?.key_path;
   }
 }

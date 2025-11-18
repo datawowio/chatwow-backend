@@ -11,33 +11,22 @@ export type StoredFilePlain = Plain<StoredFile>;
 export type StoredFileJson = Serialized<StoredFilePlain>;
 
 export type StoredFileNewData = {
-  refName: string;
-  keyPath: string;
   ownerTable: string;
   ownerId: string;
   filename: string;
   filesizeByte: number;
-  storageName: string;
-  presignUrl: string;
-  isPublic: boolean;
-  mimeType: string;
-  extension: string;
-  checksum: string;
+  keyPath: string;
+  refName?: string;
+  storageName?: string;
+  isPublic?: boolean;
   expireAt?: Date;
 };
 
 export type StoredFileUpdateData = {
-  refName?: string;
-  keyPath?: string;
-  ownerTable?: string;
-  ownerId?: string;
   filename?: string;
-  filesizeByte?: number;
-  storageName?: string;
-  presignUrl?: string;
-  isPublic?: boolean;
-  mimeType?: string;
-  extension?: string;
-  checksum?: string;
+  refName?: string;
   expireAt?: Date;
+  isPublic?: boolean;
+  filesizeByte?: number;
+  keyPath?: string;
 };

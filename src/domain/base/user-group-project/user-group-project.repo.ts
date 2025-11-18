@@ -1,59 +1,47 @@
 import { Injectable } from '@nestjs/common';
 
-import { diff } from '@shared/common/common.func';
+import { uuidV7 } from '@shared/common/common.crypto';
 import { BaseRepo } from '@shared/common/common.repo';
 
-import { UserGroupProject } from './user-group-project.domain';
 import { UserGroupProjectMapper } from './user-group-project.mapper';
 
 @Injectable()
 export class UserGroupProjectRepo extends BaseRepo {
-  async create(userGroupProject: UserGroupProject): Promise<void> {
+  async saveUserGroupRelations(userGroupId: string, projectIds: string[]) {
     await this.db
-      //
-      .insertInto('user_group_projects')
-      .values(UserGroupProjectMapper.toPg(userGroupProject))
-      .execute();
-  }
-
-  async update(id: string, userGroupProject: UserGroupProject): Promise<void> {
-    const data = diff(
-      userGroupProject.pgState,
-      UserGroupProjectMapper.toPg(userGroupProject),
-    );
-    if (!data) {
-      return;
-    }
-
-    await this.db
-      //
-      .updateTable('user_group_projects')
-      .set(data)
-      .where('id', '=', id)
-      .execute();
-  }
-
-  async findOne(id: string): Promise<UserGroupProject | null> {
-    const userGroupProjectPg = await this.readDb
-      .selectFrom('user_group_projects')
-      .selectAll()
-      .where('id', '=', id)
-      .executeTakeFirst();
-
-    if (!userGroupProjectPg) {
-      return null;
-    }
-
-    const userGroupProject =
-      UserGroupProjectMapper.fromPgWithState(userGroupProjectPg);
-    return userGroupProject;
-  }
-
-  async delete(id: string): Promise<void> {
-    await this.db
-      //
       .deleteFrom('user_group_projects')
-      .where('id', '=', id)
+      .where('user_group_projects.user_group_id', '=', userGroupId)
+      .execute();
+
+    const insertData = projectIds.map((projectId) =>
+      UserGroupProjectMapper.toPg({
+        id: uuidV7(),
+        userGroupId,
+        projectId,
+      }),
+    );
+    await this.db
+      .insertInto('user_group_projects')
+      .values(insertData)
+      .execute();
+  }
+
+  async saveProjectRelations(projectId: string, userGroupIds: string[]) {
+    await this.db
+      .deleteFrom('user_group_projects')
+      .where('user_group_projects.project_id', '=', projectId)
+      .execute();
+
+    const insertData = userGroupIds.map((userGroupId) =>
+      UserGroupProjectMapper.toPg({
+        id: uuidV7(),
+        userGroupId,
+        projectId,
+      }),
+    );
+    await this.db
+      .insertInto('user_group_projects')
+      .values(insertData)
       .execute();
   }
 }

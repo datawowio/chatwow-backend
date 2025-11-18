@@ -40,7 +40,7 @@ export class UserGroupUserMapper {
     return new UserGroupUser(plain);
   }
 
-  static toPg(userGroupUser: UserGroupUser): UserGroupUserPg {
+  static toPg(userGroupUser: UserGroupUserPlain): UserGroupUserPg {
     return {
       id: userGroupUser.id,
       user_id: userGroupUser.userId,

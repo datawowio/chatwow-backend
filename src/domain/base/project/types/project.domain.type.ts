@@ -15,6 +15,7 @@ export type ProjectNewData = {
   projectDescription?: string;
   projectGuidelineMd?: string;
   projectStatus: 'ACTIVE' | 'INACTIVE';
+  currentProjectAiSummaryId?: string;
 };
 
 export type ProjectUpdateData = {
@@ -22,4 +23,5 @@ export type ProjectUpdateData = {
   projectDescription?: string;
   projectGuidelineMd?: string;
   projectStatus?: 'ACTIVE' | 'INACTIVE';
+  currentProjectAiSummaryId?: string;
 };

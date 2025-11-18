@@ -11,8 +11,8 @@ import type {
 
 export class UserGroupUser extends DomainEntity<UserGroupUserPg> {
   readonly id: string;
-  readonly userId: string | null;
-  readonly userGroupId: string | null;
+  readonly userId: string;
+  readonly userGroupId: string;
 
   constructor(plain: UserGroupUserPlain) {
     super();

@@ -40,7 +40,7 @@ export class UserGroupProjectMapper {
     return new UserGroupProject(plain);
   }
 
-  static toPg(userGroupProject: UserGroupProject): UserGroupProjectPg {
+  static toPg(userGroupProject: UserGroupProjectPlain): UserGroupProjectPg {
     return {
       id: userGroupProject.id,
       project_id: userGroupProject.projectId,
@@ -57,14 +57,6 @@ export class UserGroupProjectMapper {
   }
 
   static toJson(userGroupProject: UserGroupProject): UserGroupProjectJson {
-    return {
-      id: userGroupProject.id,
-      projectId: userGroupProject.projectId,
-      userGroupId: userGroupProject.userGroupId,
-    };
-  }
-
-  static toResponse(userGroupProject: UserGroupProject) {
     return {
       id: userGroupProject.id,
       projectId: userGroupProject.projectId,

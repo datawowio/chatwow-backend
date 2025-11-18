@@ -1,58 +1,49 @@
 import { Injectable } from '@nestjs/common';
 
-import { diff } from '@shared/common/common.func';
+import { uuidV7 } from '@shared/common/common.crypto';
 import { BaseRepo } from '@shared/common/common.repo';
 
-import { UserGroupUser } from './user-group-user.domain';
 import { UserGroupUserMapper } from './user-group-user.mapper';
 
 @Injectable()
 export class UserGroupUserRepo extends BaseRepo {
-  async create(userGroupUser: UserGroupUser): Promise<void> {
+  async saveUserRelations(userId: string, userGroupIds: string[]) {
+    await this.db
+      .deleteFrom('user_group_users')
+      .where('user_group_users.user_id', '=', userId)
+      .execute();
+
+    const insertData = userGroupIds.map((userGroupId) =>
+      UserGroupUserMapper.toPg({
+        id: uuidV7(),
+        userGroupId,
+        userId,
+      }),
+    );
     await this.db
       //
       .insertInto('user_group_users')
-      .values(UserGroupUserMapper.toPg(userGroupUser))
+      .values(insertData)
       .execute();
   }
 
-  async update(id: string, userGroupUser: UserGroupUser): Promise<void> {
-    const data = diff(
-      userGroupUser.pgState,
-      UserGroupUserMapper.toPg(userGroupUser),
-    );
-    if (!data) {
-      return;
-    }
-
+  async saveProjectRelations(userGroupId: string, userIds: string[]) {
     await this.db
-      //
-      .updateTable('user_group_users')
-      .set(data)
-      .where('id', '=', id)
-      .execute();
-  }
-
-  async findOne(id: string): Promise<UserGroupUser | null> {
-    const userGroupUserPg = await this.readDb
-      .selectFrom('user_group_users')
-      .selectAll()
-      .where('id', '=', id)
-      .executeTakeFirst();
-
-    if (!userGroupUserPg) {
-      return null;
-    }
-
-    const userGroupUser = UserGroupUserMapper.fromPgWithState(userGroupUserPg);
-    return userGroupUser;
-  }
-
-  async delete(id: string): Promise<void> {
-    await this.db
-      //
       .deleteFrom('user_group_users')
-      .where('id', '=', id)
+      .where('user_group_users.user_group_id', '=', userGroupId)
+      .execute();
+
+    const insertData = userIds.map((userId) =>
+      UserGroupUserMapper.toPg({
+        id: uuidV7(),
+        userGroupId,
+        userId,
+      }),
+    );
+    await this.db
+      //
+      .insertInto('user_group_users')
+      .values(insertData)
       .execute();
   }
 }

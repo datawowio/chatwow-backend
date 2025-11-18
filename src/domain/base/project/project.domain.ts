@@ -19,6 +19,7 @@ export class Project extends DomainEntity<ProjectPg> {
   readonly projectDescription: string;
   readonly projectGuidelineMd: string;
   readonly projectStatus: ProjectStatus;
+  readonly currentProjectAiSummaryId: string | null;
 
   constructor(plain: ProjectPlain) {
     super();
@@ -30,6 +31,7 @@ export class Project extends DomainEntity<ProjectPg> {
       id: uuidV7(),
       createdAt: new Date(),
       updatedAt: new Date(),
+      currentProjectAiSummaryId: data.currentProjectAiSummaryId || null,
       projectName: data.projectName,
       projectDescription: data.projectDescription || '',
       projectGuidelineMd: data.projectGuidelineMd || '',
@@ -49,6 +51,10 @@ export class Project extends DomainEntity<ProjectPg> {
       id: this.id,
       createdAt: this.createdAt,
       updatedAt: new Date(),
+
+      currentProjectAiSummaryId: isDefined(data.currentProjectAiSummaryId)
+        ? data.currentProjectAiSummaryId
+        : this.currentProjectAiSummaryId,
       projectName: isDefined(data.projectName)
         ? data.projectName
         : this.projectName,

@@ -1,6 +1,8 @@
 import { toDate } from '@shared/common/common.transformer';
+import { ApiException } from '@shared/http/http.exception';
 
 import { StoredFile } from './stored-file.domain';
+import type { StoredFileResponse } from './stored-file.response';
 import type {
   StoredFileJson,
   StoredFilePg,
@@ -22,8 +24,8 @@ export class StoredFileMapper {
       isPublic: pg.is_public,
       createdAt: toDate(pg.created_at),
       updatedAt: toDate(pg.updated_at),
-      mimeType: pg.mime_type,
       extension: pg.extension,
+      mimeType: pg.mime_type,
       checksum: pg.checksum,
       expireAt: pg.expire_at ? toDate(pg.expire_at) : null,
     };
@@ -72,16 +74,23 @@ export class StoredFileMapper {
       isPublic: json.isPublic,
       createdAt: toDate(json.createdAt),
       updatedAt: toDate(json.updatedAt),
-      mimeType: json.mimeType,
       extension: json.extension,
       checksum: json.checksum,
       expireAt: json.expireAt ? toDate(json.expireAt) : null,
+      mimeType: json.mimeType,
     };
 
     return new StoredFile(plain);
   }
 
   static toPg(storedFile: StoredFile): StoredFilePg {
+    if (!storedFile.keyPath) {
+      throw new ApiException(500, 'storedFileNoKey');
+    }
+    if (!storedFile.presignUrl) {
+      throw new ApiException(500, 'storedFileNoPresign');
+    }
+
     return {
       id: storedFile.id,
       ref_name: storedFile.refName,
@@ -93,9 +102,9 @@ export class StoredFileMapper {
       storage_name: storedFile.storageName,
       presign_url: storedFile.presignUrl,
       is_public: storedFile.isPublic,
+      mime_type: storedFile.mimeType || '',
       created_at: storedFile.createdAt.toISOString(),
       updated_at: storedFile.updatedAt.toISOString(),
-      mime_type: storedFile.mimeType,
       extension: storedFile.extension,
       checksum: storedFile.checksum,
       expire_at: storedFile.expireAt?.toISOString() || null,
@@ -104,6 +113,7 @@ export class StoredFileMapper {
 
   static toPlain(storedFile: StoredFile): StoredFilePlain {
     return {
+      mimeType: storedFile.mimeType,
       id: storedFile.id,
       refName: storedFile.refName,
       keyPath: storedFile.keyPath,
@@ -116,7 +126,6 @@ export class StoredFileMapper {
       isPublic: storedFile.isPublic,
       createdAt: storedFile.createdAt,
       updatedAt: storedFile.updatedAt,
-      mimeType: storedFile.mimeType,
       extension: storedFile.extension,
       checksum: storedFile.checksum,
       expireAt: storedFile.expireAt,
@@ -125,6 +134,7 @@ export class StoredFileMapper {
 
   static toJson(storedFile: StoredFile): StoredFileJson {
     return {
+      mimeType: storedFile.mimeType,
       id: storedFile.id,
       refName: storedFile.refName,
       keyPath: storedFile.keyPath,
@@ -137,31 +147,22 @@ export class StoredFileMapper {
       isPublic: storedFile.isPublic,
       createdAt: storedFile.createdAt.toISOString(),
       updatedAt: storedFile.updatedAt.toISOString(),
-      mimeType: storedFile.mimeType,
       extension: storedFile.extension,
       checksum: storedFile.checksum,
       expireAt: storedFile.expireAt ? storedFile.expireAt.toISOString() : null,
     };
   }
 
-  static toResponse(storedFile: StoredFile) {
+  static toResponse(storedFile: StoredFile): StoredFileResponse {
     return {
       id: storedFile.id,
-      refName: storedFile.refName,
-      keyPath: storedFile.keyPath,
-      ownerTable: storedFile.ownerTable,
-      ownerId: storedFile.ownerId,
       filename: storedFile.filename,
       filesizeByte: storedFile.filesizeByte,
-      storageName: storedFile.storageName,
       presignUrl: storedFile.presignUrl,
-      isPublic: storedFile.isPublic,
-      createdAt: storedFile.createdAt?.toISOString() || null,
-      updatedAt: storedFile.updatedAt?.toISOString() || null,
+      createdAt: storedFile.createdAt.toISOString(),
+      updatedAt: storedFile.updatedAt.toISOString(),
       mimeType: storedFile.mimeType,
       extension: storedFile.extension,
-      checksum: storedFile.checksum,
-      expireAt: storedFile.expireAt?.toISOString() || null,
     };
   }
 }

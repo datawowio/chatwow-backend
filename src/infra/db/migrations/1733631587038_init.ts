@@ -41,6 +41,28 @@ export async function up(db: Kysely<any>): Promise<void> {
     .execute();
 
   //
+  // USERS_OTP
+  //
+  await db.schema
+    .createTable('user_otps')
+    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('otp', 'text', (col) => col.unique().notNull())
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('user_id', 'uuid', (col) =>
+      col.references('users.id').notNull().onDelete('cascade'),
+    )
+    .addColumn('expire_at', 'timestamptz', (col) => col.notNull())
+    .execute();
+
+  await db.schema
+    .createIndex('user_otps_otp')
+    .on('user_otps')
+    .column('otp')
+    .execute();
+
+  //
   // USER GROUPS
   //
   await db.schema
@@ -57,7 +79,7 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.notNull().references('users.id').onDelete('cascade'),
     )
     .addColumn('user_group_id', 'uuid', (col) =>
-      col.references('user_groups.id').onDelete('cascade'),
+      col.notNull().references('user_groups.id').onDelete('cascade'),
     )
     .execute();
 
@@ -119,6 +141,13 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('ai_summary_md', 'text', (col) => col.notNull().defaultTo(''))
     .execute();
 
+  await db.schema
+    .alterTable('projects')
+    .addColumn('current_project_ai_summary_id', 'uuid', (col) =>
+      col.references('project_ai_summaries.id').onDelete('set null'),
+    )
+    .execute();
+
   //
   // STORED FILES
   //
@@ -142,7 +171,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     )
     .addColumn('mime_type', 'text', (col) => col.notNull())
     .addColumn('extension', 'text', (col) => col.notNull())
-    .addColumn('checksum', 'text', (col) => col.notNull())
+    .addColumn('checksum', 'text')
     .addColumn('expire_at', 'timestamptz')
     .execute();
 

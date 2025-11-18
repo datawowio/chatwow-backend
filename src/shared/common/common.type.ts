@@ -1,3 +1,4 @@
+import type duration from 'dayjs/plugin/duration';
 import type { ReadonlyDeep } from 'type-fest';
 
 export type Read<T> = ReadonlyDeep<T>;
@@ -55,3 +56,5 @@ export type Serialized<T> = {
       ? string | null
       : T[K];
 };
+
+export type DayjsDuration = duration.DurationUnitsObjectType;
