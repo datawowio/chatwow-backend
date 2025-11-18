@@ -2,6 +2,7 @@ import myDayjs from '@shared/common/common.dayjs';
 import { toDate } from '@shared/common/common.transformer';
 
 import { Project } from './project.domain';
+import type { ProjectResponse } from './project.response';
 import type {
   ProjectJson,
   ProjectPg,
@@ -18,6 +19,7 @@ export class ProjectMapper {
       projectDescription: pg.project_description,
       projectGuidelineMd: pg.project_guideline_md,
       projectStatus: pg.project_status,
+      aiSummaryMd: pg.ai_summary_md,
     };
 
     return new Project(plain);
@@ -36,6 +38,7 @@ export class ProjectMapper {
       projectDescription: plainData.projectDescription,
       projectGuidelineMd: plainData.projectGuidelineMd,
       projectStatus: plainData.projectStatus,
+      aiSummaryMd: plainData.aiSummaryMd,
     };
 
     return new Project(plain);
@@ -50,6 +53,7 @@ export class ProjectMapper {
       projectDescription: json.projectDescription,
       projectGuidelineMd: json.projectGuidelineMd,
       projectStatus: json.projectStatus,
+      aiSummaryMd: json.aiSummaryMd,
     };
 
     return new Project(plain);
@@ -64,6 +68,7 @@ export class ProjectMapper {
       project_description: project.projectDescription,
       project_guideline_md: project.projectGuidelineMd,
       project_status: project.projectStatus,
+      ai_summary_md: project.aiSummaryMd,
     };
   }
 
@@ -76,6 +81,7 @@ export class ProjectMapper {
       projectDescription: project.projectDescription,
       projectGuidelineMd: project.projectGuidelineMd,
       projectStatus: project.projectStatus,
+      aiSummaryMd: project.aiSummaryMd,
     };
   }
 
@@ -88,10 +94,11 @@ export class ProjectMapper {
       projectDescription: project.projectDescription,
       projectGuidelineMd: project.projectGuidelineMd,
       projectStatus: project.projectStatus,
+      aiSummaryMd: project.aiSummaryMd,
     };
   }
 
-  static toResponse(project: Project) {
+  static toResponse(project: Project): ProjectResponse {
     return {
       id: project.id,
       createdAt: project.createdAt.toISOString(),
@@ -100,6 +107,7 @@ export class ProjectMapper {
       projectDescription: project.projectDescription,
       projectGuidelineMd: project.projectGuidelineMd,
       projectStatus: project.projectStatus,
+      aiSummaryMd: project.aiSummaryMd,
     };
   }
 }

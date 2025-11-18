@@ -12,6 +12,7 @@ export class LineAccountMapper {
     const plain: LineAccountPlain = {
       id: pg.id,
       createdAt: toDate(pg.created_at),
+      activeLineSessionId: pg.active_line_session_id,
     };
     return new LineAccount(plain);
   }
@@ -24,6 +25,7 @@ export class LineAccountMapper {
     return new LineAccount({
       id: plain.id,
       createdAt: plain.createdAt,
+      activeLineSessionId: plain.activeLineSessionId,
     });
   }
 
@@ -31,6 +33,7 @@ export class LineAccountMapper {
     return {
       id: lineAccount.id,
       created_at: toISO(lineAccount.createdAt),
+      active_line_session_id: lineAccount.activeLineSessionId,
     };
   }
 
@@ -38,6 +41,7 @@ export class LineAccountMapper {
     return {
       id: lineAccount.id,
       createdAt: lineAccount.createdAt,
+      activeLineSessionId: lineAccount.activeLineSessionId,
     };
   }
 

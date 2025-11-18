@@ -1,4 +1,4 @@
-import { generateOTP, uuidV7 } from '@shared/common/common.crypto';
+import { generateOTP } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
@@ -9,10 +9,10 @@ import type {
   UserOtpPlain,
   UserOtpUpdateData,
 } from './types/user-otp.domain.type';
+import { UserOtpMapper } from './user-otp.mapper';
 
 export class UserOtp extends DomainEntity<UserOtpPg> {
   readonly id: string;
-  readonly otp: string;
   readonly createdAt: Date;
   readonly userId: string;
   readonly expireAt: Date;
@@ -25,13 +25,12 @@ export class UserOtp extends DomainEntity<UserOtpPg> {
   static new(data: UserOtpNewData) {
     const now = myDayjs();
 
-    return {
-      id: uuidV7(),
-      otp: generateOTP(),
+    return UserOtpMapper.fromPlain({
+      id: generateOTP(),
       createdAt: now.toDate(),
       userId: data.userId,
-      expireAt: now.add(30, 'minutes').toDate(),
-    } as UserOtpPlain;
+      expireAt: now.add(10, 'minutes').toDate(),
+    });
   }
 
   static newBulk(data: UserOtpNewData[]) {
@@ -41,7 +40,6 @@ export class UserOtp extends DomainEntity<UserOtpPg> {
   edit(data: UserOtpUpdateData) {
     const plain: UserOtpPlain = {
       id: this.id,
-      otp: this.otp,
       createdAt: this.createdAt,
       userId: this.userId,
 

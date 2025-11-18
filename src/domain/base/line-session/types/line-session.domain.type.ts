@@ -12,9 +12,9 @@ export type LineSessionJson = Serialized<LineSessionPlain>;
 export type LineSessionNewData = {
   lineAccountId: string;
   projectId: string;
+  latestChatLogId?: string | null;
 };
 
 export type LineSessionUpdateData = {
-  lineAccountId?: string;
-  projectId?: string;
+  latestChatLogId?: string | null;
 };

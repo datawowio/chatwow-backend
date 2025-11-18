@@ -11,4 +11,10 @@ export type LineAccountJson = Serialized<LineAccountPlain>;
 
 export type LineAccountNewData = {
   id: string;
+  activeLineSessionId?: string | null;
+};
+
+export type LineAccountUpdateData = {
+  id: string;
+  activeLineSessionId?: string | null;
 };

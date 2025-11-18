@@ -14,7 +14,7 @@ export type UserNewData = {
   email: string;
   password?: string;
   role: UserRole;
-  userStatus: UserStatus;
+  userStatus?: UserStatus;
   lineAccountId?: string;
 };
 

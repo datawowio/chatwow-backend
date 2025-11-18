@@ -21,6 +21,12 @@ export async function up(db: Kysely<any>): Promise<void> {
     .asEnum(['ACTIVE', 'INACTIVE'])
     .execute();
 
+  await db.schema
+    //
+    .createType('chat_sender')
+    .asEnum(['USER', 'BOT'])
+    .execute();
+
   //
   // LINE_ACCOUNTS
   //
@@ -59,8 +65,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   //
   await db.schema
     .createTable('user_otps')
-    .addColumn('id', 'uuid', (col) => col.primaryKey())
-    .addColumn('otp', 'text', (col) => col.unique().notNull())
+    .addColumn('id', 'text', (col) => col.primaryKey())
     .addColumn('created_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
@@ -68,12 +73,6 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.references('users.id').notNull().onDelete('cascade'),
     )
     .addColumn('expire_at', 'timestamptz', (col) => col.notNull())
-    .execute();
-
-  await db.schema
-    .createIndex('user_otps_otp_idx')
-    .on('user_otps')
-    .column('otp')
     .execute();
 
   //
@@ -118,6 +117,28 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
     .addColumn('ai_summary_md', 'text', (col) => col.notNull().defaultTo(''))
+    .execute();
+
+  //
+  // PROJECTS CHAT
+  //
+  await db.schema
+    .createTable('project_chats')
+    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('chat_sender', sql`chat_sender`, (col) => col.notNull())
+    .addColumn('message', 'text', (col) => col.notNull())
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('parent_id', 'uuid', (col) =>
+      col.references('project_chats.id').onDelete('set null'),
+    )
+    .addColumn('user_id', 'uuid', (col) =>
+      col.notNull().references('users.id').onDelete('cascade'),
+    )
+    .addColumn('project_id', 'uuid', (col) =>
+      col.notNull().references('projects.id').onDelete('cascade'),
+    )
     .execute();
 
   //
@@ -220,15 +241,17 @@ export async function up(db: Kysely<any>): Promise<void> {
     )
     .execute();
 
+  // add active session
+  await db.schema
+    .alterTable('line_accounts')
+    .addColumn('active_line_session_id', 'uuid', (col) =>
+      col.references('line_sessions.id').onDelete('set null'),
+    )
+    .execute();
+
   //
   // CHAT LOGS
   //
-  await db.schema
-    //
-    .createType('chat_sender')
-    .asEnum(['USER', 'BOT'])
-    .execute();
-
   await db.schema
     .createTable('line_chat_logs')
     .addColumn('id', 'uuid', (col) => col.primaryKey())
@@ -239,6 +262,9 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.references('line_sessions.id').notNull().onDelete('cascade'),
     )
     .addColumn('chat_sender', sql`chat_sender`, (col) => col.notNull())
+    .addColumn('parent_id', 'uuid', (col) =>
+      col.references('line_chat_logs.id').onDelete('set null'),
+    )
     .addColumn('message', 'text', (col) => col.notNull())
     .execute();
 
@@ -246,6 +272,14 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createIndex('line_chat_logs_line_session_id_idx')
     .on('line_chat_logs')
     .column('line_session_id')
+    .execute();
+
+  // add last_chat_log_id for session
+  await db.schema
+    .alterTable('line_sessions')
+    .addColumn('latest_chat_log_id', 'uuid', (col) =>
+      col.references('line_chat_logs.id').onDelete('set null'),
+    )
     .execute();
 
   //
@@ -285,15 +319,30 @@ export async function up(db: Kysely<any>): Promise<void> {
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
+  // Drop indexes
   await db.schema.dropIndex('stored_files_ref_owner_idx').execute();
+  await db.schema.dropIndex('line_chat_logs_line_session_id_idx').execute();
+
+  // Drop tables (reverse order of creation)
+  await db.schema.dropTable('audit_logs').execute();
+  await db.schema.dropTable('line_chat_logs').execute();
+  await db.schema.dropTable('line_sessions').execute();
   await db.schema.dropTable('stored_files').execute();
   await db.schema.dropTable('project_documents').execute();
+  await db.schema.dropTable('user_manage_projects').execute();
   await db.schema.dropTable('user_group_projects').execute();
+  await db.schema.dropTable('project_chats').execute();
   await db.schema.dropTable('projects').execute();
   await db.schema.dropTable('user_group_users').execute();
   await db.schema.dropTable('user_groups').execute();
+  await db.schema.dropTable('user_otps').execute();
   await db.schema.dropTable('users').execute();
+  await db.schema.dropTable('line_accounts').execute();
 
+  // Drop enums/types (reverse order of creation)
+  await db.schema.dropType('action_type').execute();
+  await db.schema.dropType('actor_type').execute();
+  await db.schema.dropType('chat_sender').execute();
   await db.schema.dropType('document_status').execute();
   await db.schema.dropType('project_status').execute();
   await db.schema.dropType('user_status').execute();

@@ -24,6 +24,9 @@ export class UserFactory {
       role: isDefined(data.role) ? data.role : 'USER',
       userStatus: isDefined(data.userStatus) ? data.userStatus : 'ACTIVE',
       lineAccountId: isDefined(data.lineAccountId) ? data.lineAccountId : null,
+      lastSignedInAt: isDefined(data.lastSignedInAt)
+        ? data.lastSignedInAt
+        : null,
     });
   }
 

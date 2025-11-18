@@ -1,5 +1,5 @@
 import type { DBModel } from '@infra/db/db.common';
-import type { ProjectDocuments } from '@infra/db/db.d';
+import type { DocumentStatus, ProjectDocuments } from '@infra/db/db.d';
 
 import type { Plain, Serialized } from '@shared/common/common.type';
 
@@ -11,11 +11,13 @@ export type ProjectDocumentPlain = Plain<ProjectDocument>;
 export type ProjectDocumentJson = Serialized<ProjectDocumentPlain>;
 
 export type ProjectDocumentNewData = {
-  documentStatus: 'ACTIVE' | 'INACTIVE';
+  documentStatus: DocumentStatus;
+  projectId: string;
   aiSummaryMd?: string;
 };
 
 export type ProjectDocumentUpdateData = {
-  documentStatus?: 'ACTIVE' | 'INACTIVE';
+  documentStatus?: DocumentStatus;
   aiSummaryMd?: string;
+  projectId?: string;
 };

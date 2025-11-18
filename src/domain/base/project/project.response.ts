@@ -1,13 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { ProjectStatus } from '@infra/db/db';
+
+import { DATE_EXAMPLE, UUID_EXAMPLE } from '@shared/common/common.constant';
+
 export class ProjectResponse {
-  @ApiProperty({ example: '' })
+  @ApiProperty({ example: UUID_EXAMPLE })
   id: string;
 
-  @ApiProperty({ example: '' })
+  @ApiProperty({ example: DATE_EXAMPLE })
   createdAt: string;
 
-  @ApiProperty({ example: '' })
+  @ApiProperty({ example: DATE_EXAMPLE })
   updatedAt: string;
 
   @ApiProperty({ example: 'My Project' })
@@ -20,5 +24,8 @@ export class ProjectResponse {
   projectGuidelineMd: string;
 
   @ApiProperty({ example: 'ACTIVE' })
-  projectStatus: 'ACTIVE' | 'INACTIVE';
+  projectStatus: ProjectStatus;
+
+  @ApiProperty({ example: 'this is readme summary' })
+  aiSummaryMd: string;
 }

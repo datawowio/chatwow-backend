@@ -37,7 +37,7 @@ export class User extends DomainEntity<UserPg> {
       email: data.email,
       password: data.password ? hashString(data.password) : null,
       role: data.role,
-      userStatus: data.userStatus,
+      userStatus: isDefined(data.userStatus) ? data.userStatus : 'ACTIVE',
       lineAccountId: data.lineAccountId || null,
       lastSignedInAt: null,
     });

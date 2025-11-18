@@ -48,6 +48,7 @@ export interface AuditLogs {
 }
 
 export interface LineAccounts {
+  active_line_session_id: string | null;
   created_at: Generated<string>;
   id: string;
 }
@@ -58,14 +59,26 @@ export interface LineChatLogs {
   id: string;
   line_session_id: string;
   message: string;
+  parent_id: string | null;
 }
 
 export interface LineSessions {
   created_at: Generated<string>;
   id: string;
+  latest_chat_log_id: string | null;
   line_account_id: string;
   project_id: string;
   updated_at: Generated<string>;
+}
+
+export interface ProjectChats {
+  chat_sender: ChatSender;
+  created_at: Generated<string>;
+  id: string;
+  message: string;
+  parent_id: string | null;
+  project_id: string;
+  user_id: string;
 }
 
 export interface ProjectDocuments {
@@ -134,7 +147,6 @@ export interface UserOtps {
   created_at: Generated<string>;
   expire_at: string;
   id: string;
-  otp: string;
   user_id: string;
 }
 
@@ -155,6 +167,7 @@ export interface DB {
   line_accounts: LineAccounts;
   line_chat_logs: LineChatLogs;
   line_sessions: LineSessions;
+  project_chats: ProjectChats;
   project_documents: ProjectDocuments;
   projects: Projects;
   stored_files: StoredFiles;

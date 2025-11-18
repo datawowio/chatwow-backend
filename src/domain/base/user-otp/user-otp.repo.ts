@@ -45,20 +45,6 @@ export class UserOtpRepo extends BaseRepo {
     return userOtp;
   }
 
-  async findByOtp(otp: string): Promise<UserOtp | null> {
-    const userOtpPg = await this.readDb
-      .selectFrom('user_otps')
-      .selectAll()
-      .where('otp', '=', otp)
-      .executeTakeFirst();
-
-    if (!userOtpPg) {
-      return null;
-    }
-
-    return UserOtpMapper.fromPgWithState(userOtpPg);
-  }
-
   async delete(id: string): Promise<void> {
     await this.db
       //

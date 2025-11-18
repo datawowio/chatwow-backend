@@ -1,96 +1,101 @@
 import { toDate, toISO } from '@shared/common/common.transformer';
 
-import { LineChatLog } from './line-chat-log.domain';
-import type { LineChatLogResponse } from './line-chat-log.response';
+import { ProjectChat } from './project-chat.domain';
+import type { ProjectChatResponse } from './project-chat.response';
 import type {
-  LineChatLogJson,
-  LineChatLogPg,
-  LineChatLogPlain,
-} from './types/line-chat-log.domain.type';
+  ProjectChatJson,
+  ProjectChatPg,
+  ProjectChatPlain,
+} from './types/project-chat.domain.type';
 
-export class LineChatLogMapper {
-  static fromPg(pg: LineChatLogPg): LineChatLog {
-    const plain: LineChatLogPlain = {
+export class ProjectChatMapper {
+  static fromPg(pg: ProjectChatPg): ProjectChat {
+    const plain: ProjectChatPlain = {
       id: pg.id,
       parentId: pg.parent_id,
       message: pg.message,
       createdAt: toDate(pg.created_at),
-      lineSessionId: pg.line_session_id,
+      projectId: pg.project_id,
       chatSender: pg.chat_sender,
+      userId: pg.user_id,
     };
 
-    return new LineChatLog(plain);
+    return new ProjectChat(plain);
   }
 
-  static fromPgWithState(pg: LineChatLogPg): LineChatLog {
+  static fromPgWithState(pg: ProjectChatPg): ProjectChat {
     return this.fromPg(pg).setPgState(this.toPg);
   }
 
-  static fromPlain(plainData: LineChatLogPlain): LineChatLog {
-    const plain: LineChatLogPlain = {
+  static fromPlain(plainData: ProjectChatPlain): ProjectChat {
+    const plain: ProjectChatPlain = {
       id: plainData.id,
       parentId: plainData.parentId,
       message: plainData.message,
       createdAt: toDate(plainData.createdAt),
-      lineSessionId: plainData.lineSessionId,
+      projectId: plainData.projectId,
       chatSender: plainData.chatSender,
+      userId: plainData.userId,
     };
 
-    return new LineChatLog(plain);
+    return new ProjectChat(plain);
   }
 
-  static fromJson(json: LineChatLogJson): LineChatLog {
-    const plain: LineChatLogPlain = {
+  static fromJson(json: ProjectChatJson): ProjectChat {
+    const plain: ProjectChatPlain = {
       id: json.id,
       parentId: json.parentId,
       message: json.message,
       createdAt: toDate(json.createdAt),
-      lineSessionId: json.lineSessionId,
+      projectId: json.projectId,
       chatSender: json.chatSender,
+      userId: json.userId,
     };
 
-    return new LineChatLog(plain);
+    return new ProjectChat(plain);
   }
 
-  static toPg(domain: LineChatLog): LineChatLogPg {
+  static toPg(domain: ProjectChat): ProjectChatPg {
     return {
       id: domain.id,
       parent_id: domain.parentId,
       chat_sender: domain.chatSender,
       created_at: toISO(domain.createdAt),
-      line_session_id: domain.lineSessionId,
+      project_id: domain.projectId,
+      user_id: domain.userId,
       message: domain.message,
     };
   }
 
-  static toPlain(domain: LineChatLog): LineChatLogPlain {
+  static toPlain(domain: ProjectChat): ProjectChatPlain {
     return {
       id: domain.id,
       parentId: domain.parentId,
       message: domain.message,
       createdAt: domain.createdAt,
-      lineSessionId: domain.lineSessionId,
+      projectId: domain.projectId,
       chatSender: domain.chatSender,
+      userId: domain.userId,
     };
   }
 
-  static toJson(domain: LineChatLog): LineChatLogJson {
+  static toJson(domain: ProjectChat): ProjectChatJson {
     return {
       id: domain.id,
       parentId: domain.parentId,
       message: domain.message,
       createdAt: toISO(domain.createdAt),
-      lineSessionId: domain.lineSessionId,
+      projectId: domain.projectId,
       chatSender: domain.chatSender,
+      userId: domain.userId,
     };
   }
 
-  static toResponse(domain: LineChatLog): LineChatLogResponse {
+  static toResponse(domain: ProjectChat): ProjectChatResponse {
     return {
       id: domain.id,
       message: domain.message,
       createdAt: toISO(domain.createdAt),
-      lineSessionId: domain.lineSessionId,
       chatSender: domain.chatSender,
     };
   }

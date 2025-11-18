@@ -5,6 +5,7 @@ import { BaseRepo } from '@shared/common/common.repo';
 
 import { User } from './user.domain';
 import { UserMapper } from './user.mapper';
+import { usersTableFilter } from './user.util';
 
 @Injectable()
 export class UserRepo extends BaseRepo {
@@ -35,6 +36,7 @@ export class UserRepo extends BaseRepo {
       .selectFrom('users')
       .selectAll()
       .where('id', '=', id)
+      .where(usersTableFilter)
       .executeTakeFirst();
 
     if (!userPg) {

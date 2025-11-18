@@ -12,10 +12,6 @@ export class UserOtpService {
     return this.repo.findOne(id);
   }
 
-  async findByOtp(otp: string) {
-    return this.repo.findByOtp(otp);
-  }
-
   async save(userOtp: UserOtp) {
     this._validate(userOtp);
 

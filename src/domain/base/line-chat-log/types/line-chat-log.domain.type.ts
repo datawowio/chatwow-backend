@@ -14,4 +14,5 @@ export type LineChatLogNewData = {
   message: string;
   lineSessionId: string;
   chatSender: ChatSender;
+  parentId?: string;
 };

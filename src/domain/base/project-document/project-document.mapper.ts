@@ -9,6 +9,7 @@ export class ProjectDocumentMapper {
   static fromPg(pg: ProjectDocumentPg): ProjectDocument {
     const plain: ProjectDocumentPlain = {
       id: pg.id,
+      projectId: pg.project_id,
       documentStatus: pg.document_status,
       aiSummaryMd: pg.ai_summary_md,
     };
@@ -23,6 +24,7 @@ export class ProjectDocumentMapper {
   static fromPlain(plainData: ProjectDocumentPlain): ProjectDocument {
     const plain: ProjectDocumentPlain = {
       id: plainData.id,
+      projectId: plainData.projectId,
       documentStatus: plainData.documentStatus,
       aiSummaryMd: plainData.aiSummaryMd,
     };
@@ -33,6 +35,7 @@ export class ProjectDocumentMapper {
   static fromJson(json: ProjectDocumentJson): ProjectDocument {
     const plain: ProjectDocumentPlain = {
       id: json.id,
+      projectId: json.projectId,
       documentStatus: json.documentStatus,
       aiSummaryMd: json.aiSummaryMd,
     };
@@ -43,6 +46,7 @@ export class ProjectDocumentMapper {
   static toPg(projectDocument: ProjectDocument): ProjectDocumentPg {
     return {
       id: projectDocument.id,
+      project_id: projectDocument.projectId,
       document_status: projectDocument.documentStatus,
       ai_summary_md: projectDocument.aiSummaryMd,
     };
@@ -51,6 +55,7 @@ export class ProjectDocumentMapper {
   static toPlain(projectDocument: ProjectDocument): ProjectDocumentPlain {
     return {
       id: projectDocument.id,
+      projectId: projectDocument.projectId,
       documentStatus: projectDocument.documentStatus,
       aiSummaryMd: projectDocument.aiSummaryMd,
     };
@@ -59,6 +64,7 @@ export class ProjectDocumentMapper {
   static toJson(projectDocument: ProjectDocument): ProjectDocumentJson {
     return {
       id: projectDocument.id,
+      projectId: projectDocument.projectId,
       documentStatus: projectDocument.documentStatus,
       aiSummaryMd: projectDocument.aiSummaryMd,
     };

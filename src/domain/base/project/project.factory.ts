@@ -22,6 +22,7 @@ export class ProjectFactory {
       projectStatus: isDefined(data.projectStatus)
         ? data.projectStatus
         : 'ACTIVE',
+      aiSummaryMd: isDefined(data.aiSummaryMd) ? data.aiSummaryMd : '',
     });
   }
 

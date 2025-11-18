@@ -7,6 +7,6 @@ export class CronSetup extends BaseCronQueue {
   queueName = QUEUE.CRONS;
 
   async setupCron(): Promise<void> {
-    await this.addCron(CRON_JOBS.SAMPLE, '* * * * *');
+    await this.addCron(CRON_JOBS.SAMPLE, '0 0 * * *');
   }
 }

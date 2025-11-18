@@ -5,33 +5,35 @@ import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { LineChatLogMapper } from './line-chat-log.mapper';
+import { ProjectChatMapper } from './project-chat.mapper';
 import type {
-  LineChatLogNewData,
-  LineChatLogPg,
-  LineChatLogPlain,
-} from './types/line-chat-log.domain.type';
+  ProjectChatNewData,
+  ProjectChatPg,
+  ProjectChatPlain,
+} from './types/project-chat.domain.type';
 
-export class LineChatLog extends DomainEntity<LineChatLogPg> {
+export class ProjectChat extends DomainEntity<ProjectChatPg> {
   readonly id: string;
   readonly createdAt: Date;
   readonly chatSender: ChatSender;
+  readonly userId: string;
   readonly message: string;
-  readonly lineSessionId: string;
+  readonly projectId: string;
   readonly parentId: string | null;
 
-  constructor(plain: LineChatLogPlain) {
+  constructor(plain: ProjectChatPlain) {
     super();
     Object.assign(this, plain);
   }
 
-  static new(data: LineChatLogNewData): LineChatLog {
-    return LineChatLogMapper.fromPlain({
+  static new(data: ProjectChatNewData): ProjectChat {
+    return ProjectChatMapper.fromPlain({
       id: uuidV7(),
       createdAt: myDayjs().toDate(),
       chatSender: data.chatSender,
-      lineSessionId: data.lineSessionId,
+      projectId: data.projectId,
       message: data.message,
+      userId: data.userId,
       parentId: isDefined(data.parentId) ? data.parentId : null,
     });
   }

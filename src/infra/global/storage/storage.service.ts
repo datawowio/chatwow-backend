@@ -244,7 +244,7 @@ export class StorageService implements OnModuleInit {
 
   private async _ensureBucket(bucket: string): Promise<void> {
     if (!this.enable) {
-      throw new ApiException(500, 'storageDisable');
+      return;
     }
 
     try {

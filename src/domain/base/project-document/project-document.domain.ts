@@ -2,6 +2,7 @@ import { uuidV7 } from '@shared/common/common.crypto';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
+import { ProjectDocumentMapper } from './project-document.mapper';
 import type {
   ProjectDocumentNewData,
   ProjectDocumentPg,
@@ -13,6 +14,7 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
   readonly id: string;
   readonly documentStatus: 'ACTIVE' | 'INACTIVE';
   readonly aiSummaryMd: string;
+  readonly projectId: string;
 
   constructor(plain: ProjectDocumentPlain) {
     super();
@@ -20,11 +22,12 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
   }
 
   static new(data: ProjectDocumentNewData) {
-    return {
+    return ProjectDocumentMapper.fromPlain({
       id: uuidV7(),
+      projectId: data.projectId,
       documentStatus: data.documentStatus,
       aiSummaryMd: data.aiSummaryMd || '',
-    } as ProjectDocumentPlain;
+    });
   }
 
   static newBulk(data: ProjectDocumentNewData[]) {
@@ -40,6 +43,7 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
       aiSummaryMd: isDefined(data.aiSummaryMd)
         ? data.aiSummaryMd
         : this.aiSummaryMd,
+      projectId: isDefined(data.projectId) ? data.projectId : this.projectId,
     };
 
     Object.assign(this, plain);

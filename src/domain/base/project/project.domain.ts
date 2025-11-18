@@ -4,6 +4,7 @@ import { uuidV7 } from '@shared/common/common.crypto';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
+import { ProjectMapper } from './project.mapper';
 import type {
   ProjectNewData,
   ProjectPg,
@@ -19,7 +20,7 @@ export class Project extends DomainEntity<ProjectPg> {
   readonly projectDescription: string;
   readonly projectGuidelineMd: string;
   readonly projectStatus: ProjectStatus;
-  readonly currentProjectAiSummaryId: string | null;
+  readonly aiSummaryMd: string;
 
   constructor(plain: ProjectPlain) {
     super();
@@ -27,16 +28,16 @@ export class Project extends DomainEntity<ProjectPg> {
   }
 
   static new(data: ProjectNewData) {
-    return {
+    return ProjectMapper.fromPlain({
       id: uuidV7(),
       createdAt: new Date(),
       updatedAt: new Date(),
-      currentProjectAiSummaryId: data.currentProjectAiSummaryId || null,
       projectName: data.projectName,
       projectDescription: data.projectDescription || '',
       projectGuidelineMd: data.projectGuidelineMd || '',
       projectStatus: data.projectStatus,
-    } as ProjectPlain;
+      aiSummaryMd: isDefined(data.aiSummaryMd) ? data.aiSummaryMd : '',
+    });
   }
 
   static newBulk(data: ProjectNewData[]) {
@@ -49,9 +50,9 @@ export class Project extends DomainEntity<ProjectPg> {
       createdAt: this.createdAt,
       updatedAt: new Date(),
 
-      currentProjectAiSummaryId: isDefined(data.currentProjectAiSummaryId)
-        ? data.currentProjectAiSummaryId
-        : this.currentProjectAiSummaryId,
+      aiSummaryMd: isDefined(data.aiSummaryMd)
+        ? data.aiSummaryMd
+        : this.aiSummaryMd,
       projectName: isDefined(data.projectName)
         ? data.projectName
         : this.projectName,

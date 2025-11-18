@@ -48,6 +48,7 @@ Table "kysely_migration_lock" {
 Table "line_accounts" {
   "id" text [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "active_line_session_id" uuid
 }
 
 Table "users" {
@@ -63,15 +64,10 @@ Table "users" {
 }
 
 Table "user_otps" {
-  "id" uuid [pk, not null]
-  "otp" text [unique, not null]
+  "id" text [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "user_id" uuid [not null]
   "expire_at" timestamptz [not null]
-
-  Indexes {
-    otp [type: btree, name: "user_otps_otp_idx"]
-  }
 }
 
 Table "user_groups" {
@@ -95,6 +91,16 @@ Table "projects" {
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "ai_summary_md" text [not null, default: '']
+}
+
+Table "project_chats" {
+  "id" uuid [pk, not null]
+  "chat_sender" chat_sender [not null]
+  "message" text [not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "parent_id" uuid
+  "user_id" uuid [not null]
+  "project_id" uuid [not null]
 }
 
 Table "user_group_projects" {
@@ -146,6 +152,7 @@ Table "line_sessions" {
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "line_account_id" text [not null]
   "project_id" uuid [not null]
+  "latest_chat_log_id" uuid
 }
 
 Table "line_chat_logs" {
@@ -153,6 +160,7 @@ Table "line_chat_logs" {
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "line_session_id" uuid [not null]
   "chat_sender" chat_sender [not null]
+  "parent_id" uuid
   "message" text [not null]
 
   Indexes {
@@ -174,11 +182,23 @@ Table "audit_logs" {
 
 Ref "audit_logs_created_by_id_fkey":"users"."id" < "audit_logs"."created_by_id"
 
+Ref "line_accounts_active_line_session_id_fkey":"line_sessions"."id" < "line_accounts"."active_line_session_id" [delete: set null]
+
 Ref "line_chat_logs_line_session_id_fkey":"line_sessions"."id" < "line_chat_logs"."line_session_id" [delete: cascade]
+
+Ref "line_chat_logs_parent_id_fkey":"line_chat_logs"."id" < "line_chat_logs"."parent_id" [delete: set null]
+
+Ref "line_sessions_latest_chat_log_id_fkey":"line_chat_logs"."id" < "line_sessions"."latest_chat_log_id" [delete: set null]
 
 Ref "line_sessions_line_account_id_fkey":"line_accounts"."id" < "line_sessions"."line_account_id" [delete: cascade]
 
 Ref "line_sessions_project_id_fkey":"projects"."id" < "line_sessions"."project_id" [delete: cascade]
+
+Ref "project_chats_parent_id_fkey":"project_chats"."id" < "project_chats"."parent_id" [delete: set null]
+
+Ref "project_chats_project_id_fkey":"projects"."id" < "project_chats"."project_id" [delete: cascade]
+
+Ref "project_chats_user_id_fkey":"users"."id" < "project_chats"."user_id" [delete: cascade]
 
 Ref "project_documents_project_id_fkey":"projects"."id" < "project_documents"."project_id" [delete: cascade]
 
