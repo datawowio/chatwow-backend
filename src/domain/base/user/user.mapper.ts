@@ -142,4 +142,19 @@ export class UserMapper {
       lineAccountId: domain.lineAccountId,
     };
   }
+
+  static pgToResponse(pg: UserPg): UserResponse {
+    return {
+      id: pg.id,
+      createdAt: toResponseDate(pg.created_at),
+      updatedAt: toResponseDate(pg.updated_at),
+      lastSignedInAt: toResponseDate(pg.last_signed_in_at),
+      firstName: pg.first_name,
+      lastName: pg.last_name,
+      email: pg.email,
+      role: pg.role,
+      userStatus: pg.user_status,
+      lineAccountId: pg.line_account_id,
+    };
+  }
 }

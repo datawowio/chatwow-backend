@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
+import qs from 'qs';
 
 import { config } from '@infra/config';
 import { KYSELY, runMigrations } from '@infra/db/db.common';
@@ -13,10 +14,16 @@ const appConfig = config().app;
 const dbConfig = config().database;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppApiModule, new FastifyAdapter(), {
-    logger: coreLogger(appConfig),
-    cors: { origin: ['http://localhost:8081'] },
-  });
+  const app = await NestFactory.create(
+    AppApiModule,
+    new FastifyAdapter({
+      querystringParser: (str) => qs.parse(str),
+    }),
+    {
+      logger: coreLogger(appConfig),
+      cors: { origin: ['http://localhost:8081'] },
+    },
+  );
 
   setupApp(app);
 

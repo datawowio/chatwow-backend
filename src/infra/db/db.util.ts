@@ -1,6 +1,10 @@
 import type { SelectQueryBuilder, StringReference } from 'kysely';
 import { sql } from 'kysely';
 
+import {
+  type PaginationQuery,
+  getQueryPagination,
+} from '@shared/common/common.pagintaion';
 import type { ParsedSort } from '@shared/common/common.type';
 
 import type { DB } from './db';
@@ -58,4 +62,15 @@ export function sortQb<DB, TB extends keyof DB & string, T extends string>(
     q = q.orderBy(col, dir);
   }
   return q;
+}
+
+export function addPagination<DB, TB extends keyof DB & string, U>(
+  qb: SelectQueryBuilder<DB, TB, U>,
+  pagination: PaginationQuery | undefined,
+) {
+  const { limit, offset } = getQueryPagination(pagination);
+
+  return qb
+    .$if(!!limit, (q) => q.limit(limit!))
+    .$if(!!offset, (q) => q.offset(offset!));
 }

@@ -1,5 +1,5 @@
 import { createZodDto } from 'nestjs-zod';
-import type { ZodArray, ZodError } from 'zod';
+import type { ZodError } from 'zod';
 import { z } from 'zod';
 
 import { setNestedKey } from '../common/common.func';
@@ -8,37 +8,12 @@ import type { ParsedSort, SortDir } from '../common/common.type';
 
 export const zodDto = createZodDto;
 
-export function zodResponse(
-  data: z.AnyZodObject | ZodArray<z.AnyZodObject>,
-  meta?: z.AnyZodObject,
-) {
-  const res = {
-    success: z.boolean(),
-    key: z.string(),
-    data,
-    meta: z.object({}).optional(),
-  };
-
-  if (meta) {
-    res.meta = meta as any;
-  }
-
-  const standard = z.object(res);
-
-  return zodDto(standard);
-}
-
-export function getPerPageZod() {
-  return z.string().optional().transform(toOptionalNumber);
-}
-export function getPaginationZod() {
-  return z
-    .object({
-      page: z.string().optional().transform(toOptionalNumber),
-      perPage: getPerPageZod(),
-    })
-    .optional();
-}
+export const paginationZod = z
+  .object({
+    page: z.string().optional().transform(toOptionalNumber),
+    perPage: z.string().optional().transform(toOptionalNumber),
+  })
+  .optional();
 
 export function getZodErrorFields(zodErr: ZodError) {
   const fields = {};

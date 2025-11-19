@@ -2,6 +2,7 @@ import { AuditLogModule } from './base/audit-log/audit-log.module';
 import { LineAccountModule } from './base/line-account/line-account.module';
 import { LineChatLogModule } from './base/line-chat-log/line-chat-log.module';
 import { LineSessionModule } from './base/line-session/line-chat-log.module';
+import { ProjectChatModule } from './base/project-chat/project-chat.module';
 import { ProjectDocumentModule } from './base/project-document/project-document.module';
 import { ProjectModule } from './base/project/project.module';
 import { StoredFileModule } from './base/stored-file/stored-file.module';
@@ -28,6 +29,7 @@ export const DOMAIN_PROVIDER = [
   UserGroupUserModule,
   UserManageProjectModule,
   UserOtpModule,
+  ProjectChatModule,
 
   QueueModule,
 ];

@@ -1,5 +1,5 @@
 import myDayjs from '@shared/common/common.dayjs';
-import { toDate } from '@shared/common/common.transformer';
+import { toDate, toResponseDate } from '@shared/common/common.transformer';
 
 import { Project } from './project.domain';
 import type { ProjectResponse } from './project.response';
@@ -101,13 +101,26 @@ export class ProjectMapper {
   static toResponse(project: Project): ProjectResponse {
     return {
       id: project.id,
-      createdAt: project.createdAt.toISOString(),
-      updatedAt: project.updatedAt.toISOString(),
+      createdAt: toResponseDate(project.createdAt),
+      updatedAt: toResponseDate(project.updatedAt),
       projectName: project.projectName,
       projectDescription: project.projectDescription,
       projectGuidelineMd: project.projectGuidelineMd,
       projectStatus: project.projectStatus,
       aiSummaryMd: project.aiSummaryMd,
+    };
+  }
+
+  static pgToResponse(pg: ProjectPg): ProjectResponse {
+    return {
+      id: pg.id,
+      createdAt: toResponseDate(pg.created_at),
+      updatedAt: toResponseDate(pg.updated_at),
+      projectName: pg.project_name,
+      projectDescription: pg.project_description,
+      projectGuidelineMd: pg.project_guideline_md,
+      projectStatus: pg.project_status,
+      aiSummaryMd: pg.ai_summary_md,
     };
   }
 }

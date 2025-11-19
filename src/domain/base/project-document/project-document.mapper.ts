@@ -77,4 +77,12 @@ export class ProjectDocumentMapper {
       aiSummaryMd: projectDocument.aiSummaryMd,
     };
   }
+
+  static pgToResponse(pg: ProjectDocumentPg) {
+    return {
+      id: pg.id,
+      documentStatus: pg.document_status,
+      aiSummaryMd: pg.ai_summary_md,
+    };
+  }
 }

@@ -1,5 +1,5 @@
 import type duration from 'dayjs/plugin/duration';
-import type { ReadonlyDeep } from 'type-fest';
+import type { ReadonlyDeep, ReadonlyTuple, UnionToTuple } from 'type-fest';
 
 export type Read<T> = ReadonlyDeep<T>;
 
@@ -64,7 +64,7 @@ export type IDomainData = {
   relations?: Record<string, any>;
 };
 
-export type UnionArray<
-  TUnion,
-  TTuple extends readonly TUnion[],
-> = TUnion extends TTuple[number] ? TTuple : never;
+export type UnionArray<T extends string> = ReadonlyTuple<
+  T,
+  UnionToTuple<T>['length'] & number
+>;

@@ -71,4 +71,12 @@ export class UserGroupMapper {
       description: userGroup.description,
     };
   }
+
+  static pgToResponse(pg: UserGroupPg) {
+    return {
+      id: pg.id,
+      groupName: pg.group_name,
+      description: pg.description,
+    };
+  }
 }
