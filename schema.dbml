@@ -118,9 +118,9 @@ Table "user_group_projects" {
 }
 
 Table "user_manage_projects" {
-  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "project_id" uuid [not null]
   "user_id" uuid [not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
 
   Indexes {
     (project_id, user_id) [type: btree, name: "pk_user_manage_projects"]
@@ -130,6 +130,7 @@ Table "user_manage_projects" {
 Table "project_documents" {
   "id" uuid [pk, not null]
   "project_id" uuid [not null]
+  "document_details" text [not null, default: '']
   "document_status" document_status [not null]
   "ai_summary_md" text [not null, default: '']
 }

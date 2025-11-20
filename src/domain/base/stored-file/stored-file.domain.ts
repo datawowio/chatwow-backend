@@ -53,6 +53,7 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
       keyPath: getStoredFileKey({
         id: data.id,
         ownerTable: data.ownerTable,
+        isPublic: data.isPublic || false,
       }),
       presignUrl: null,
       mimeType: null,

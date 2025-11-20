@@ -14,10 +14,12 @@ export type ProjectDocumentNewData = {
   documentStatus: DocumentStatus;
   projectId: string;
   aiSummaryMd?: string;
+  documentDetails?: string;
 };
 
 export type ProjectDocumentUpdateData = {
   documentStatus?: DocumentStatus;
   aiSummaryMd?: string;
   projectId?: string;
+  documentDetails?: string;
 };

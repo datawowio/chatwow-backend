@@ -13,6 +13,7 @@ import type {
 export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
   readonly id: string;
   readonly documentStatus: 'ACTIVE' | 'INACTIVE';
+  readonly documentDetails: string;
   readonly aiSummaryMd: string;
   readonly projectId: string;
 
@@ -25,6 +26,7 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
     return ProjectDocumentMapper.fromPlain({
       id: uuidV7(),
       projectId: data.projectId,
+      documentDetails: data.documentDetails || '',
       documentStatus: data.documentStatus,
       aiSummaryMd: data.aiSummaryMd || '',
     });
@@ -37,6 +39,9 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
   edit(data: ProjectDocumentUpdateData) {
     const plain: ProjectDocumentPlain = {
       id: this.id,
+      documentDetails: isDefined(data.documentDetails)
+        ? data.documentDetails
+        : this.documentDetails,
       documentStatus: isDefined(data.documentStatus)
         ? data.documentStatus
         : this.documentStatus,

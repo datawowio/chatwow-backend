@@ -12,6 +12,10 @@ export class UserGroupUserRepo extends BaseRepo {
       .where('user_group_users.user_id', '=', userId)
       .execute();
 
+    if (!userGroupIds.length) {
+      return;
+    }
+
     const insertData = userGroupIds.map((userGroupId) =>
       UserGroupUserMapper.toPg({
         userGroupId,
@@ -30,6 +34,10 @@ export class UserGroupUserRepo extends BaseRepo {
       .deleteFrom('user_group_users')
       .where('user_group_users.user_group_id', '=', userGroupId)
       .execute();
+
+    if (!userIds.length) {
+      return;
+    }
 
     const insertData = userIds.map((userId) =>
       UserGroupUserMapper.toPg({

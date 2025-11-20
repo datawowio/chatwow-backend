@@ -7,6 +7,9 @@ export class ProjectDocumentResponse {
   @ApiProperty({ example: 'ACTIVE' })
   documentStatus: 'ACTIVE' | 'INACTIVE';
 
+  @ApiProperty({ example: 'Detailed description of the document.' })
+  documentDetails: string;
+
   @ApiProperty({ example: '# Summary' })
   aiSummaryMd: string;
 }

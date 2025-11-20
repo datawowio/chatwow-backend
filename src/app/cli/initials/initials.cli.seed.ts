@@ -86,11 +86,13 @@ export class InitialsCliSeed extends CommandRunner {
       projectId: projectA.id,
       documentStatus: 'ACTIVE',
       aiSummaryMd: 'this is summary for docA',
+      documentDetails: 'This is the details of document A',
     });
     const projectDocumentB = ProjectDocument.new({
       projectId: projectA.id,
       documentStatus: 'ACTIVE',
       aiSummaryMd: 'this is summary for doc B',
+      documentDetails: 'This is the details of document B',
     });
 
     // save db

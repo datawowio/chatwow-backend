@@ -25,7 +25,7 @@ function repl() {
 }
 
 function cli() {
-  NODE_ENV=cli node -r tsconfig-paths/register -r @swc-node/register ./src/cli.ts $@
+  NODE_ENV=cli ts-node -r tsconfig-paths/register ./src/cli.ts $@
 }
 
 function db:type() {

@@ -25,9 +25,11 @@ import { CreateProjectDto, CreateProjectResponse } from './create-project.dto';
 
 type Entity = {
   project: Project;
-  storedFiles: StoredFile[];
   userGroups: UserGroup[];
-  projectDocuments: ProjectDocument[];
+  projectDocumentsFiles: {
+    storedFile: StoredFile;
+    projectDocument: ProjectDocument;
+  }[];
 };
 
 @Injectable()
@@ -51,28 +53,30 @@ export class CreateProjectCommand implements CommandInterface {
     });
     const userGroups = await this.getUserGroups(body.userGroupIds);
 
-    const projectDocuments: ProjectDocument[] = [];
-    const storedFiles: StoredFile[] = [];
-    for (const sf of body.storedFiles) {
+    const projectDocumentsFiles: Entity['projectDocumentsFiles'] = [];
+
+    for (const pd of body.projectDocuments) {
       const projectDocument = ProjectDocument.new({
         projectId: project.id,
         documentStatus: 'ACTIVE',
+        documentDetails: pd.documentDetails,
       });
-      projectDocuments.push(projectDocument);
-
       const storedFile = StoredFile.new({
-        ...sf,
+        ...pd.storedFile,
         ownerTable: STORED_FILE_OWNER_TABLE.PROJECT_DOCUMENT,
         ownerId: projectDocument.id,
       });
-      storedFiles.push(storedFile);
+
+      projectDocumentsFiles.push({
+        projectDocument,
+        storedFile,
+      });
     }
 
     await this.save({
       project,
-      storedFiles,
       userGroups,
-      projectDocuments,
+      projectDocumentsFiles,
     });
 
     return {
@@ -85,12 +89,12 @@ export class CreateProjectCommand implements CommandInterface {
             userGroups: userGroups.map((g) => ({
               attributes: UserGroupMapper.toResponse(g),
             })),
-            projectDocuments: projectDocuments.map((pd) => ({
-              attributes: ProjectDocumentMapper.toResponse(pd),
+            projectDocuments: projectDocumentsFiles.map((pd) => ({
+              attributes: ProjectDocumentMapper.toResponse(pd.projectDocument),
               relations: {
-                storedFiles: storedFiles.map((sf) => ({
-                  attributes: StoredFileMapper.toResponse(sf),
-                })),
+                storedFile: {
+                  attributes: StoredFileMapper.toResponse(pd.storedFile),
+                },
               },
             })),
           },
@@ -111,8 +115,12 @@ export class CreateProjectCommand implements CommandInterface {
         );
       }
 
-      await this.projectDocumentService.saveBulk(entity.projectDocuments);
-      await this.storedFileService.saveBulk(entity.storedFiles);
+      await this.projectDocumentService.saveBulk(
+        entity.projectDocumentsFiles.map((pdf) => pdf.projectDocument),
+      );
+      await this.storedFileService.saveBulk(
+        entity.projectDocumentsFiles.map((pdf) => pdf.storedFile),
+      );
     });
   }
 

@@ -13,6 +13,10 @@ export class UserManageProjectRepo extends BaseRepo {
       .where('user_manage_projects.user_id', '=', userId)
       .execute();
 
+    if (!projectIds.length) {
+      return;
+    }
+
     const insertData = projectIds.map((projectId) =>
       UserManageProjectMapper.toPg({
         createdAt: myDayjs().toDate(),
@@ -31,6 +35,10 @@ export class UserManageProjectRepo extends BaseRepo {
       .deleteFrom('user_manage_projects')
       .where('user_manage_projects.project_id', '=', projectId)
       .execute();
+
+    if (!userIds.length) {
+      return;
+    }
 
     const insertData = userIds.map((userId) =>
       UserManageProjectMapper.toPg({

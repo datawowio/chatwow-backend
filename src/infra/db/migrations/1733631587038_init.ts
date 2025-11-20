@@ -192,6 +192,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('project_id', 'uuid', (col) =>
       col.notNull().references('projects.id').onDelete('cascade'),
     )
+    .addColumn('document_details', 'text', (col) => col.notNull().defaultTo(''))
     .addColumn('document_status', sql`document_status`, (col) => col.notNull())
     .addColumn('ai_summary_md', 'text', (col) => col.notNull().defaultTo(''))
     .execute();
@@ -227,9 +228,9 @@ export async function up(db: Kysely<any>): Promise<void> {
   // STORED FILES INDEXES
   //
   await db.schema
-    .createIndex('stored_files_ref_owner_idx')
+    .createIndex('stored_files_owner_id_idx')
     .on('stored_files')
-    .columns(['owner_table', 'owner_id'])
+    .column('owner_id')
     .execute();
 
   //

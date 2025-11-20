@@ -1,4 +1,5 @@
 import { ProjectDocument } from './project-document.domain';
+import type { ProjectDocumentResponse } from './project-document.response';
 import type {
   ProjectDocumentJson,
   ProjectDocumentPg,
@@ -11,6 +12,7 @@ export class ProjectDocumentMapper {
       id: pg.id,
       projectId: pg.project_id,
       documentStatus: pg.document_status,
+      documentDetails: pg.document_details,
       aiSummaryMd: pg.ai_summary_md,
     };
 
@@ -25,6 +27,7 @@ export class ProjectDocumentMapper {
     const plain: ProjectDocumentPlain = {
       id: plainData.id,
       projectId: plainData.projectId,
+      documentDetails: plainData.documentDetails,
       documentStatus: plainData.documentStatus,
       aiSummaryMd: plainData.aiSummaryMd,
     };
@@ -37,6 +40,7 @@ export class ProjectDocumentMapper {
       id: json.id,
       projectId: json.projectId,
       documentStatus: json.documentStatus,
+      documentDetails: json.documentDetails,
       aiSummaryMd: json.aiSummaryMd,
     };
 
@@ -49,6 +53,7 @@ export class ProjectDocumentMapper {
       project_id: projectDocument.projectId,
       document_status: projectDocument.documentStatus,
       ai_summary_md: projectDocument.aiSummaryMd,
+      document_details: projectDocument.documentDetails,
     };
   }
 
@@ -58,6 +63,7 @@ export class ProjectDocumentMapper {
       projectId: projectDocument.projectId,
       documentStatus: projectDocument.documentStatus,
       aiSummaryMd: projectDocument.aiSummaryMd,
+      documentDetails: projectDocument.documentDetails,
     };
   }
 
@@ -67,21 +73,24 @@ export class ProjectDocumentMapper {
       projectId: projectDocument.projectId,
       documentStatus: projectDocument.documentStatus,
       aiSummaryMd: projectDocument.aiSummaryMd,
+      documentDetails: projectDocument.documentDetails,
     };
   }
 
-  static toResponse(projectDocument: ProjectDocument) {
+  static toResponse(projectDocument: ProjectDocument): ProjectDocumentResponse {
     return {
       id: projectDocument.id,
       documentStatus: projectDocument.documentStatus,
+      documentDetails: projectDocument.documentDetails,
       aiSummaryMd: projectDocument.aiSummaryMd,
     };
   }
 
-  static pgToResponse(pg: ProjectDocumentPg) {
+  static pgToResponse(pg: ProjectDocumentPg): ProjectDocumentResponse {
     return {
       id: pg.id,
       documentStatus: pg.document_status,
+      documentDetails: pg.document_details,
       aiSummaryMd: pg.ai_summary_md,
     };
   }

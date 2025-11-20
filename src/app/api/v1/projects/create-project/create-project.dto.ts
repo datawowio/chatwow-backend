@@ -17,7 +17,12 @@ const zod = z.object({
     projectName: z.string(),
     projectDescription: z.string(),
   }),
-  storedFiles: z.array(createStoredFileZod),
+  projectDocuments: z.array(
+    z.object({
+      documentDetails: z.string(),
+      storedFile: createStoredFileZod,
+    }),
+  ),
   userGroupIds: z.array(z.string()),
 });
 
@@ -40,7 +45,7 @@ class CreateProjectProjectProjectDocumentRelations {
     type: () => CreateProjectProjectDocumentStoredFiles,
     isArray: true,
   })
-  storedFiles?: CreateProjectProjectDocumentStoredFiles[];
+  storedFile?: CreateProjectProjectDocumentStoredFiles;
 }
 
 class CreateProjectProjectProjectDocument implements IDomainData {

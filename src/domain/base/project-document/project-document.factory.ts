@@ -13,6 +13,9 @@ export class ProjectDocumentFactory {
       documentStatus: isDefined(data.documentStatus)
         ? data.documentStatus
         : 'ACTIVE',
+      documentDetails: isDefined(data.documentDetails)
+        ? data.documentDetails
+        : '',
       projectId: data.projectId,
       aiSummaryMd: isDefined(data.aiSummaryMd) ? data.aiSummaryMd : '',
     });
