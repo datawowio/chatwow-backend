@@ -133,6 +133,11 @@ export class UserRepo extends BaseRepo {
       .$if(isDefined(filter?.email), (q) =>
         q.where('users.email', '=', filter!.email!),
       )
+      .$if(!!filter?.userGroupIds?.length, (q) =>
+        q
+          .innerJoin('user_group_users', 'user_group_users.user_id', 'users.id')
+          .where('user_group_users.user_group_id', 'in', filter!.userGroupIds!),
+      )
       .$if(isDefined(filter?.search), (q) => {
         const search = `%${filter!.search!}%`;
 

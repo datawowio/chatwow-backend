@@ -1,6 +1,7 @@
 import z from 'zod';
 
 import type { PaginationQuery } from '@shared/common/common.pagintaion';
+import { parmUuidsZod } from '@shared/common/common.zod';
 import { getSortZod } from '@shared/zod/zod.util';
 
 import { USER_ROLE, USER_STATUS } from './user.constant';
@@ -12,6 +13,7 @@ export const userFilterZod = z
     email: z.string().optional(),
     role: z.enum(USER_ROLE).optional(),
     userStatus: z.enum(USER_STATUS).optional(),
+    userGroupIds: parmUuidsZod.optional(),
     search: z.string().optional(),
   })
   .optional();

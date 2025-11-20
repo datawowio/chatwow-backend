@@ -5,9 +5,7 @@ import { userGroupsTableFilter } from '@domain/base/user-group/user-group.utils'
 import { User } from '@domain/base/user/user.domain';
 import { UserMapper } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
-import { usersTableFilter } from '@domain/base/user/user.util';
 import { Inject, Injectable } from '@nestjs/common';
-import { jsonArrayFrom } from 'kysely/helpers/postgres';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
 import { TransactionService } from '@infra/global/transaction/transaction.service';
@@ -41,8 +39,7 @@ export class EditUserCommand implements CommandInterface {
     }
 
     if (body.userGroupIds) {
-      const userGroupSet = new Set(body.userGroupIds);
-      entity.userGroups.filter((ug) => userGroupSet.has(ug.id));
+      entity.userGroups = await this.getUserGroups(body.userGroupIds);
     }
 
     await this.save(entity);
@@ -75,34 +72,33 @@ export class EditUserCommand implements CommandInterface {
   }
 
   async find(id: string): Promise<Entity> {
-    const user = await this.readDb
-      .selectFrom('users')
-      .selectAll()
-      .select((q) => [
-        jsonArrayFrom(
-          q
-            .selectFrom('user_group_users')
-            .innerJoin(
-              'user_groups',
-              'user_groups.id',
-              'user_group_users.user_group_id',
-            )
-            .selectAll('user_groups')
-            .where(userGroupsTableFilter)
-            .whereRef('user_group_users.user_id', '=', 'users.id'),
-        ).as('userGroups'),
-      ])
-      .where('id', '=', id)
-      .where(usersTableFilter)
-      .executeTakeFirst();
-
+    const user = await this.userService.findOne(id);
     if (!user) {
       throw new ApiException(404, 'userNotFound');
     }
 
     return {
-      user: UserMapper.fromPgWithState(user),
-      userGroups: user.userGroups.map((ug) => UserGroupMapper.fromPg(ug)),
+      user,
+      userGroups: [],
     };
+  }
+
+  async getUserGroups(ids: string[]): Promise<UserGroup[]> {
+    if (!ids.length) {
+      return [];
+    }
+
+    const rawGroups = await this.readDb
+      .selectFrom('user_groups')
+      .selectAll()
+      .where('id', 'in', ids)
+      .where(userGroupsTableFilter)
+      .execute();
+
+    if (rawGroups.length !== ids.length) {
+      throw new ApiException(400, 'invalidGroupId');
+    }
+
+    return rawGroups.map((g) => UserGroupMapper.fromPgWithState(g));
   }
 }

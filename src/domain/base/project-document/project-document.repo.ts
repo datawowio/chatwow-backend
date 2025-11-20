@@ -107,6 +107,11 @@ export class ProjectDocumentRepo extends BaseRepo {
           .innerJoin('projects', 'projects.id', 'project_documents.project_id')
           .where('projects.project_name', '=', filter!.projectName!),
       )
+      .$if(!!filter?.projectIds?.length, (qb) =>
+        qb
+          .innerJoin('projects', 'projects.id', 'project_documents.project_id')
+          .where('projects.id', 'in', filter!.projectIds!),
+      )
       .$if(isDefined(filter?.search), (qb) => {
         const search = `%${filter!.search!}%`;
 

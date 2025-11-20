@@ -60,8 +60,12 @@ export function toResponseDate(date: Date | string | null): string | null {
   return myDayjs(date).toISOString();
 }
 
-export function toSplitCommaArray(v: string) {
-  return v.split(',');
+export function toSplitCommaArray(v?: string) {
+  if (!v) {
+    return [];
+  }
+
+  return v.split(',').filter((v) => !!v);
 }
 
 export function toSplitCommaArrayOrThrow(v: unknown) {

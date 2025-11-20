@@ -1,7 +1,10 @@
 import Big from 'big.js';
 import { isNullish } from 'remeda';
+import { validate as UuidValidate } from 'uuid';
 
 import type { Nilable } from './common.type';
+
+export const isUuid = UuidValidate;
 
 export function isUndefined(value: unknown): value is undefined {
   return value === undefined;

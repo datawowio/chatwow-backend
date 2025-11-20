@@ -1,6 +1,7 @@
 import z from 'zod';
 
 import type { PaginationQuery } from '@shared/common/common.pagintaion';
+import { parmUuidsZod } from '@shared/common/common.zod';
 import { getSortZod } from '@shared/zod/zod.util';
 
 import { PROJECT_DOCUMENT_STATUS } from './project-document.constant';
@@ -11,6 +12,7 @@ export const projectDocumentFilterZod = z.object({
   documentStatus: z.enum(PROJECT_DOCUMENT_STATUS).optional(),
   projectName: z.string().optional(),
   search: z.string().optional(),
+  projectIds: parmUuidsZod.optional(),
 });
 export const projectDocumentSortZod = getSortZod([
   'id',
