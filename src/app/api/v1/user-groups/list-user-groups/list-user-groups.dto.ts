@@ -23,6 +23,7 @@ const zod = z.object({
   includes: userGroupsV1IncludesZod,
   sort: userGroupSortZod,
   filter: userGroupFilterZod,
+  countFilter: userGroupFilterZod,
   pagination: paginationZod,
 });
 

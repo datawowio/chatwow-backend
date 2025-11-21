@@ -25,6 +25,7 @@ const zod = z.object({
   includes: projectsV1IncludesZod,
   sort: projectSortZod,
   filter: projectFilterZod,
+  countFilter: projectFilterZod,
   pagination: paginationZod,
 });
 

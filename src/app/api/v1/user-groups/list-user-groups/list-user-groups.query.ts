@@ -74,7 +74,9 @@ export class ListUserGroupsQuery implements QueryInterface {
       .$call((q) => filterQbIds(ids, q, 'user_groups.id'))
       .execute();
 
-    const totalCount = await this.userGroupsService.getCount(query);
+    const totalCount = await this.userGroupsService.getCount({
+      filter: query.countFilter,
+    });
 
     return {
       result,

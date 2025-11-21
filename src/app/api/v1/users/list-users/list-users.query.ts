@@ -76,7 +76,9 @@ export class ListUsersQuery implements QueryInterface {
       .$call((q) => filterQbIds(ids, q, 'users.id'))
       .execute();
 
-    const totalCount = await this.userService.getCount(query);
+    const totalCount = await this.userService.getCount({
+      filter: query.countFilter,
+    });
 
     return {
       result,

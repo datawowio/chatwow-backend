@@ -79,7 +79,9 @@ export class ListProjectDocumentsQuery implements QueryInterface {
       .$call((q) => filterQbIds(ids, q, 'project_documents.id'))
       .execute();
 
-    const totalCount = await this.projectsDocumentService.getCount(query);
+    const totalCount = await this.projectsDocumentService.getCount({
+      filter: query.countFilter,
+    });
 
     return {
       result,

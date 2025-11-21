@@ -23,6 +23,7 @@ const zod = z.object({
   includes: projectDocumentsV1IncludesZod,
   sort: projectDocumentSortZod,
   filter: projectDocumentFilterZod,
+  countFilter: projectDocumentFilterZod,
   pagination: paginationZod,
 });
 
