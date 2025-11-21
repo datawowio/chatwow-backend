@@ -44,6 +44,16 @@ export class ListUsersDataUsersRelationsLineAccounts implements IDomainData {
   attributes: LineAccountResponse;
 }
 
+export class ListUsersDataUsersRelationsCreatedBy implements IDomainData {
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
+export class ListUsersDataUsersRelationsUpdatedBy implements IDomainData {
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
 export class ListUsersDataUsersRelations {
   @ApiProperty({
     type: () => ListUsersDataUsersRelationsManageProjects,
@@ -61,6 +71,16 @@ export class ListUsersDataUsersRelations {
     type: () => ListUsersDataUsersRelationsLineAccounts,
   })
   lineAccount?: ListUsersDataUsersRelationsLineAccounts;
+
+  @ApiProperty({
+    type: () => ListUsersDataUsersRelationsCreatedBy,
+  })
+  createdBy?: ListUsersDataUsersRelationsCreatedBy;
+
+  @ApiProperty({
+    type: () => ListUsersDataUsersRelationsUpdatedBy,
+  })
+  updatedBy?: ListUsersDataUsersRelationsUpdatedBy;
 }
 
 export class ListUsersDataUser implements IDomainData {

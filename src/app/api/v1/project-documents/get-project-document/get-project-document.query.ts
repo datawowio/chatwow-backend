@@ -2,6 +2,7 @@ import { ProjectDocumentMapper } from '@domain/base/project-document/project-doc
 import { projectDocumentsTableFilter } from '@domain/base/project-document/project-document.util';
 import { ProjectMapper } from '@domain/base/project/project.mapper';
 import { StoredFileMapper } from '@domain/base/stored-file/stored-file.mapper';
+import { UserMapper } from '@domain/base/user/user.mapper';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
@@ -46,6 +47,20 @@ export class GetProjectDocumentQuery implements QueryInterface {
               ? {
                   attributes: ProjectMapper.pgToResponse(
                     projectDocument.project,
+                  ),
+                }
+              : undefined,
+            createdBy: projectDocument.createdBy
+              ? {
+                  attributes: UserMapper.pgToResponse(
+                    projectDocument.createdBy,
+                  ),
+                }
+              : undefined,
+            updatedBy: projectDocument.updatedBy
+              ? {
+                  attributes: UserMapper.pgToResponse(
+                    projectDocument.updatedBy,
                   ),
                 }
               : undefined,

@@ -1,6 +1,7 @@
 import { lineAccountsTableFilter } from '@domain/base/line-account/line-account.util';
 import { projectsTableFilter } from '@domain/base/project/project.util';
 import { userGroupsTableFilter } from '@domain/base/user-group/user-group.utils';
+import { usersTableFilter } from '@domain/base/user/user.util';
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 import type z from 'zod';
 
@@ -12,6 +13,8 @@ export const usersV1IncludesZod = getIncludesZod([
   'manageProjects',
   'userGroups',
   'lineAccount',
+  'createdBy',
+  'updatedBy',
 ]);
 
 export function usersV1InclusionQb(
@@ -60,6 +63,28 @@ export function usersV1InclusionQb(
             .where(lineAccountsTableFilter)
             .selectAll('line_accounts'),
         ).as('lineAccount'),
+      ),
+    )
+    .$if(includes.has('createdBy'), (q) =>
+      q.select((eb) =>
+        jsonObjectFrom(
+          eb
+            .selectFrom('users')
+            .whereRef('users.id', '=', 'users.created_by_id')
+            .where(usersTableFilter)
+            .selectAll(),
+        ).as('createdBy'),
+      ),
+    )
+    .$if(includes.has('updatedBy'), (q) =>
+      q.select((eb) =>
+        jsonObjectFrom(
+          eb
+            .selectFrom('users')
+            .whereRef('users.id', '=', 'users.updated_by_id')
+            .where(usersTableFilter)
+            .selectAll(),
+        ).as('updatedBy'),
       ),
     );
 }

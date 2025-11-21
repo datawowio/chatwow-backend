@@ -33,12 +33,40 @@ export class ListProjectsDto extends zodDto(zod) {}
 
 // ================ Response ================
 
+export class ListProjectsProjectsDocumentsRelationsCreatedBy
+  implements IDomainData
+{
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
+export class ListProjectsProjectsDocumentsRelationsUpdatedBy
+  implements IDomainData
+{
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
 export class ListProjectsProjectsUserGroups implements IDomainData {
   @ApiProperty({ type: () => UserGroupResponse })
   attributes: UserGroupResponse;
 }
 
 export class ListProjectsProjectsManageUsers implements IDomainData {
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
+export class ListProjectsProjectProjectDocumentsRelationsCreatedBy
+  implements IDomainData
+{
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
+export class ListProjectsProjectProjectDocumentsRelationsUpdatedBy
+  implements IDomainData
+{
   @ApiProperty({ type: () => UserResponse })
   attributes: UserResponse;
 }
@@ -55,6 +83,16 @@ export class ListProjectsProjectsDocumentsRelations {
     type: () => ListProjectsProjectsDocumentsRelationsStoredFile,
   })
   storedFile?: ListProjectsProjectsDocumentsRelationsStoredFile;
+
+  @ApiProperty({
+    type: () => ListProjectsProjectProjectDocumentsRelationsCreatedBy,
+  })
+  createdBy?: ListProjectsProjectProjectDocumentsRelationsCreatedBy;
+
+  @ApiProperty({
+    type: () => ListProjectsProjectProjectDocumentsRelationsUpdatedBy,
+  })
+  updatedBy?: ListProjectsProjectProjectDocumentsRelationsUpdatedBy;
 }
 
 export class ListProjectsProjectsProjectDocuments implements IDomainData {
@@ -83,6 +121,16 @@ export class ListProjectsProjectsRelations {
     isArray: true,
   })
   manageUsers?: ListProjectsProjectsManageUsers[];
+
+  @ApiProperty({
+    type: () => ListProjectsProjectsDocumentsRelationsCreatedBy,
+  })
+  createdBy?: ListProjectsProjectsDocumentsRelationsCreatedBy;
+
+  @ApiProperty({
+    type: () => ListProjectsProjectsDocumentsRelationsUpdatedBy,
+  })
+  updatedBy?: ListProjectsProjectsDocumentsRelationsUpdatedBy;
 }
 
 export class ListProjectsProjectsData implements IDomainData {

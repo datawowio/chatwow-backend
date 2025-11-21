@@ -37,6 +37,16 @@ export class GetUserGroupResponseDataUserGroupsRelationsProjects {
   attributes?: ProjectResponse;
 }
 
+export class GetUserGroupsResponseDataUserGroupsRelationsCreatedBy {
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
+export class GetUserGroupsResponseDataUserGroupsRelationsUpdatedBy {
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
 export class GetUserGroupResponseDataUserGroupsRelations {
   @ApiProperty({
     type: () => GetUserGroupResponseDataUserGroupsRelationsProjects,
@@ -49,6 +59,16 @@ export class GetUserGroupResponseDataUserGroupsRelations {
     isArray: true,
   })
   users?: GetUserGroupResponseDataUserGroupsRelationsUsers[];
+
+  @ApiProperty({
+    type: () => GetUserGroupsResponseDataUserGroupsRelationsCreatedBy,
+  })
+  createdBy?: GetUserGroupsResponseDataUserGroupsRelationsCreatedBy;
+
+  @ApiProperty({
+    type: () => GetUserGroupsResponseDataUserGroupsRelationsUpdatedBy,
+  })
+  updatedBy?: GetUserGroupsResponseDataUserGroupsRelationsUpdatedBy;
 }
 
 export class GetUserGroupResponseDataUserGroups implements IDomainData {

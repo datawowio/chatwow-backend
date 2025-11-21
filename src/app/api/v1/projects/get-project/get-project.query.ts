@@ -41,6 +41,16 @@ export class GetProjectQuery implements QueryInterface {
               project.projectDocuments.map((doc) => ({
                 attributes: ProjectDocumentMapper.pgToResponse(doc),
                 relations: {
+                  createdBy: doc.createdBy
+                    ? {
+                        attributes: UserMapper.pgToResponse(doc.createdBy),
+                      }
+                    : undefined,
+                  updatedBy: doc.updatedBy
+                    ? {
+                        attributes: UserMapper.pgToResponse(doc.updatedBy),
+                      }
+                    : undefined,
                   storedFile: doc.storedFile
                     ? {
                         attributes: StoredFileMapper.pgToResponse(
@@ -55,6 +65,16 @@ export class GetProjectQuery implements QueryInterface {
               project.userGroups.map((group) => ({
                 attributes: UserGroupMapper.pgToResponse(group),
               })),
+            createdBy: project.createdBy
+              ? {
+                  attributes: UserMapper.pgToResponse(project.createdBy),
+                }
+              : undefined,
+            updatedBy: project.updatedBy
+              ? {
+                  attributes: UserMapper.pgToResponse(project.updatedBy),
+                }
+              : undefined,
           },
         },
       },

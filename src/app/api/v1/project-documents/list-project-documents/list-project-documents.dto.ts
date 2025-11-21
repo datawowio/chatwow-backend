@@ -5,6 +5,7 @@ import {
 } from '@domain/base/project-document/project-document.zod';
 import { ProjectResponse } from '@domain/base/project/project.response';
 import { StoredFileResponse } from '@domain/base/stored-file/stored-file.response';
+import { UserResponse } from '@domain/base/user/user.response';
 import { ApiProperty } from '@nestjs/swagger';
 import z from 'zod';
 
@@ -45,6 +46,20 @@ export class ListProjectDocumentsProjectsRelationsProject
   attributes: ProjectResponse;
 }
 
+export class ListProjectDocumentsProjectsRelationsCreatedBy
+  implements IDomainData
+{
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
+export class ListProjectDocumentsProjectsRelationsUpdatedBy
+  implements IDomainData
+{
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
 export class ListProjectDocumentsProjectsRelations {
   @ApiProperty({
     type: () => ListProjectDocumentsProjectsRelationsProject,
@@ -55,6 +70,16 @@ export class ListProjectDocumentsProjectsRelations {
     type: () => ListProjectDocumentsProjectsDocumentsRelationsStoredFile,
   })
   storedFile?: ListProjectDocumentsProjectsDocumentsRelationsStoredFile;
+
+  @ApiProperty({
+    type: () => ListProjectDocumentsProjectsRelationsCreatedBy,
+  })
+  createdBy?: ListProjectDocumentsProjectsRelationsCreatedBy;
+
+  @ApiProperty({
+    type: () => ListProjectDocumentsProjectsRelationsUpdatedBy,
+  })
+  updatedBy?: ListProjectDocumentsProjectsRelationsUpdatedBy;
 }
 
 export class ListProjectDocumentsProjectsData implements IDomainData {

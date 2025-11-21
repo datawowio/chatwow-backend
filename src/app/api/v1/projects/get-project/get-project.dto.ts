@@ -22,12 +22,40 @@ export class GetProjectDto extends zodDto(zod) {}
 
 // ================ Response ================
 
+export class GetProjectProjectsDocumentsRelationsCreatedBy
+  implements IDomainData
+{
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
+export class GetProjectProjectsDocumentsRelationsUpdatedBy
+  implements IDomainData
+{
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
 export class GetProjectProjectUserGroups implements IDomainData {
   @ApiProperty({ type: () => UserGroupResponse })
   attributes: UserGroupResponse;
 }
 
 export class GetProjectProjectManageUsers implements IDomainData {
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
+export class GetProjectProjectProjectDocumentsRelationsCreatedBy
+  implements IDomainData
+{
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
+export class GetProjectProjectProjectDocumentsRelationsUpdatedBy
+  implements IDomainData
+{
   @ApiProperty({ type: () => UserResponse })
   attributes: UserResponse;
 }
@@ -44,6 +72,16 @@ export class GetProjectProjectProjectDocumentsRelations {
     type: () => GetProjectProjectProjectDocumentsRelationsStoredFile,
   })
   storedFile?: GetProjectProjectProjectDocumentsRelationsStoredFile;
+
+  @ApiProperty({
+    type: () => GetProjectProjectProjectDocumentsRelationsCreatedBy,
+  })
+  createdBy?: GetProjectProjectProjectDocumentsRelationsCreatedBy;
+
+  @ApiProperty({
+    type: () => GetProjectProjectProjectDocumentsRelationsUpdatedBy,
+  })
+  updatedBy?: GetProjectProjectProjectDocumentsRelationsUpdatedBy;
 }
 
 export class GetProjectProjectProjectDocuments implements IDomainData {
@@ -72,6 +110,16 @@ export class GetProjectProjectRelations {
     isArray: true,
   })
   manageUsers?: GetProjectProjectManageUsers[];
+
+  @ApiProperty({
+    type: () => GetProjectProjectsDocumentsRelationsCreatedBy,
+  })
+  createdBy?: GetProjectProjectsDocumentsRelationsCreatedBy;
+
+  @ApiProperty({
+    type: () => GetProjectProjectsDocumentsRelationsUpdatedBy,
+  })
+  updatedBy?: GetProjectProjectsDocumentsRelationsUpdatedBy;
 }
 
 export class GetProjectProjectData implements IDomainData {

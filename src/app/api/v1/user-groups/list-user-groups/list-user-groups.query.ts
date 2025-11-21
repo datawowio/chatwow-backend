@@ -48,6 +48,16 @@ export class ListUserGroupsQuery implements QueryInterface {
               userGroup.users.map((user) => ({
                 attributes: UserMapper.pgToResponse(user),
               })),
+            createdBy: userGroup.createdBy
+              ? {
+                  attributes: UserMapper.pgToResponse(userGroup.createdBy),
+                }
+              : undefined,
+            updatedBy: userGroup.updatedBy
+              ? {
+                  attributes: UserMapper.pgToResponse(userGroup.updatedBy),
+                }
+              : undefined,
           },
         })),
       },
