@@ -18,7 +18,7 @@ import { EditUserDto, EditUserResponse } from './edit-user.dto';
 
 type Entity = {
   user: User;
-  userGroups: UserGroup[];
+  userGroups?: UserGroup[];
 };
 
 @Injectable()
@@ -33,7 +33,6 @@ export class EditUserCommand implements CommandInterface {
 
   async exec(id: string, body: EditUserDto): Promise<EditUserResponse> {
     const entity = await this.find(id);
-
     if (body.user) {
       entity.user.edit(body.user);
     }
@@ -49,9 +48,11 @@ export class EditUserCommand implements CommandInterface {
         user: {
           attributes: UserMapper.toResponse(entity.user),
           relations: {
-            userGroups: entity.userGroups.map((g) => ({
-              attributes: UserGroupMapper.toResponse(g),
-            })),
+            userGroups:
+              entity.userGroups &&
+              entity.userGroups.map((g) => ({
+                attributes: UserGroupMapper.toResponse(g),
+              })),
           },
         },
       },
@@ -64,10 +65,13 @@ export class EditUserCommand implements CommandInterface {
 
     await this.transactionService.transaction(async () => {
       await this.userService.save(user);
-      await this.userGroupUserService.saveUserRelations(
-        user.id,
-        userGroups.map((g) => g.id),
-      );
+
+      if (userGroups) {
+        await this.userGroupUserService.saveUserRelations(
+          user.id,
+          userGroups.map((g) => g.id),
+        );
+      }
     });
   }
 

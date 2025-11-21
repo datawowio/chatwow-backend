@@ -7,6 +7,7 @@ import { ProjectDocumentService } from '@domain/base/project-document/project-do
 import { Project } from '@domain/base/project/project.domain';
 import { ProjectService } from '@domain/base/project/project.service';
 import { UserGroupProjectService } from '@domain/base/user-group-project/user-group-project.service';
+import { UserGroupUserService } from '@domain/base/user-group-user/user-group-user.service';
 import { UserGroup } from '@domain/base/user-group/user-group.domain';
 import { UserGroupService } from '@domain/base/user-group/user-group.service';
 import { UserManageProjectService } from '@domain/base/user-manage-project/user-manage-project.service';
@@ -29,6 +30,7 @@ export class InitialsCliSeed extends CommandRunner {
     private projectService: ProjectService,
     private projectChatService: ProjectChatService,
     private projectDocumentService: ProjectDocumentService,
+    private userGroupUserService: UserGroupUserService,
     private userGroupProjectService: UserGroupProjectService,
     private userManageProjectService: UserManageProjectService,
   ) {
@@ -100,6 +102,9 @@ export class InitialsCliSeed extends CommandRunner {
     await this.userService.save(superAdmin);
     await this.userGroupService.save(groupA);
     await this.projectService.save(projectA);
+    await this.userGroupUserService.saveUserRelations(superAdmin.id, [
+      groupA.id,
+    ]);
     await this.userGroupProjectService.saveUserGroupRelations(groupA.id, [
       projectA.id,
     ]);

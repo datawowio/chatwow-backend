@@ -74,6 +74,8 @@ Table "user_otps" {
 
 Table "user_groups" {
   "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "group_name" text [not null]
   "description" text [not null, default: '']
 }

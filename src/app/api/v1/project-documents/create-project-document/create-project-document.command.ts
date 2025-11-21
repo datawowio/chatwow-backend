@@ -44,7 +44,6 @@ export class CreateProjectDocumentCommand implements CommandInterface {
       ownerId: projectDocument.id,
       ownerTable: STORED_FILE_OWNER_TABLE.PROJECT_DOCUMENT,
     });
-    await this.storedFileService.save(storedFile);
 
     await this.save({
       projectDocument,

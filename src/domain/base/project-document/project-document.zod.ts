@@ -25,3 +25,7 @@ export type ProjectDocumentQueryOptions = {
   sort?: z.infer<typeof projectDocumentSortZod>;
   pagination?: PaginationQuery;
 };
+export type ProjectDocumentCountQueryOptions = Pick<
+  ProjectDocumentQueryOptions,
+  'filter'
+>;

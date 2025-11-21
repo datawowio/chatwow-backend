@@ -1,0 +1,16 @@
+meta {
+  name: list-user-groups
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/v1/user-groups?includes=userGroups,userGroups,manageUsers&sort=id
+  body: none
+  auth: inherit
+}
+
+params:query {
+  includes: userGroups,userGroups,manageUsers
+  sort: id
+}

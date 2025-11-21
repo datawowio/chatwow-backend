@@ -12,7 +12,7 @@ import { ApiException } from '@shared/http/http.exception';
 import { User } from './user.domain';
 import { UserMapper } from './user.mapper';
 import { usersTableFilter } from './user.util';
-import { UserQueryOptions } from './user.zod';
+import { UserCountQueryOptions, UserQueryOptions } from './user.zod';
 
 @Injectable()
 export class UserRepo extends BaseRepo {
@@ -38,10 +38,12 @@ export class UserRepo extends BaseRepo {
     return getUniqueIds(qb);
   }
 
-  async getCount(opts?: UserQueryOptions) {
+  async getCount(opts?: UserCountQueryOptions) {
     const totalCount = await this
       //
-      ._getFilterQb(opts)
+      ._getFilterQb({
+        filter: opts?.filter,
+      })
       .$call((q) => queryCount(q));
 
     return totalCount;

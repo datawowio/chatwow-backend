@@ -2,7 +2,7 @@ import { PROJECT_DOCUMENT_STATUS } from '@domain/base/project-document/project-d
 import { ProjectDocumentResponse } from '@domain/base/project-document/project-document.response';
 import { ProjectResponse } from '@domain/base/project/project.response';
 import { StoredFileResponse } from '@domain/base/stored-file/stored-file.response';
-import { createStoredFileZod } from '@domain/base/stored-file/stored-file.zod';
+import { storedFileZod } from '@domain/base/stored-file/stored-file.zod';
 import { ApiProperty } from '@nestjs/swagger';
 import z from 'zod';
 
@@ -19,7 +19,7 @@ const zod = z.object({
     documentDetails: z.string().optional(),
     aiSummaryMd: z.string().optional(),
   }),
-  storedFile: createStoredFileZod,
+  storedFile: storedFileZod,
 });
 
 export class CreateProjectDocumentDto extends zodDto(zod) {}

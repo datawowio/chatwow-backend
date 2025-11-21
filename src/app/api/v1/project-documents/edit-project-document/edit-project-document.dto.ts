@@ -1,6 +1,8 @@
 import { PROJECT_DOCUMENT_STATUS } from '@domain/base/project-document/project-document.constant';
 import { ProjectDocumentResponse } from '@domain/base/project-document/project-document.response';
 import { ProjectResponse } from '@domain/base/project/project.response';
+import { StoredFileResponse } from '@domain/base/stored-file/stored-file.response';
+import { storedFileZod } from '@domain/base/stored-file/stored-file.zod';
 import { ApiProperty } from '@nestjs/swagger';
 import z from 'zod';
 
@@ -11,11 +13,14 @@ import { zodDto } from '@shared/zod/zod.util';
 // ================ Request ================
 
 const zod = z.object({
-  projectDocument: z.object({
-    documentStatus: z.enum(PROJECT_DOCUMENT_STATUS).optional(),
-    documentDetails: z.string().optional(),
-    aiSummaryMd: z.string().optional(),
-  }),
+  projectDocument: z
+    .object({
+      documentStatus: z.enum(PROJECT_DOCUMENT_STATUS).optional(),
+      documentDetails: z.string().optional(),
+      aiSummaryMd: z.string().optional(),
+    })
+    .optional(),
+  storedFile: storedFileZod.optional(),
 });
 
 export class EditProjectDocumentDto extends zodDto(zod) {}
@@ -29,11 +34,23 @@ class EditProjectDocumentDataProjectDocumentRelationsProject
   attributes: ProjectResponse;
 }
 
+class EditProjectDocumentDataProjectDocumentRelationsStoredFile
+  implements IDomainData
+{
+  @ApiProperty({ type: () => StoredFileResponse })
+  attributes: StoredFileResponse;
+}
+
 class EditProjectDocumentDataProjectDocumentRelations {
   @ApiProperty({
     type: () => EditProjectDocumentDataProjectDocumentRelationsProject,
   })
   project: EditProjectDocumentDataProjectDocumentRelationsProject;
+
+  @ApiProperty({
+    type: () => EditProjectDocumentDataProjectDocumentRelationsStoredFile,
+  })
+  storedFile?: EditProjectDocumentDataProjectDocumentRelationsStoredFile;
 }
 
 class EditProjectDocumentDataProjectDocument implements IDomainData {

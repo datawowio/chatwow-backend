@@ -3,10 +3,22 @@ import { Injectable } from '@nestjs/common';
 import { UserGroup } from './user-group.domain';
 import { UserGroupMapper } from './user-group.mapper';
 import { UserGroupRepo } from './user-group.repo';
+import {
+  UserGroupCountQueryOptions,
+  UserGroupQueryOptions,
+} from './user-group.zod';
 
 @Injectable()
 export class UserGroupService {
   constructor(private repo: UserGroupRepo) {}
+
+  async getIds(opts?: UserGroupQueryOptions) {
+    return this.repo.getIds(opts);
+  }
+
+  async getCount(opts?: UserGroupCountQueryOptions) {
+    return this.repo.getCount(opts);
+  }
 
   async findOne(id: string) {
     return this.repo.findOne(id);

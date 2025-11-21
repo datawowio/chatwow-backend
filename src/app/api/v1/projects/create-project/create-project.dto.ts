@@ -1,7 +1,7 @@
 import { ProjectDocumentResponse } from '@domain/base/project-document/project-document.response';
 import { ProjectResponse } from '@domain/base/project/project.response';
 import { StoredFileResponse } from '@domain/base/stored-file/stored-file.response';
-import { createStoredFileZod } from '@domain/base/stored-file/stored-file.zod';
+import { storedFileZod } from '@domain/base/stored-file/stored-file.zod';
 import { UserGroupResponse } from '@domain/base/user-group/user-group.response';
 import { ApiProperty } from '@nestjs/swagger';
 import z from 'zod';
@@ -17,13 +17,15 @@ const zod = z.object({
     projectName: z.string(),
     projectDescription: z.string(),
   }),
-  projectDocuments: z.array(
-    z.object({
-      documentDetails: z.string(),
-      storedFile: createStoredFileZod,
-    }),
-  ),
-  userGroupIds: z.array(z.string()),
+  projectDocuments: z
+    .array(
+      z.object({
+        documentDetails: z.string(),
+        storedFile: storedFileZod,
+      }),
+    )
+    .optional(),
+  userGroupIds: z.array(z.string()).optional(),
 });
 
 export class CreateProjectDto extends zodDto(zod) {}

@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Project } from './project.domain';
 import { ProjectMapper } from './project.mapper';
 import { ProjectRepo } from './project.repo';
-import { ProjectQueryOptions } from './project.zod';
+import { ProjectCountQueryOptions, ProjectQueryOptions } from './project.zod';
 
 @Injectable()
 export class ProjectService {
@@ -13,7 +13,7 @@ export class ProjectService {
     return this.repo.getIds(query);
   }
 
-  async getCount(query?: ProjectQueryOptions) {
+  async getCount(query?: ProjectCountQueryOptions) {
     return this.repo.getCount(query);
   }
 

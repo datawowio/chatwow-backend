@@ -18,12 +18,8 @@ import { HttpResponseMapper } from '@shared/http/http.mapper';
 import { AddUserDto, AddUserResponse } from './add-user.dto';
 
 type Entity = {
-  user: {
-    domain: User;
-    relations: {
-      userGroups: UserGroup[];
-    };
-  };
+  user: User;
+  userGroups: UserGroup[];
 };
 
 @Injectable()
@@ -44,14 +40,9 @@ export class AddUserCommand implements CommandInterface {
     });
 
     const userGroups = await this.getUserGroups(body.userGroupIds);
-
     const entity: Entity = {
-      user: {
-        domain: user,
-        relations: {
-          userGroups,
-        },
-      },
+      user,
+      userGroups,
     };
 
     await this.save(entity);
@@ -61,9 +52,9 @@ export class AddUserCommand implements CommandInterface {
     return HttpResponseMapper.toSuccess({
       data: {
         user: {
-          attributes: UserMapper.toResponse(entity.user.domain),
+          attributes: UserMapper.toResponse(entity.user),
           relations: {
-            userGroups: entity.user.relations.userGroups.map((g) => ({
+            userGroups: entity.userGroups.map((g) => ({
               attributes: UserGroupMapper.toResponse(g),
             })),
           },
@@ -73,8 +64,8 @@ export class AddUserCommand implements CommandInterface {
   }
 
   async save(entity: Entity): Promise<void> {
-    const user = entity.user.domain;
-    const userGroups = entity.user.relations.userGroups;
+    const user = entity.user;
+    const userGroups = entity.userGroups;
 
     await this.transactionService.transaction(async () => {
       await this.userService.save(user);
@@ -88,8 +79,8 @@ export class AddUserCommand implements CommandInterface {
     });
   }
 
-  async getUserGroups(ids: string[]): Promise<UserGroup[]> {
-    if (!ids.length) {
+  async getUserGroups(ids?: string[]): Promise<UserGroup[]> {
+    if (!ids?.length) {
       return [];
     }
 

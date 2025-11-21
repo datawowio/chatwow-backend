@@ -17,7 +17,7 @@ const zod = z.object({
     email: z.string().email(),
     role: z.enum(USER_ROLE),
   }),
-  userGroupIds: z.array(z.string().uuid()),
+  userGroupIds: z.array(z.string().uuid()).optional(),
 });
 
 export class AddUserDto extends zodDto(zod) {}

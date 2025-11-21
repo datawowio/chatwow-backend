@@ -55,22 +55,24 @@ export class CreateProjectCommand implements CommandInterface {
 
     const projectDocumentsFiles: Entity['projectDocumentsFiles'] = [];
 
-    for (const pd of body.projectDocuments) {
-      const projectDocument = ProjectDocument.new({
-        projectId: project.id,
-        documentStatus: 'ACTIVE',
-        documentDetails: pd.documentDetails,
-      });
-      const storedFile = StoredFile.new({
-        ...pd.storedFile,
-        ownerTable: STORED_FILE_OWNER_TABLE.PROJECT_DOCUMENT,
-        ownerId: projectDocument.id,
-      });
+    if (body.projectDocuments) {
+      for (const pd of body.projectDocuments) {
+        const projectDocument = ProjectDocument.new({
+          projectId: project.id,
+          documentStatus: 'ACTIVE',
+          documentDetails: pd.documentDetails,
+        });
+        const storedFile = StoredFile.new({
+          ...pd.storedFile,
+          ownerTable: STORED_FILE_OWNER_TABLE.PROJECT_DOCUMENT,
+          ownerId: projectDocument.id,
+        });
 
-      projectDocumentsFiles.push({
-        projectDocument,
-        storedFile,
-      });
+        projectDocumentsFiles.push({
+          projectDocument,
+          storedFile,
+        });
+      }
     }
 
     await this.save({
@@ -124,7 +126,13 @@ export class CreateProjectCommand implements CommandInterface {
     });
   }
 
-  async getUserGroups(userGroupIds: string[]): Promise<UserGroup[]> {
+  async getUserGroups(
+    userGroupIds: string[] | undefined,
+  ): Promise<UserGroup[]> {
+    if (!userGroupIds?.length) {
+      return [];
+    }
+
     const rawRes = await this.readDb
       .selectFrom('user_groups')
       .where('id', 'in', userGroupIds)

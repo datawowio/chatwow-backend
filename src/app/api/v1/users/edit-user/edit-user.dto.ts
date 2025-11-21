@@ -32,7 +32,7 @@ class EditUserGroupData implements IDomainData {
 
 class EditUserRelations {
   @ApiProperty({ type: () => EditUserGroupData, isArray: true })
-  userGroups: EditUserGroupData[];
+  userGroups?: EditUserGroupData[];
 }
 
 class EditUserUserData implements IDomainData {

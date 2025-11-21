@@ -31,3 +31,4 @@ export type UserQueryOptions = {
   sort?: z.infer<typeof userSortZod>;
   pagination?: PaginationQuery;
 };
+export type UserCountQueryOptions = Pick<UserQueryOptions, 'filter'>;

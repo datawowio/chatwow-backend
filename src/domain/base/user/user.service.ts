@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { User } from './user.domain';
 import { UserMapper } from './user.mapper';
 import { UserRepo } from './user.repo';
-import { UserQueryOptions } from './user.zod';
+import { UserCountQueryOptions, UserQueryOptions } from './user.zod';
 
 @Injectable()
 export class UserService {
@@ -13,7 +13,7 @@ export class UserService {
     return this.repo.getIds(query);
   }
 
-  async getCount(query?: UserQueryOptions) {
+  async getCount(query?: UserCountQueryOptions) {
     return this.repo.getCount(query);
   }
 

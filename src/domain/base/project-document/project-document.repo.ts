@@ -10,7 +10,10 @@ import { isDefined } from '@shared/common/common.validator';
 import { ProjectDocument } from './project-document.domain';
 import { ProjectDocumentMapper } from './project-document.mapper';
 import { projectDocumentsTableFilter } from './project-document.util';
-import { ProjectDocumentQueryOptions } from './project-document.zod';
+import {
+  ProjectDocumentCountQueryOptions,
+  ProjectDocumentQueryOptions,
+} from './project-document.zod';
 
 @Injectable()
 export class ProjectDocumentRepo extends BaseRepo {
@@ -33,10 +36,12 @@ export class ProjectDocumentRepo extends BaseRepo {
     return getUniqueIds(qb);
   }
 
-  async getCount(opts?: ProjectDocumentQueryOptions) {
+  async getCount(opts?: ProjectDocumentCountQueryOptions) {
     const totalCount = await this
       //
-      ._getFilterQb(opts)
+      ._getFilterQb({
+        filter: opts?.filter,
+      })
       .$call((q) => queryCount(q));
 
     return totalCount;

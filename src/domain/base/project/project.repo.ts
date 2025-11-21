@@ -10,7 +10,7 @@ import { isDefined } from '@shared/common/common.validator';
 import { Project } from './project.domain';
 import { ProjectMapper } from './project.mapper';
 import { projectsTableFilter } from './project.util';
-import { ProjectQueryOptions } from './project.zod';
+import { ProjectCountQueryOptions, ProjectQueryOptions } from './project.zod';
 
 @Injectable()
 export class ProjectRepo extends BaseRepo {
@@ -33,10 +33,12 @@ export class ProjectRepo extends BaseRepo {
     return getUniqueIds(qb);
   }
 
-  async getCount(opts?: ProjectQueryOptions) {
+  async getCount(opts?: ProjectCountQueryOptions) {
     const totalCount = await this
       //
-      ._getFilterQb(opts)
+      ._getFilterQb({
+        filter: opts?.filter,
+      })
       .$call((q) => queryCount(q));
 
     return totalCount;

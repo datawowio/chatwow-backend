@@ -83,6 +83,12 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('user_groups')
     .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('updated_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
     .addColumn('group_name', 'text', (col) => col.notNull())
     .addColumn('description', 'text', (col) => col.notNull().defaultTo(''))
     .execute();

@@ -53,11 +53,11 @@ export class StoredFileRepo extends BaseRepo {
       .execute();
   }
 
-  async deleteRelated(ownerId: string): Promise<void> {
+  async deleteRelated(ownerIds: string[]): Promise<void> {
     await this.db
       //
       .deleteFrom('stored_files')
-      .where('owner_id', '=', ownerId)
+      .where('owner_id', 'in', ownerIds)
       .execute();
   }
 }

@@ -4,7 +4,7 @@ import { toNumber } from '@shared/common/common.transformer';
 import { isNumericString } from '@shared/common/common.validator';
 import { zodDto } from '@shared/zod/zod.util';
 
-export const createStoredFileZod = z.object({
+export const storedFileZod = z.object({
   id: z.string(),
   filename: z.string(),
 });

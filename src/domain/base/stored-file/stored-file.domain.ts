@@ -66,7 +66,11 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
 
   edit(data: StoredFileUpdateData) {
     const plain: StoredFilePlain = {
-      keyPath: this.keyPath,
+      keyPath: getStoredFileKey({
+        id: isDefined(data.id) ? data.id : this.id,
+        ownerTable: this.ownerTable,
+        isPublic: isDefined(data.isPublic) ? data.isPublic : this.isPublic,
+      }),
       ownerTable: this.ownerTable,
       storageName: this.storageName,
       presignUrl: this.presignUrl,

@@ -4,11 +4,16 @@ import { ProjectDocumentService } from '@domain/base/project-document/project-do
 import { projectDocumentsTableFilter } from '@domain/base/project-document/project-document.util';
 import { Project } from '@domain/base/project/project.domain';
 import { ProjectMapper } from '@domain/base/project/project.mapper';
-import { ProjectService } from '@domain/base/project/project.service';
+import { projectsTableFilter } from '@domain/base/project/project.util';
+import { STORED_FILE_OWNER_TABLE } from '@domain/base/stored-file/stored-file.constant';
+import { StoredFile } from '@domain/base/stored-file/stored-file.domain';
+import { StoredFileMapper } from '@domain/base/stored-file/stored-file.mapper';
+import { StoredFileService } from '@domain/base/stored-file/stored-file.service';
 import { Inject, Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { TransactionService } from '@infra/global/transaction/transaction.service';
 
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
@@ -20,6 +25,7 @@ import {
 
 type Entity = {
   projectDocument: ProjectDocument;
+  storedFile?: StoredFile;
   project: Project;
 };
 
@@ -30,7 +36,8 @@ export class EditProjectDocumentCommand implements CommandInterface {
     private readDb: ReadDB,
 
     private projectDocumentService: ProjectDocumentService,
-    private projectService: ProjectService,
+    private storedFileService: StoredFileService,
+    private transactionService: TransactionService,
   ) {}
 
   async exec(
@@ -38,7 +45,12 @@ export class EditProjectDocumentCommand implements CommandInterface {
     body: EditProjectDocumentDto,
   ): Promise<EditProjectDocumentResponse> {
     const entity = await this.find(id);
-    entity.projectDocument.edit(body.projectDocument);
+
+    if (body.projectDocument) {
+      entity.projectDocument.edit(body.projectDocument);
+    }
+    this.editStoredFile(entity, body);
+
     await this.save(entity);
 
     return {
@@ -51,6 +63,11 @@ export class EditProjectDocumentCommand implements CommandInterface {
             project: {
               attributes: ProjectMapper.toResponse(entity.project),
             },
+            storedFile: entity.storedFile
+              ? {
+                  attributes: StoredFileMapper.toResponse(entity.storedFile),
+                }
+              : undefined,
           },
         },
       },
@@ -61,16 +78,17 @@ export class EditProjectDocumentCommand implements CommandInterface {
     const projectDocument = await this.readDb
       .selectFrom('project_documents')
       .selectAll()
-      .select((q) =>
+      .select((q) => [
         jsonObjectFrom(
           q
             .selectFrom('projects')
             .selectAll()
+            .where(projectsTableFilter)
             .whereRef('projects.id', '=', 'project_documents.project_id'),
         )
           .$notNull()
           .as('project'),
-      )
+      ])
       .where('id', '=', id)
       .where(projectDocumentsTableFilter)
       .executeTakeFirst();
@@ -86,6 +104,24 @@ export class EditProjectDocumentCommand implements CommandInterface {
   }
 
   async save(entity: Entity): Promise<void> {
-    await this.projectDocumentService.save(entity.projectDocument);
+    await this.transactionService.transaction(async () => {
+      await this.projectDocumentService.save(entity.projectDocument);
+
+      if (entity.storedFile) {
+        await this.storedFileService.save(entity.storedFile);
+      }
+    });
+  }
+
+  editStoredFile(entity: Entity, body: EditProjectDocumentDto) {
+    if (!body.storedFile) {
+      return;
+    }
+
+    entity.storedFile = StoredFile.new({
+      ...body.storedFile,
+      ownerId: entity.projectDocument.id,
+      ownerTable: STORED_FILE_OWNER_TABLE.PROJECT_DOCUMENT,
+    });
   }
 }

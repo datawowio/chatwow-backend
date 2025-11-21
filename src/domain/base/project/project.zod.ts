@@ -19,3 +19,4 @@ export type ProjectQueryOptions = {
   sort?: z.infer<typeof projectSortZod>;
   pagination?: PaginationQuery;
 };
+export type ProjectCountQueryOptions = Pick<ProjectQueryOptions, 'filter'>;

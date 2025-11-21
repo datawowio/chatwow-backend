@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { unique } from 'remeda';
 import { Writable } from 'type-fest';
 
 import { StorageService } from '@infra/global/storage/storage.service';
@@ -25,35 +26,28 @@ export class StoredFileService {
   }
 
   async save(storedFile: StoredFile) {
+    await this.repo.deleteRelated([storedFile.ownerId]);
+    await this._create(storedFile);
+  }
+
+  async saveBulk(storedFiles: StoredFile[]) {
+    await this.repo.deleteRelated(unique(storedFiles.map((s) => s.id)));
+    return Promise.all(storedFiles.map((s) => this._create(s)));
+  }
+
+  private async _create(storedFile: StoredFile) {
     this._validate(storedFile);
 
     await this.setMetaInfo(storedFile);
-    if (!storedFile.isPersist) {
-      await this.repo.create(storedFile);
-    } else {
-      await this.repo.update(storedFile.id, storedFile);
-    }
+
+    // create every time
+    await this.repo.create(storedFile);
 
     storedFile.setPgState(StoredFileMapper.toPg);
   }
 
-  async saveBulk(storedFiles: StoredFile[]) {
-    return Promise.all(storedFiles.map((s) => this.save(s)));
-  }
-
-  async delete(id: string) {
-    return this.repo.delete(id);
-  }
-
-  async deleteRelated(storedFile: StoredFile) {
-    await this.repo.deleteRelated(storedFile.ownerId);
-    await this.storageService.remove(storedFile.keyPath);
-  }
-
-  async deleteRelatedBulk(storedFiles: StoredFile[]) {
-    await Promise.all(
-      storedFiles.map((storedFile) => this.deleteRelated(storedFile)),
-    );
+  async delete(storedFile: StoredFile) {
+    await this.repo.delete(storedFile.id);
   }
 
   private _validate(_storedFile: StoredFile) {

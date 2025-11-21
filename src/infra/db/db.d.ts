@@ -126,9 +126,11 @@ export interface UserGroupProjects {
 }
 
 export interface UserGroups {
+  created_at: Generated<string>;
   description: Generated<string>;
   group_name: string;
   id: string;
+  updated_at: Generated<string>;
 }
 
 export interface UserGroupUsers {
