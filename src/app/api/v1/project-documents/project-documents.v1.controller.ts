@@ -14,6 +14,8 @@ import {
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
+
 import { CreateProjectDocumentCommand } from './create-project-document/create-project-document.command';
 import {
   CreateProjectDocumentDto,
@@ -49,8 +51,11 @@ export class ProjectDocumentsV1Controller {
   @ApiResponse({
     type: () => CreateProjectDocumentResponse,
   })
-  async createProject(@Body() body: CreateProjectDocumentDto) {
-    return this.createProjectDocumentCommand.exec(body);
+  async createProject(
+    @UserClaims() claims: UserClaims,
+    @Body() body: CreateProjectDocumentDto,
+  ) {
+    return this.createProjectDocumentCommand.exec(claims, body);
   }
 
   @Patch(':id')
@@ -58,10 +63,11 @@ export class ProjectDocumentsV1Controller {
     type: () => EditProjectDocumentResponse,
   })
   async editProject(
+    @UserClaims() claims: UserClaims,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() body: EditProjectDocumentDto,
   ) {
-    return this.editProjectDocumentCommand.exec(id, body);
+    return this.editProjectDocumentCommand.exec(claims, id, body);
   }
 
   @Get()

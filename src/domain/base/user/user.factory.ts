@@ -30,6 +30,8 @@ export class UserFactory {
 
       firstName: isDefined(data.firstName) ? data.firstName : 'firstname',
       lastName: isDefined(data.lastName) ? data.lastName : 'lastname',
+      createdById: isDefined(data.createdById) ? data.createdById : null,
+      updatedById: isDefined(data.updatedById) ? data.updatedById : null,
     });
   }
 

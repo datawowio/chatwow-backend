@@ -26,6 +26,7 @@ Enum "project_status" {
 
 Enum "user_role" {
   "ADMIN"
+  "MANAGER"
   "USER"
 }
 
@@ -60,6 +61,8 @@ Table "users" {
   "last_signed_in_at" timestamptz
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "created_by_id" uuid
+  "updated_by_id" uuid
   "role" user_role [not null]
   "user_status" user_status [not null]
   "line_account_id" text [unique]
@@ -76,6 +79,8 @@ Table "user_groups" {
   "id" uuid [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "created_by_id" uuid
+  "updated_by_id" uuid
   "group_name" text [not null]
   "description" text [not null, default: '']
 }
@@ -96,6 +101,8 @@ Table "projects" {
   "project_guideline_md" text [not null, default: '']
   "project_status" project_status [not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "created_by_id" uuid
+  "updated_by_id" uuid
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "ai_summary_md" text [not null, default: '']
 }
@@ -132,7 +139,10 @@ Table "user_manage_projects" {
 Table "project_documents" {
   "id" uuid [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "project_id" uuid [not null]
+  "created_by_id" uuid
+  "updated_by_id" uuid
   "document_details" text [not null, default: '']
   "document_status" document_status [not null]
   "ai_summary_md" text [not null, default: '']
@@ -215,7 +225,15 @@ Ref "project_chats_project_id_fkey":"projects"."id" < "project_chats"."project_i
 
 Ref "project_chats_user_id_fkey":"users"."id" < "project_chats"."user_id" [delete: cascade]
 
+Ref "project_documents_created_by_id_fkey":"users"."id" < "project_documents"."created_by_id" [delete: set null]
+
 Ref "project_documents_project_id_fkey":"projects"."id" < "project_documents"."project_id" [delete: cascade]
+
+Ref "project_documents_updated_by_id_fkey":"users"."id" < "project_documents"."updated_by_id" [delete: set null]
+
+Ref "projects_created_by_id_fkey":"users"."id" < "projects"."created_by_id" [delete: set null]
+
+Ref "projects_updated_by_id_fkey":"users"."id" < "projects"."updated_by_id" [delete: set null]
 
 Ref "user_group_projects_project_id_fkey":"projects"."id" < "user_group_projects"."project_id" [delete: cascade]
 
@@ -225,10 +243,18 @@ Ref "user_group_users_user_group_id_fkey":"user_groups"."id" < "user_group_users
 
 Ref "user_group_users_user_id_fkey":"users"."id" < "user_group_users"."user_id" [delete: cascade]
 
+Ref "user_groups_created_by_id_fkey":"users"."id" < "user_groups"."created_by_id" [delete: set null]
+
+Ref "user_groups_updated_by_id_fkey":"users"."id" < "user_groups"."updated_by_id" [delete: set null]
+
 Ref "user_manage_projects_project_id_fkey":"projects"."id" < "user_manage_projects"."project_id" [delete: cascade]
 
 Ref "user_manage_projects_user_id_fkey":"users"."id" < "user_manage_projects"."user_id" [delete: cascade]
 
 Ref "user_otps_user_id_fkey":"users"."id" < "user_otps"."user_id" [delete: cascade]
 
+Ref "users_created_by_id_fkey":"users"."id" < "users"."created_by_id" [delete: set null]
+
 Ref "users_line_account_id_fkey":"line_accounts"."id" < "users"."line_account_id" [delete: set null]
+
+Ref "users_updated_by_id_fkey":"users"."id" < "users"."updated_by_id" [delete: set null]

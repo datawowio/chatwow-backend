@@ -52,24 +52,33 @@ export class InitialsCliSeed extends CommandRunner {
       id: 'SUPERADMIN_LINE',
     });
     const superAdmin = User.new({
-      email: 'superadmin@example.com',
-      password: 'password',
-      role: 'ADMIN',
-      firstName: 'superadmin',
-      lastName: 'superadmin',
-      userStatus: 'ACTIVE',
-      lineAccountId: superAdminLine.id,
+      actorId: null,
+      data: {
+        email: 'superadmin@example.com',
+        password: 'password',
+        role: 'ADMIN',
+        firstName: 'superadmin',
+        lastName: 'superadmin',
+        userStatus: 'ACTIVE',
+        lineAccountId: superAdminLine.id,
+      },
     });
 
     const groupA = UserGroup.new({
-      groupName: 'test group',
-      description: 'for local test',
+      actorId: superAdmin.id,
+      data: {
+        groupName: 'test group',
+        description: 'for local test',
+      },
     });
 
     const projectA = Project.new({
-      projectName: 'local test',
-      projectStatus: 'ACTIVE',
-      projectDescription: 'for local testing',
+      actorId: superAdmin.id,
+      data: {
+        projectName: 'local test',
+        projectStatus: 'ACTIVE',
+        projectDescription: 'for local testing',
+      },
     });
     const projectChatA = ProjectChat.new({
       chatSender: 'USER',
@@ -85,16 +94,22 @@ export class InitialsCliSeed extends CommandRunner {
       parentId: projectChatA.id,
     });
     const projectDocumentA = ProjectDocument.new({
-      projectId: projectA.id,
-      documentStatus: 'ACTIVE',
-      aiSummaryMd: 'this is summary for docA',
-      documentDetails: 'This is the details of document A',
+      actorId: superAdmin.id,
+      data: {
+        projectId: projectA.id,
+        documentStatus: 'ACTIVE',
+        aiSummaryMd: 'this is summary for docA',
+        documentDetails: 'This is the details of document A',
+      },
     });
     const projectDocumentB = ProjectDocument.new({
-      projectId: projectA.id,
-      documentStatus: 'ACTIVE',
-      aiSummaryMd: 'this is summary for doc B',
-      documentDetails: 'This is the details of document B',
+      actorId: superAdmin.id,
+      data: {
+        projectId: projectA.id,
+        documentStatus: 'ACTIVE',
+        aiSummaryMd: 'this is summary for doc B',
+        documentDetails: 'This is the details of document B',
+      },
     });
 
     // save db

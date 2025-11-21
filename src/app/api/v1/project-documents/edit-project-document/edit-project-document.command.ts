@@ -14,6 +14,7 @@ import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
 import { TransactionService } from '@infra/global/transaction/transaction.service';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
@@ -41,13 +42,17 @@ export class EditProjectDocumentCommand implements CommandInterface {
   ) {}
 
   async exec(
+    claims: UserClaims,
     id: string,
     body: EditProjectDocumentDto,
   ): Promise<EditProjectDocumentResponse> {
     const entity = await this.find(id);
 
     if (body.projectDocument) {
-      entity.projectDocument.edit(body.projectDocument);
+      entity.projectDocument.edit({
+        actorId: claims.userId,
+        data: body.projectDocument,
+      });
     }
     this.editStoredFile(entity, body);
 

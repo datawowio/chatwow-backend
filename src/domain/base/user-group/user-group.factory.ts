@@ -17,6 +17,8 @@ export class UserGroupFactory {
       updatedAt: isDefined(data.updatedAt)
         ? data.updatedAt
         : myDayjs().toDate(),
+      createdById: isDefined(data.createdById) ? data.createdById : null,
+      updatedById: isDefined(data.updatedById) ? data.updatedById : null,
     });
   }
 

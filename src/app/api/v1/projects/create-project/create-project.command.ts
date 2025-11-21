@@ -17,6 +17,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
 import { TransactionService } from '@infra/global/transaction/transaction.service';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
@@ -46,10 +47,16 @@ export class CreateProjectCommand implements CommandInterface {
     private transactionService: TransactionService,
   ) {}
 
-  async exec(body: CreateProjectDto): Promise<CreateProjectResponse> {
+  async exec(
+    claims: UserClaims,
+    body: CreateProjectDto,
+  ): Promise<CreateProjectResponse> {
     const project = Project.new({
-      ...body.project,
-      projectStatus: 'ACTIVE',
+      actorId: claims.userId,
+      data: {
+        ...body.project,
+        projectStatus: 'ACTIVE',
+      },
     });
     const userGroups = await this.getUserGroups(body.userGroupIds);
 
@@ -58,9 +65,12 @@ export class CreateProjectCommand implements CommandInterface {
     if (body.projectDocuments) {
       for (const pd of body.projectDocuments) {
         const projectDocument = ProjectDocument.new({
-          projectId: project.id,
-          documentStatus: 'ACTIVE',
-          documentDetails: pd.documentDetails,
+          actorId: claims.userId,
+          data: {
+            projectId: project.id,
+            documentStatus: 'ACTIVE',
+            documentDetails: pd.documentDetails,
+          },
         });
         const storedFile = StoredFile.new({
           ...pd.storedFile,

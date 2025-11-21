@@ -25,19 +25,23 @@ export class User extends DomainEntity<UserPg> {
   readonly userStatus: UserStatus;
   readonly lineAccountId: string | null;
   readonly lastSignedInAt: Date | null;
+  readonly createdById: string | null;
+  readonly updatedById: string | null;
 
   constructor(plain: UserPlain) {
     super();
     Object.assign(this, plain);
   }
 
-  static new(data: UserNewData): User {
+  static new({ actorId, data }: UserNewData): User {
     return UserMapper.fromPlain({
       id: uuidV7(),
       firstName: data.firstName,
       lastName: data.lastName,
       createdAt: myDayjs().toDate(),
       updatedAt: myDayjs().toDate(),
+      createdById: actorId || null,
+      updatedById: actorId || null,
       email: data.email,
       password: data.password ? hashString(data.password) : null,
       role: data.role,
@@ -51,12 +55,14 @@ export class User extends DomainEntity<UserPg> {
     return data.map((d) => User.new(d));
   }
 
-  edit(data: UserUpdateData) {
+  edit({ actorId, data }: UserUpdateData) {
     const plain: UserPlain = {
       id: this.id,
       createdAt: this.createdAt,
       updatedAt: myDayjs().toDate(),
       email: isDefined(data.email) ? data.email : this.email,
+      createdById: this.createdById,
+      updatedById: isDefined(actorId) ? actorId : this.updatedById,
       lastSignedInAt: isDefined(data.lastSignedInAt)
         ? data.lastSignedInAt
         : this.lastSignedInAt,

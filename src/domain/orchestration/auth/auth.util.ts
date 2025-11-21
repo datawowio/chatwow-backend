@@ -20,12 +20,14 @@ export function signIn({ user, password }: SignInOpts) {
   }
 
   user.edit({
-    lastSignedInAt: myDayjs().toDate(),
+    data: {
+      lastSignedInAt: myDayjs().toDate(),
+    },
   });
 
   return ok(null);
 }
 
 export function getAccessToken(user: User) {
-  return encodeUserJwt({ id: user.id });
+  return encodeUserJwt(user);
 }

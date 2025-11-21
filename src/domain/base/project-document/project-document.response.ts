@@ -12,6 +12,9 @@ export class ProjectDocumentResponse {
   @ApiProperty({ example: DATE_EXAMPLE })
   createdAt: string;
 
+  @ApiProperty({ example: DATE_EXAMPLE })
+  updatedAt: string;
+
   @ApiProperty({ example: 'Detailed description of the document.' })
   documentDetails: string;
 

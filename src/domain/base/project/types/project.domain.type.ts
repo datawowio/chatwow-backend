@@ -11,17 +11,23 @@ export type ProjectPlain = Plain<Project>;
 export type ProjectJson = Serialized<ProjectPlain>;
 
 export type ProjectNewData = {
-  projectName: string;
-  projectDescription?: string;
-  projectGuidelineMd?: string;
-  projectStatus: 'ACTIVE' | 'INACTIVE';
-  aiSummaryMd?: string;
+  actorId: string | null;
+  data: {
+    projectName: string;
+    projectDescription?: string;
+    projectGuidelineMd?: string;
+    projectStatus: 'ACTIVE' | 'INACTIVE';
+    aiSummaryMd?: string;
+  };
 };
 
 export type ProjectUpdateData = {
-  projectName?: string;
-  projectDescription?: string;
-  projectGuidelineMd?: string;
-  projectStatus?: 'ACTIVE' | 'INACTIVE';
-  aiSummaryMd?: string;
+  actorId?: string;
+  data: {
+    projectName?: string;
+    projectDescription?: string;
+    projectGuidelineMd?: string;
+    projectStatus?: 'ACTIVE' | 'INACTIVE';
+    aiSummaryMd?: string;
+  };
 };

@@ -11,15 +11,21 @@ export type ProjectDocumentPlain = Plain<ProjectDocument>;
 export type ProjectDocumentJson = Serialized<ProjectDocumentPlain>;
 
 export type ProjectDocumentNewData = {
-  documentStatus?: DocumentStatus;
-  projectId: string;
-  aiSummaryMd?: string;
-  documentDetails?: string;
+  actorId: string | null;
+  data: {
+    documentStatus?: DocumentStatus;
+    projectId: string;
+    aiSummaryMd?: string;
+    documentDetails?: string;
+  };
 };
 
 export type ProjectDocumentUpdateData = {
-  documentStatus?: DocumentStatus;
-  aiSummaryMd?: string;
-  projectId?: string;
-  documentDetails?: string;
+  actorId?: string;
+  data: {
+    documentStatus?: DocumentStatus;
+    aiSummaryMd?: string;
+    projectId?: string;
+    documentDetails?: string;
+  };
 };

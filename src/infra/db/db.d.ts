@@ -31,7 +31,7 @@ export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 
 export type ProjectStatus = "ACTIVE" | "INACTIVE";
 
-export type UserRole = "ADMIN" | "USER";
+export type UserRole = "ADMIN" | "MANAGER" | "USER";
 
 export type UserStatus = "ACTIVE" | "INACTIVE" | "PENDING_REGISTRATION";
 
@@ -84,21 +84,26 @@ export interface ProjectChats {
 export interface ProjectDocuments {
   ai_summary_md: Generated<string>;
   created_at: Generated<string>;
+  created_by_id: string | null;
   document_details: Generated<string>;
   document_status: DocumentStatus;
   id: string;
   project_id: string;
+  updated_at: Generated<string>;
+  updated_by_id: string | null;
 }
 
 export interface Projects {
   ai_summary_md: Generated<string>;
   created_at: Generated<string>;
+  created_by_id: string | null;
   id: string;
   project_description: Generated<string>;
   project_guideline_md: Generated<string>;
   project_name: string;
   project_status: ProjectStatus;
   updated_at: Generated<string>;
+  updated_by_id: string | null;
 }
 
 export interface StoredFiles {
@@ -127,10 +132,12 @@ export interface UserGroupProjects {
 
 export interface UserGroups {
   created_at: Generated<string>;
+  created_by_id: string | null;
   description: Generated<string>;
   group_name: string;
   id: string;
   updated_at: Generated<string>;
+  updated_by_id: string | null;
 }
 
 export interface UserGroupUsers {
@@ -153,6 +160,7 @@ export interface UserOtps {
 
 export interface Users {
   created_at: Generated<string>;
+  created_by_id: string | null;
   email: string;
   first_name: string;
   id: string;
@@ -162,6 +170,7 @@ export interface Users {
   password: string | null;
   role: UserRole;
   updated_at: Generated<string>;
+  updated_by_id: string | null;
   user_status: UserStatus;
 }
 

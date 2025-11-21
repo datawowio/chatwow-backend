@@ -22,15 +22,20 @@ export class Project extends DomainEntity<ProjectPg> {
   readonly projectStatus: ProjectStatus;
   readonly aiSummaryMd: string;
 
+  readonly createdById: string | null;
+  readonly updatedById: string | null;
+
   constructor(plain: ProjectPlain) {
     super();
     Object.assign(this, plain);
   }
 
-  static new(data: ProjectNewData) {
+  static new({ actorId, data }: ProjectNewData) {
     return ProjectMapper.fromPlain({
       id: uuidV7(),
       createdAt: new Date(),
+      createdById: actorId,
+      updatedById: actorId,
       updatedAt: new Date(),
       projectName: data.projectName,
       projectDescription: data.projectDescription || '',
@@ -44,11 +49,13 @@ export class Project extends DomainEntity<ProjectPg> {
     return data.map((d) => Project.new(d));
   }
 
-  edit(data: ProjectUpdateData) {
+  edit({ actorId, data }: ProjectUpdateData) {
     const plain: ProjectPlain = {
       id: this.id,
       createdAt: this.createdAt,
       updatedAt: new Date(),
+      createdById: this.createdById,
+      updatedById: isDefined(actorId) ? actorId : this.updatedById,
 
       aiSummaryMd: isDefined(data.aiSummaryMd)
         ? data.aiSummaryMd

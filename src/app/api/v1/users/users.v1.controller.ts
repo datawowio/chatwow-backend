@@ -48,8 +48,11 @@ export class UsersV1Controller {
 
   @Post()
   @ApiResponse({ type: () => AddUserResponse })
-  async addUser(@Body() body: AddUserDto): Promise<AddUserResponse> {
-    return this.addUserCommand.exec(body);
+  async addUser(
+    @UserClaims() claims: UserClaims,
+    @Body() body: AddUserDto,
+  ): Promise<AddUserResponse> {
+    return this.addUserCommand.exec(claims, body);
   }
 
   @Get('summary')
@@ -66,7 +69,7 @@ export class UsersV1Controller {
     @UserClaims() claims: UserClaims,
     @Query() query: GetUserDto,
   ): Promise<GetUserResponse> {
-    return this.getUserQuery.exec(claims.id, query);
+    return this.getUserQuery.exec(claims.userId, query);
   }
 
   @Get(':id')
@@ -81,10 +84,11 @@ export class UsersV1Controller {
   @Patch(':id')
   @ApiResponse({ type: () => EditUserResponse })
   async editUser(
+    @UserClaims() claims: UserClaims,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() body: EditUserDto,
   ): Promise<EditUserResponse> {
-    return this.editUserCommand.exec(id, body);
+    return this.editUserCommand.exec(claims, id, body);
   }
 
   @Post(':id/resend-invite')

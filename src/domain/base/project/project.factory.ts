@@ -23,6 +23,8 @@ export class ProjectFactory {
         ? data.projectStatus
         : 'ACTIVE',
       aiSummaryMd: isDefined(data.aiSummaryMd) ? data.aiSummaryMd : '',
+      createdById: isDefined(data.createdById) ? data.createdById : null,
+      updatedById: isDefined(data.updatedById) ? data.updatedById : null,
     });
   }
 

@@ -11,22 +11,28 @@ export type UserPlain = Plain<User>;
 export type UserJson = Serialized<UserPlain>;
 
 export type UserNewData = {
-  email: string;
-  role: UserRole;
-  firstName: string;
-  lastName: string;
-  password?: string;
-  userStatus?: UserStatus;
-  lineAccountId?: string;
+  actorId: string | null;
+  data: {
+    email: string;
+    role: UserRole;
+    firstName: string;
+    lastName: string;
+    password?: string;
+    userStatus?: UserStatus;
+    lineAccountId?: string;
+  };
 };
 
 export type UserUpdateData = {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  password?: string;
-  role?: UserRole;
-  userStatus?: UserStatus;
-  lineAccountId?: string;
-  lastSignedInAt?: Date | null;
+  actorId?: string;
+  data: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    password?: string;
+    role?: UserRole;
+    userStatus?: UserStatus;
+    lineAccountId?: string;
+    lastSignedInAt?: Date | null;
+  };
 };

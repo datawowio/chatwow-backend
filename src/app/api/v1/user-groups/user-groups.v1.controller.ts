@@ -10,6 +10,8 @@ import {
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
+
 import { CreateUserGroupCommand } from './create-user-group/create-user-group.command';
 import {
   CreateUserGroupDto,
@@ -48,8 +50,11 @@ export class UserGroupsV1Controller {
 
   @Post()
   @ApiResponse({ type: () => CreateUserGroupResponse })
-  async createUserGroup(@Body() body: CreateUserGroupDto) {
-    return this.createUserGroupCommand.exec(body);
+  async createUserGroup(
+    @UserClaims() claims: UserClaims,
+    @Body() body: CreateUserGroupDto,
+  ) {
+    return this.createUserGroupCommand.exec(claims, body);
   }
 
   @Get(':id')
@@ -64,9 +69,10 @@ export class UserGroupsV1Controller {
   @Patch(':id')
   @ApiResponse({ type: () => EditUserGroupResponse })
   async editUserGroup(
+    @UserClaims() claims: UserClaims,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() body: EditUserGroupDto,
   ) {
-    return this.editUserGroupCommand.exec(id, body);
+    return this.editUserGroupCommand.exec(claims, id, body);
   }
 }

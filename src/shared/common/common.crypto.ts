@@ -1,3 +1,4 @@
+import { User } from '@domain/base/user/user.domain';
 import * as bcrypt from 'bcrypt';
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 import { TokenExpiredError, sign, verify } from 'jsonwebtoken';
@@ -67,9 +68,10 @@ export function isMatchedHash(raw: string, hashed: string) {
   return isMatch;
 }
 
-export function encodeUserJwt(user: UserJwtEncoded) {
+export function encodeUserJwt(user: User) {
   const encoded: UserJwtEncoded = {
-    id: user.id,
+    userId: user.id,
+    role: user.role,
   };
 
   return encodeJwt(encoded, jwtConfig.salt, {

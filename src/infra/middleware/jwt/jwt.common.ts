@@ -1,14 +1,18 @@
 import type { ExecutionContext } from '@nestjs/common';
 import { SetMetadata, createParamDecorator } from '@nestjs/common';
 
+import { UserRole } from '@infra/db/db';
+
 export const USER_CONTEXT = 'user';
 
 export type UserJwtEncoded = {
-  id: string;
+  userId: string;
+  role: UserRole;
 };
 
 export type UserClaims = {
-  id: string;
+  userId: string;
+  role: UserRole;
 };
 
 export const IS_PUBLIC_KEY = 'isPublic';
@@ -20,7 +24,8 @@ export const UserClaims = createParamDecorator(
     const userCtx: UserJwtEncoded = req[USER_CONTEXT];
 
     return {
-      id: userCtx.id,
+      userId: userCtx.userId,
+      role: userCtx.role,
     };
   },
 );

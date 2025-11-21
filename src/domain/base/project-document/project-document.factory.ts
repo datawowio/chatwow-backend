@@ -22,6 +22,11 @@ export class ProjectDocumentFactory {
         ? data.createdAt
         : myDayjs().toDate(),
       aiSummaryMd: isDefined(data.aiSummaryMd) ? data.aiSummaryMd : '',
+      createdById: isDefined(data.createdById) ? data.createdById : null,
+      updatedById: isDefined(data.updatedById) ? data.updatedById : null,
+      updatedAt: isDefined(data.updatedAt)
+        ? data.updatedAt
+        : myDayjs().toDate(),
     });
   }
 

@@ -4,6 +4,7 @@ import { ProjectService } from '@domain/base/project/project.service';
 import { Injectable } from '@nestjs/common';
 
 import { TransactionService } from '@infra/global/transaction/transaction.service';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
@@ -17,11 +18,18 @@ export class EditProjectCommand implements CommandInterface {
     private transactionService: TransactionService,
   ) {}
 
-  async exec(id: string, body: EditProjectDto): Promise<EditProjectResponse> {
+  async exec(
+    claims: UserClaims,
+    id: string,
+    body: EditProjectDto,
+  ): Promise<EditProjectResponse> {
     const project = await this.find(id);
 
     if (body.project) {
-      project.edit(body.project);
+      project.edit({
+        data: body.project,
+        actorId: claims.userId,
+      });
     }
 
     await this.save(project);

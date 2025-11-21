@@ -20,17 +20,23 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
   readonly aiSummaryMd: string;
   readonly projectId: string;
   readonly createdAt: Date;
+  readonly updatedAt: Date;
+  readonly createdById: string | null;
+  readonly updatedById: string | null;
 
   constructor(plain: ProjectDocumentPlain) {
     super();
     Object.assign(this, plain);
   }
 
-  static new(data: ProjectDocumentNewData) {
+  static new({ actorId, data }: ProjectDocumentNewData) {
     return ProjectDocumentMapper.fromPlain({
       id: uuidV7(),
       createdAt: myDayjs().toDate(),
+      createdById: actorId,
+      updatedById: actorId,
       projectId: data.projectId,
+      updatedAt: myDayjs().toDate(),
       documentDetails: data.documentDetails || '',
       documentStatus: data.documentStatus || 'ACTIVE',
       aiSummaryMd: data.aiSummaryMd || '',
@@ -41,10 +47,13 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
     return data.map((d) => ProjectDocument.new(d));
   }
 
-  edit(data: ProjectDocumentUpdateData) {
+  edit({ actorId, data }: ProjectDocumentUpdateData) {
     const plain: ProjectDocumentPlain = {
       id: this.id,
       createdAt: this.createdAt,
+      updatedAt: myDayjs().toDate(),
+      createdById: this.createdById,
+      updatedById: isDefined(actorId) ? actorId : this.updatedById,
       documentDetails: isDefined(data.documentDetails)
         ? data.documentDetails
         : this.documentDetails,

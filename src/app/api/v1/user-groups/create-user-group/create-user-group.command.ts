@@ -13,6 +13,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
 import { TransactionService } from '@infra/global/transaction/transaction.service';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
@@ -40,8 +41,14 @@ export class CreateUserGroupCommand implements CommandInterface {
     private transactionService: TransactionService,
   ) {}
 
-  async exec(body: CreateUserGroupDto): Promise<CreateUserGroupResponse> {
-    const userGroup = UserGroup.new(body.userGroup);
+  async exec(
+    claims: UserClaims,
+    body: CreateUserGroupDto,
+  ): Promise<CreateUserGroupResponse> {
+    const userGroup = UserGroup.new({
+      actorId: claims.userId,
+      data: body.userGroup,
+    });
     const [users, projects] = await Promise.all([
       this.findUsers(body.userIds),
       this.findProjects(body.projectIds),

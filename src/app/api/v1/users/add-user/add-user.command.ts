@@ -10,6 +10,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
 import { TransactionService } from '@infra/global/transaction/transaction.service';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
@@ -33,10 +34,16 @@ export class AddUserCommand implements CommandInterface {
     private eventDispatch: EventDispatch,
   ) {}
 
-  async exec(body: AddUserDto): Promise<AddUserResponse> {
-    const user = User.new(body.user);
+  async exec(claims: UserClaims, body: AddUserDto): Promise<AddUserResponse> {
+    const user = User.new({
+      actorId: claims.userId,
+      data: body.user,
+    });
     user.edit({
-      userStatus: 'PENDING_REGISTRATION',
+      actorId: claims.userId,
+      data: {
+        userStatus: 'PENDING_REGISTRATION',
+      },
     });
 
     const userGroups = await this.getUserGroups(body.userGroupIds);

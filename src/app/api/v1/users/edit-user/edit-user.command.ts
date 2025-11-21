@@ -9,6 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
 import { TransactionService } from '@infra/global/transaction/transaction.service';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
@@ -31,10 +32,17 @@ export class EditUserCommand implements CommandInterface {
     private userGroupUserService: UserGroupUserService,
   ) {}
 
-  async exec(id: string, body: EditUserDto): Promise<EditUserResponse> {
+  async exec(
+    claims: UserClaims,
+    id: string,
+    body: EditUserDto,
+  ): Promise<EditUserResponse> {
     const entity = await this.find(id);
     if (body.user) {
-      entity.user.edit(body.user);
+      entity.user.edit({
+        actorId: claims.userId,
+        data: body.user,
+      });
     }
 
     if (body.userGroupIds) {

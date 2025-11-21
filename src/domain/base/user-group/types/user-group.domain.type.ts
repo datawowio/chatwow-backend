@@ -11,11 +11,17 @@ export type UserGroupPlain = Plain<UserGroup>;
 export type UserGroupJson = Serialized<UserGroupPlain>;
 
 export type UserGroupNewData = {
-  groupName: string;
-  description?: string;
+  actorId: string | null;
+  data: {
+    groupName: string;
+    description?: string;
+  };
 };
 
 export type UserGroupUpdateData = {
-  groupName?: string;
-  description?: string;
+  actorId?: string;
+  data: {
+    groupName?: string;
+    description?: string;
+  };
 };

@@ -10,6 +10,7 @@ import { StoredFileService } from '@domain/base/stored-file/stored-file.service'
 import { Injectable } from '@nestjs/common';
 
 import { TransactionService } from '@infra/global/transaction/transaction.service';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
@@ -34,9 +35,13 @@ export class CreateProjectDocumentCommand implements CommandInterface {
   ) {}
 
   async exec(
+    claims: UserClaims,
     body: CreateProjectDocumentDto,
   ): Promise<CreateProjectDocumentResponse> {
-    const projectDocument = ProjectDocument.new(body.projectDocument);
+    const projectDocument = ProjectDocument.new({
+      actorId: claims.userId,
+      data: body.projectDocument,
+    });
     const project = await this.getProject(body.projectDocument.projectId);
 
     const storedFile = StoredFile.new({

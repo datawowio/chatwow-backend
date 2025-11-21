@@ -4,7 +4,10 @@ export async function up(db: Kysely<any>): Promise<void> {
   //
   // ENUMS
   //
-  await db.schema.createType('user_role').asEnum(['ADMIN', 'USER']).execute();
+  await db.schema
+    .createType('user_role')
+    .asEnum(['ADMIN', 'MANAGER', 'USER'])
+    .execute();
 
   await db.schema
     .createType('user_status')
@@ -67,6 +70,12 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('updated_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
+    .addColumn('created_by_id', 'uuid', (col) =>
+      col.references('users.id').onDelete('set null'),
+    )
+    .addColumn('updated_by_id', 'uuid', (col) =>
+      col.references('users.id').onDelete('set null'),
+    )
     .addColumn('role', sql`user_role`, (col) => col.notNull())
     .addColumn('user_status', sql`user_status`, (col) => col.notNull())
     .addColumn('line_account_id', 'text', (col) =>
@@ -100,6 +109,12 @@ export async function up(db: Kysely<any>): Promise<void> {
     )
     .addColumn('updated_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('created_by_id', 'uuid', (col) =>
+      col.references('users.id').onDelete('set null'),
+    )
+    .addColumn('updated_by_id', 'uuid', (col) =>
+      col.references('users.id').onDelete('set null'),
     )
     .addColumn('group_name', 'text', (col) => col.notNull())
     .addColumn('description', 'text', (col) => col.notNull().defaultTo(''))
@@ -135,6 +150,12 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('project_status', sql`project_status`, (col) => col.notNull())
     .addColumn('created_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('created_by_id', 'uuid', (col) =>
+      col.references('users.id').onDelete('set null'),
+    )
+    .addColumn('updated_by_id', 'uuid', (col) =>
+      col.references('users.id').onDelete('set null'),
     )
     .addColumn('updated_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -210,8 +231,17 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('created_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
+    .addColumn('updated_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
     .addColumn('project_id', 'uuid', (col) =>
       col.notNull().references('projects.id').onDelete('cascade'),
+    )
+    .addColumn('created_by_id', 'uuid', (col) =>
+      col.references('users.id').onDelete('set null'),
+    )
+    .addColumn('updated_by_id', 'uuid', (col) =>
+      col.references('users.id').onDelete('set null'),
     )
     .addColumn('document_details', 'text', (col) => col.notNull().defaultTo(''))
     .addColumn('document_status', sql`document_status`, (col) => col.notNull())
