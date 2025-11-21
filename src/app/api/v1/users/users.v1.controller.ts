@@ -11,6 +11,7 @@ import {
 import { ApiResponse } from '@nestjs/swagger';
 
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
+import { UseRoleGuard } from '@infra/middleware/role-guard/role.guard';
 
 import { AddUserCommand } from './add-user/add-user.command';
 import { AddUserDto, AddUserResponse } from './add-user/add-user.dto';
@@ -41,12 +42,14 @@ export class UsersV1Controller {
   ) {}
 
   @Get()
+  @UseRoleGuard(['ADMIN'])
   @ApiResponse({ type: () => ListUsersResponse })
   async getUsers(@Query() query: ListUsersDto) {
     return this.listUsersQuery.exec(query);
   }
 
   @Post()
+  @UseRoleGuard(['ADMIN'])
   @ApiResponse({ type: () => AddUserResponse })
   async addUser(
     @UserClaims() claims: UserClaims,
@@ -56,6 +59,7 @@ export class UsersV1Controller {
   }
 
   @Get('summary')
+  @UseRoleGuard(['ADMIN'])
   @ApiResponse({ type: () => UserSummaryResponse })
   async getUserSummary(
     @Query() query: UserSummaryDto,
@@ -73,6 +77,7 @@ export class UsersV1Controller {
   }
 
   @Get(':id')
+  @UseRoleGuard(['ADMIN'])
   @ApiResponse({ type: () => GetUserResponse })
   async getUser(
     @Param('id', ParseUUIDPipe) id: string,
@@ -82,6 +87,7 @@ export class UsersV1Controller {
   }
 
   @Patch(':id')
+  @UseRoleGuard(['ADMIN'])
   @ApiResponse({ type: () => EditUserResponse })
   async editUser(
     @UserClaims() claims: UserClaims,
@@ -92,6 +98,7 @@ export class UsersV1Controller {
   }
 
   @Post(':id/resend-invite')
+  @UseRoleGuard(['ADMIN'])
   @ApiResponse({ type: () => ResendInviteResponse })
   async resendInvite(
     @Param('id', ParseUUIDPipe) id: string,
