@@ -1,7 +1,8 @@
-import { LineSendMessageJobData } from '@domain/orchestration/queue/line-event/line-event.queue.type';
 import { Injectable } from '@nestjs/common';
 
 import { LineService } from '@infra/global/line/line.service';
+
+import { LineSendMessageJobData } from './line-send-message.type';
 
 @Injectable()
 export class LineSendMessageCommand {

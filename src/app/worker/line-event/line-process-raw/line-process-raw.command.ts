@@ -1,7 +1,8 @@
-import { LineProcessRawJobData } from '@domain/orchestration/queue/line-event/line-event.queue.type';
 import { Injectable } from '@nestjs/common';
 
 import { LineWebHookMessage } from '@infra/global/line/line.type';
+
+import { LineProcessRawJobData } from './line-process-raw.type';
 
 type MessageType = 'verification' | 'selectionMenu' | 'aiChat';
 

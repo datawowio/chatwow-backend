@@ -5,7 +5,7 @@ import { userGroupsTableFilter } from '@domain/base/user-group/user-group.utils'
 import { User } from '@domain/base/user/user.domain';
 import { UserMapper } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
-import { EventDispatch } from '@domain/orchestration/queue/event.dispatch';
+import { DomainEventQueue } from '@domain/orchestration/queue/domain-event/domain-event.queue';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
@@ -31,7 +31,7 @@ export class AddUserCommand implements CommandInterface {
     private transactionService: TransactionService,
     private userService: UserService,
     private userGroupUserService: UserGroupUserService,
-    private eventDispatch: EventDispatch,
+    private domainEventQueue: DomainEventQueue,
   ) {}
 
   async exec(claims: UserClaims, body: AddUserDto): Promise<AddUserResponse> {
@@ -54,7 +54,7 @@ export class AddUserCommand implements CommandInterface {
 
     await this.save(entity);
 
-    this.eventDispatch.addUser(user);
+    this.domainEventQueue.jobSendVerification(user);
 
     return HttpResponseMapper.toSuccess({
       data: {

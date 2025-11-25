@@ -1,10 +1,3 @@
-import {
-  LineProcessAiChatJobData,
-  LineProcessRawJobData,
-  LineProcessSelectionMenuJobData,
-  LineProcessVerificationJobData,
-  LineSendMessageJobData,
-} from '@domain/orchestration/queue/line-event/line-event.queue.type';
 import { Injectable } from '@nestjs/common';
 
 import { LINE_EVENT_JOBS } from '@app/worker/worker.job';
@@ -13,10 +6,15 @@ import { BaseTaskHandler } from '@shared/task/task.abstract';
 import { QueueTask } from '@shared/task/task.decorator';
 
 import { LineProcessAiChatCommand } from './line-process-ai-chat/line-process-ai-chat.command';
+import { LineProcessAiChatJobData } from './line-process-ai-chat/line-process-ai-chat.type';
 import { LineProcessRawCommand } from './line-process-raw/line-process-raw.command';
+import { LineProcessRawJobData } from './line-process-raw/line-process-raw.type';
 import { LineProcessSelectionMenuCommand } from './line-process-selection-menu/line-process-selection-menu.command';
+import { LineProcessSelectionMenuJobData } from './line-process-selection-menu/line-process-selection-menu.type';
 import { LineProcessVerificationCommand } from './line-process-verification/line-process-verification.command';
+import { LineProcessVerificationJobData } from './line-process-verification/line-process-verification.type';
 import { LineSendMessageCommand } from './line-send-message/line-send-message.command';
+import { LineSendMessageJobData } from './line-send-message/line-send-message.type';
 
 @Injectable()
 export class LineEventBullmq extends BaseTaskHandler {

@@ -7,7 +7,6 @@ import { UserMapper } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { getAccessToken } from '@domain/orchestration/auth/auth.util';
-import { EventDispatch } from '@domain/orchestration/queue/event.dispatch';
 import { Inject, Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
@@ -36,7 +35,6 @@ export class ResetPasswordCommand implements CommandInterface {
     private userService: UserService,
     private passwordResetTokenService: PasswordResetTokenService,
     private transactionService: TransactionService,
-    private eventDispatch: EventDispatch,
   ) {}
 
   async exec(body: ResetPasswordDto): Promise<ResetPasswordResponse> {

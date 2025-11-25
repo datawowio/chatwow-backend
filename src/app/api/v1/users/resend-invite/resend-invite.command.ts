@@ -1,5 +1,5 @@
 import { UserService } from '@domain/base/user/user.service';
-import { EventDispatch } from '@domain/orchestration/queue/event.dispatch';
+import { DomainEventQueue } from '@domain/orchestration/queue/domain-event/domain-event.queue';
 
 import { ApiException } from '@shared/http/http.exception';
 
@@ -8,12 +8,12 @@ import { ResendInviteResponse } from './resend-invite.dto';
 export class ResendInviteCommand {
   constructor(
     private userService: UserService,
-    private eventDispatch: EventDispatch,
+    private domainEventQueue: DomainEventQueue,
   ) {}
 
   async exec(userId: string): Promise<ResendInviteResponse> {
     const user = await this.find(userId);
-    this.eventDispatch.sendVerification(user);
+    this.domainEventQueue.jobSendVerification(user);
 
     return {
       success: true,

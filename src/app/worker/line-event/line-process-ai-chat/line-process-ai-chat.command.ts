@@ -1,5 +1,6 @@
-import { LineProcessAiChatJobData } from '@domain/orchestration/queue/line-event/line-event.queue.type';
 import { Injectable } from '@nestjs/common';
+
+import { LineProcessAiChatJobData } from './line-process-ai-chat.type';
 
 @Injectable()
 export class LineProcessAiChatCommand {

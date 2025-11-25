@@ -1,4 +1,3 @@
-import { ForgotPasswordDispatchEvent } from '@domain/orchestration/queue/event.dispatch.type';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -8,6 +7,8 @@ import TemplateForgotPassword from '@infra/global/email/template/template.forgot
 
 import { renderHtml } from '@shared/common/common.func';
 
+import { ForgotPasswordJobData } from './forgot-password.type';
+
 @Injectable()
 export class ForgotPasswordQueueCommand {
   constructor(
@@ -15,7 +16,7 @@ export class ForgotPasswordQueueCommand {
     private emailService: EmailService,
   ) {}
 
-  async exec(data: ForgotPasswordDispatchEvent) {
+  async exec(data: ForgotPasswordJobData) {
     const appConfig = this.configService.getOrThrow<AppConfig['app']>('app');
 
     const html = await renderHtml(

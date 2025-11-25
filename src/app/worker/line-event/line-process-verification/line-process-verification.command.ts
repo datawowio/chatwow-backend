@@ -1,5 +1,6 @@
-import { LineProcessVerificationJobData } from '@domain/orchestration/queue/line-event/line-event.queue.type';
 import { Injectable } from '@nestjs/common';
+
+import { LineProcessVerificationJobData } from './line-process-verification.type';
 
 @Injectable()
 export class LineProcessVerificationCommand {

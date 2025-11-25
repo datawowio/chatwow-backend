@@ -3,13 +3,12 @@ import { User } from '@domain/base/user/user.domain';
 import { UserMapper } from '@domain/base/user/user.mapper';
 import { Injectable } from '@nestjs/common';
 
+import { ForgotPasswordJobData } from '@app/worker/domain-event/forgot-password/forgot-password.type';
+import { ForgotPasswordJobInput } from '@app/worker/domain-event/forgot-password/forgot-password.type';
 import { DOMAIN_EVENT_JOBS } from '@app/worker/worker.job';
 import { QUEUE } from '@app/worker/worker.queue';
 
 import { BaseQueue } from '@shared/task/task.abstract';
-
-import { ForgotPasswordDispatchEvent } from '../event.dispatch.type';
-import { SendForgotPasswordJobData } from './domain-event.queue.type';
 
 @Injectable()
 export class DomainEventQueue extends BaseQueue {
@@ -22,8 +21,8 @@ export class DomainEventQueue extends BaseQueue {
     );
   }
 
-  jobResetPassword(data: ForgotPasswordDispatchEvent) {
-    const jobData: SendForgotPasswordJobData = {
+  jobResetPassword(data: ForgotPasswordJobData) {
+    const jobData: ForgotPasswordJobInput = {
       user: UserMapper.toJsonState(data.user),
       passwordResetToken: PasswordResetTokenMapper.toJsonState(
         data.passwordResetToken,

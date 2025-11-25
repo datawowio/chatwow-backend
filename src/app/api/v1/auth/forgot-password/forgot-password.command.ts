@@ -6,7 +6,7 @@ import { UserMapper } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { getAccessToken } from '@domain/orchestration/auth/auth.util';
-import { EventDispatch } from '@domain/orchestration/queue/event.dispatch';
+import { DomainEventQueue } from '@domain/orchestration/queue/domain-event/domain-event.queue';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { READ_DB, ReadDB } from '@infra/db/db.common';
@@ -36,7 +36,7 @@ export class ForgotPasswordCommand implements CommandInterface {
     private userService: UserService,
     private passwordResetTokenService: PasswordResetTokenService,
     private transactionService: TransactionService,
-    private eventDispatch: EventDispatch,
+    private domainEventQueue: DomainEventQueue,
   ) {}
 
   async exec(body: ForgotPasswordDto): Promise<ForgotPasswordResponse> {
@@ -53,7 +53,7 @@ export class ForgotPasswordCommand implements CommandInterface {
       passwordResetToken,
     });
 
-    this.eventDispatch.resetPassword({
+    this.domainEventQueue.jobResetPassword({
       user,
       passwordResetToken,
       plainToken: token,
