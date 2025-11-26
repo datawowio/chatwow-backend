@@ -14,7 +14,7 @@ export default function TemplateNewPassword({ user, url }: DefaultProps) {
 
   return (
     <Html lang="en">
-      <a href={`${url}`}>Reset Password</a>
+      <a href={`${url}`}>Setup your password</a>
     </Html>
   );
 }

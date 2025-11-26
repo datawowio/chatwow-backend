@@ -62,7 +62,7 @@ export class CheckResetPasswordQuery implements QueryInterface {
             .selectAll()
             .whereRef('password_reset_tokens.user_id', '=', 'users.id')
             .where(usersTableFilter)
-            .where('users.user_status', '=', 'ACTIVE'),
+            .where('users.user_status', '!=', 'INACTIVE'),
         ).as('user'),
       )
       .where(passwordResetTokensTableFilter)

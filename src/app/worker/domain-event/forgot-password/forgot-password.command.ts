@@ -20,12 +20,16 @@ export class ForgotPasswordQueueCommand {
   async exec(data: ForgotPasswordJobData) {
     const appConfig = this.configService.getOrThrow<AppConfig['app']>('app');
 
+    const email = data.user.email;
+
     let template = TemplateForgotPassword;
-    let url = `${appConfig.frontendUrl}/th/reset-password?token=${data.plainToken}`;
+    let url = `${appConfig.frontendUrl}/th/reset-password?token=${data.plainToken}&email=${email}`;
+    let subject = 'ลืมรหัสผ่าน';
 
     if (data.action === 'newUser') {
       template = TemplateNewPassword;
-      url = `${appConfig.frontendUrl}/th/invitation/register?token=${data.plainToken}`;
+      url = `${appConfig.frontendUrl}/th/invitation/register?token=${data.plainToken}&email=${email}`;
+      subject = 'ยินดีต้อนรับสู่ระบบ';
     }
 
     const html = await renderHtml(
@@ -35,6 +39,6 @@ export class ForgotPasswordQueueCommand {
       }),
     );
 
-    await this.emailService.send(data.user.email, 'ลืมรหัสผ่าน', html);
+    await this.emailService.send(data.user.email, subject, html);
   }
 }

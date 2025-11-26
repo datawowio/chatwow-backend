@@ -53,6 +53,16 @@ export class ResetPasswordCommand implements CommandInterface {
       },
     });
 
+    if (entity.user.userStatus === 'PENDING_REGISTRATION') {
+      // if new account set to active
+      entity.user.edit({
+        actorId: entity.user.id,
+        data: {
+          userStatus: 'ACTIVE',
+        },
+      });
+    }
+
     await this.save(entity);
 
     return HttpResponseMapper.toSuccess({
@@ -93,7 +103,7 @@ export class ResetPasswordCommand implements CommandInterface {
             .selectAll()
             .whereRef('password_reset_tokens.user_id', '=', 'users.id')
             .where(usersTableFilter)
-            .where('users.user_status', '=', 'ACTIVE'),
+            .where('users.user_status', '!=', 'INACTIVE'),
         ).as('user'),
       )
       .where(passwordResetTokensTableFilter)

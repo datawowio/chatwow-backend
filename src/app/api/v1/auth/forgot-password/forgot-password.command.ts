@@ -44,16 +44,6 @@ export class ForgotPasswordCommand implements CommandInterface {
       });
     }
 
-    if (user.userStatus === 'PENDING_REGISTRATION') {
-      // if new account set to active
-      user.edit({
-        actorId: user.id,
-        data: {
-          userStatus: 'ACTIVE',
-        },
-      });
-    }
-
     const token = shaHashstring();
     const passwordResetToken = PasswordResetToken.new({
       userId: user.id,
