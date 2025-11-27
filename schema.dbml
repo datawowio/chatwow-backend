@@ -75,7 +75,8 @@ Table "users" {
 }
 
 Table "user_verifications" {
-  "id" text [pk, not null]
+  "id" uuid [pk, not null]
+  "code" text [unique, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "user_id" uuid [not null]
   "revoke_at" timestamptz

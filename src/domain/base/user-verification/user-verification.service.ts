@@ -41,8 +41,8 @@ export class UserVerificationService {
     return this.repo.delete(id);
   }
 
-  async deleteAll(userId: string) {
-    return this.repo.deleteAll(userId);
+  async revokeAll(userId: string) {
+    return this.repo.revokeAll(userId);
   }
 
   async sendVerificationMail(user: User, userVerification: UserVerification) {

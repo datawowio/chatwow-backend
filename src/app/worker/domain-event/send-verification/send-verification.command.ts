@@ -29,7 +29,7 @@ export class SendVerificationQueueCommand implements CommandInterface {
   async save(user: User, verification: UserVerification): Promise<void> {
     await this.transactionService.transaction(async () => {
       await this.userService.save(user);
-      await this.userVerificationService.deleteAll(user.id);
+      await this.userVerificationService.revokeAll(user.id);
       await this.userVerificationService.save(verification);
 
       // send otp do in transaction in case failure

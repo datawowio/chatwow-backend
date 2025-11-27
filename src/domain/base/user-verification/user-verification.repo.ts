@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import myDayjs from '@shared/common/common.dayjs';
 import { diff } from '@shared/common/common.func';
 import { BaseRepo } from '@shared/common/common.repo';
 
@@ -58,10 +59,13 @@ export class UserVerificationRepo extends BaseRepo {
       .execute();
   }
 
-  async deleteAll(userId: string) {
+  async revokeAll(userId: string) {
     await this.db
       //
-      .deleteFrom('user_verifications')
+      .updateTable('user_verifications')
+      .set({
+        revoke_at: myDayjs().toISOString(),
+      })
       .where('user_id', '=', userId)
       .execute();
   }

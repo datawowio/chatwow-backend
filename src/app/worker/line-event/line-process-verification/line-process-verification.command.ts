@@ -101,7 +101,7 @@ export class LineProcessVerificationCommand {
     const res = await this.readDb
       .selectFrom('user_verifications')
       .where(usersVerificationsTableFilter)
-      .where('user_verifications.id', '=', verificationCode.toUpperCase())
+      .where('user_verifications.code', '=', verificationCode.toUpperCase())
       .where('user_verifications.expire_at', '>', myDayjs().toISOString())
       .where('user_verifications.revoke_at', 'is', null)
       .selectAll('user_verifications')

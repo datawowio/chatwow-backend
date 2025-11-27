@@ -1,3 +1,4 @@
+import { uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
@@ -14,6 +15,7 @@ import { generateVerificationCode } from './user-verification.util';
 export class UserVerification extends DomainEntity<UserVerificationPg> {
   readonly id: string;
   readonly createdAt: Date;
+  readonly code: string;
   readonly userId: string;
   readonly expireAt: Date;
   readonly revokeAt: Date | null;
@@ -27,7 +29,8 @@ export class UserVerification extends DomainEntity<UserVerificationPg> {
     const now = myDayjs();
 
     return UserVerificationMapper.fromPlain({
-      id: generateVerificationCode(),
+      id: uuidV7(),
+      code: generateVerificationCode(),
       createdAt: now.toDate(),
       userId: data.userId,
       expireAt: now.add(10, 'minutes').toDate(),
@@ -44,6 +47,7 @@ export class UserVerification extends DomainEntity<UserVerificationPg> {
       id: this.id,
       createdAt: this.createdAt,
       userId: this.userId,
+      code: this.code,
 
       // update
       revokeAt: isDefined(data.revokeAt) ? data.revokeAt : this.revokeAt,

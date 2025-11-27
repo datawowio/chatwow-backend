@@ -21,7 +21,7 @@ type DefaultProps = {
 export default function TemplateSendVerificationCode({ userVerification }: DefaultProps) {
   userVerification ??= UserVerificationFactory.mock({});
 
-  const verificationCode = userVerification.id;
+  const verificationCode = userVerification.code;
 
   return (
     <Html>

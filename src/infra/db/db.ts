@@ -199,6 +199,7 @@ export interface Users {
 }
 
 export interface UserVerifications {
+  code: string;
   created_at: Generated<string>;
   expire_at: string;
   id: string;

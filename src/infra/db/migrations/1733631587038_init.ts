@@ -101,7 +101,8 @@ export async function up(db: Kysely<any>): Promise<void> {
   //
   await db.schema
     .createTable('user_verifications')
-    .addColumn('id', 'text', (col) => col.primaryKey())
+    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('code', 'text', (col) => col.notNull())
     .addColumn('created_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
@@ -110,6 +111,14 @@ export async function up(db: Kysely<any>): Promise<void> {
     )
     .addColumn('revoke_at', 'timestamptz')
     .addColumn('expire_at', 'timestamptz', (col) => col.notNull())
+    .execute();
+
+  await db.schema
+    .createIndex('user_verifications_code_idx')
+    .unique()
+    .on('user_verifications')
+    .columns(['code'])
+    .where(sql`revoke_at`, 'is', null)
     .execute();
 
   //

@@ -16,6 +16,7 @@ export class UserVerificationMapper {
       userId: pg.user_id,
       expireAt: toDate(pg.expire_at),
       revokeAt: toDate(pg.revoke_at),
+      code: pg.code,
     };
 
     return new UserVerification(plain);
@@ -32,6 +33,7 @@ export class UserVerificationMapper {
       userId: plainData.userId,
       expireAt: plainData.expireAt,
       revokeAt: plainData.revokeAt,
+      code: plainData.code,
     };
 
     return new UserVerification(plain);
@@ -44,6 +46,7 @@ export class UserVerificationMapper {
       userId: json.userId,
       expireAt: toDate(json.expireAt),
       revokeAt: toDate(json.revokeAt),
+      code: json.code,
     };
 
     return new UserVerification(plain);
@@ -56,6 +59,7 @@ export class UserVerificationMapper {
       user_id: userVerification.userId,
       expire_at: userVerification.expireAt.toISOString(),
       revoke_at: toISO(userVerification.revokeAt),
+      code: userVerification.code,
     };
   }
 
@@ -66,6 +70,7 @@ export class UserVerificationMapper {
       userId: userVerification.userId,
       expireAt: userVerification.expireAt,
       revokeAt: userVerification.revokeAt,
+      code: userVerification.code,
     };
   }
 
@@ -76,6 +81,7 @@ export class UserVerificationMapper {
       userId: userVerification.userId,
       expireAt: toISO(userVerification.expireAt),
       revokeAt: toISO(userVerification.revokeAt),
+      code: userVerification.code,
     };
   }
 
