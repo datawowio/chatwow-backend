@@ -61,8 +61,6 @@ export class LineProcessRawCommand {
     }
 
     this.processByMessageType(entity, { event, config: body.config });
-
-    await lineService.reply(event.replyToken, LINE_INVALID_MESSAGE_REPLY);
   }
 
   processByMessageType(entity: Entity, opts: ProcessByMessageTypeOpts) {

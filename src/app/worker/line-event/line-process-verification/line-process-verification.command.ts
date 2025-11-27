@@ -2,6 +2,9 @@ import { LineAccount } from '@domain/base/line-account/line-account.domain';
 import { LineAccountService } from '@domain/base/line-account/line-account.service';
 import { LineSession } from '@domain/base/line-session/line-session.domain';
 import { LineSessionService } from '@domain/base/line-session/line-session.service';
+import { UserVerification } from '@domain/base/user-verification/user-verification.domain';
+import { UserVerificationMapper } from '@domain/base/user-verification/user-verification.mapper';
+import { UserVerificationService } from '@domain/base/user-verification/user-verification.service';
 import { usersVerificationsTableFilter } from '@domain/base/user-verification/user-verification.util';
 import { User } from '@domain/base/user/user.domain';
 import { UserMapper } from '@domain/base/user/user.mapper';
@@ -27,6 +30,7 @@ type Entity = {
   user: User;
   lineAccount: LineAccount;
   lineSession: LineSession;
+  userVerification: UserVerification;
 };
 
 @Injectable()
@@ -38,6 +42,7 @@ export class LineProcessVerificationCommand {
     private lineAccountService: LineAccountService,
     private lineSessionService: LineSessionService,
     private userService: UserService,
+    private userVerificationService: UserVerificationService,
 
     private transactionService: TransactionService,
     private lineEventQueue: LineEventQueue,
@@ -46,12 +51,13 @@ export class LineProcessVerificationCommand {
   async exec({ lineBot, lineSession, data }: LineProcessVerificationJobData) {
     const lineService = new LineService(lineBot);
 
-    const user = await this.findUserFromVerification(data.verificationCode);
-    if (!user) {
+    const res = await this.findUserFromVerification(data.verificationCode);
+    if (!res) {
       await lineService.reply(data.replyToken, LINE_INVALID_VERIFICATION_REPLY);
       return;
     }
 
+    const { user, userVerification } = res;
     const lineAccount = LineAccount.new({
       id: lineSession.lineAccountId,
     });
@@ -60,20 +66,24 @@ export class LineProcessVerificationCommand {
         lineAccountId: lineAccount.id,
       },
     });
+    userVerification.edit({
+      revokeAt: myDayjs().toDate(),
+    });
 
     await this.save({
       lineAccount,
       lineSession,
       user,
+      userVerification,
     });
 
-    await lineService.reply(data.replyToken, LINE_SUCCESS_VERIFICATION_REPLY);
     this.lineEventQueue.jobShowSelectionMenu({
       lineBot,
       lineSession,
       data: {
         replyToken: data.replyToken,
         lineAccountId: lineSession.lineAccountId,
+        addMessages: [LINE_SUCCESS_VERIFICATION_REPLY],
       },
     });
   }
@@ -83,6 +93,7 @@ export class LineProcessVerificationCommand {
       await this.lineAccountService.save(entity.lineAccount);
       await this.lineSessionService.save(entity.lineSession);
       await this.userService.save(entity.user);
+      await this.userVerificationService.save(entity.userVerification);
     });
   }
 
@@ -90,8 +101,9 @@ export class LineProcessVerificationCommand {
     const res = await this.readDb
       .selectFrom('user_verifications')
       .where(usersVerificationsTableFilter)
-      .where('user_verifications.id', '=', verificationCode)
+      .where('user_verifications.id', '=', verificationCode.toUpperCase())
       .where('user_verifications.expire_at', '>', myDayjs().toISOString())
+      .where('user_verifications.revoke_at', 'is', null)
       .selectAll('user_verifications')
       .select((eb) =>
         jsonObjectFrom(
@@ -108,6 +120,9 @@ export class LineProcessVerificationCommand {
       return null;
     }
 
-    return UserMapper.fromPgWithState(res.user);
+    return {
+      user: UserMapper.fromPgWithState(res.user),
+      userVerification: UserVerificationMapper.fromPgWithState(res),
+    };
   }
 }

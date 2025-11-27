@@ -108,6 +108,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('user_id', 'uuid', (col) =>
       col.references('users.id').notNull().onDelete('cascade'),
     )
+    .addColumn('revoke_at', 'timestamptz')
     .addColumn('expire_at', 'timestamptz', (col) => col.notNull())
     .execute();
 

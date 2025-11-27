@@ -16,6 +16,7 @@ export class UserVerification extends DomainEntity<UserVerificationPg> {
   readonly createdAt: Date;
   readonly userId: string;
   readonly expireAt: Date;
+  readonly revokeAt: Date | null;
 
   constructor(plain: UserVerificationPlain) {
     super();
@@ -30,6 +31,7 @@ export class UserVerification extends DomainEntity<UserVerificationPg> {
       createdAt: now.toDate(),
       userId: data.userId,
       expireAt: now.add(10, 'minutes').toDate(),
+      revokeAt: null,
     });
   }
 
@@ -44,6 +46,7 @@ export class UserVerification extends DomainEntity<UserVerificationPg> {
       userId: this.userId,
 
       // update
+      revokeAt: isDefined(data.revokeAt) ? data.revokeAt : this.revokeAt,
       expireAt: isDefined(data.expireAt) ? data.expireAt : this.expireAt,
     };
 

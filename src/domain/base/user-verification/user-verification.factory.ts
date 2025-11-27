@@ -11,6 +11,7 @@ export class UserVerificationFactory {
       id: isDefined(data.id) ? data.id : generateVerificationCode(),
       createdAt: isDefined(data.createdAt) ? data.createdAt : new Date(),
       userId: isDefined(data.userId) ? data.userId : uuidV7(),
+      revokeAt: isDefined(data.revokeAt) ? data.revokeAt : null,
       expireAt: isDefined(data.expireAt)
         ? data.expireAt
         : new Date(Date.now() + 5 * 60 * 1000),

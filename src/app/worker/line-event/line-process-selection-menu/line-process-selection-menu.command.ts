@@ -25,13 +25,11 @@ export class LineProcessSelectionMenuCommand {
 
   async exec({ lineBot, lineSession, data }: LineProcessSelectionMenuJobData) {
     const lineService = new LineService(lineBot);
-    lineSession.edit({
-      lineSessionStatus: 'PROJECT_SELECTION',
-    });
-
     const projects = await this.getUserProjects(data.lineAccountId);
 
-    const selectedProject = projects.find((p) => p.id === data.message);
+    const selectedProject = projects.find(
+      (p) => p.projectName === data.message,
+    );
     if (!selectedProject) {
       await lineService.reply(
         data.replyToken,
@@ -42,6 +40,7 @@ export class LineProcessSelectionMenuCommand {
 
     lineSession.edit({
       projectId: selectedProject.id,
+      lineSessionStatus: 'ACTIVE',
     });
     await this.save(lineSession);
 
@@ -60,6 +59,7 @@ export class LineProcessSelectionMenuCommand {
       options: {
         filter: {
           lineAccountId,
+          projectStatus: 'ACTIVE',
         },
       },
     });

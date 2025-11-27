@@ -4,6 +4,7 @@ import { createHmac } from 'crypto';
 
 import { LINE_NO_PROJECT_REPLY } from '@app/worker/line-event/line-event.constant';
 
+import { isDefined } from '@shared/common/common.validator';
 import { ApiException } from '@shared/http/http.exception';
 
 import { ValidateSignatureOpts } from './line.type';
@@ -56,50 +57,68 @@ export class LineService {
     });
   }
 
-  async replyProjectSelection(replyToken: string, projects: Project[]) {
+  async replyProjectSelection(
+    replyToken: string,
+    projects: Project[],
+    addTexts?: string[],
+  ) {
     if (!projects.length) {
       await this.reply(replyToken, LINE_NO_PROJECT_REPLY);
       return;
     }
 
-    await this.lineApi.replyMessage({
-      replyToken,
-      messages: [
-        {
-          type: 'flex',
-          altText: 'Select a project',
-          contents: {
-            type: 'bubble',
-            body: {
+    const messages: messagingApi.Message[] = [];
+    if (isDefined(addTexts)) {
+      addTexts.forEach((text) => {
+        messages.push({
+          type: 'text',
+          text,
+        });
+      });
+    }
+
+    messages.push({
+      type: 'flex',
+      altText: 'Select a project',
+      contents: {
+        type: 'bubble',
+        body: {
+          type: 'box',
+          layout: 'vertical',
+          contents: [
+            {
+              type: 'text',
+              text: 'Select a project',
+              weight: 'bold',
+              size: 'lg',
+            },
+            {
               type: 'box',
               layout: 'vertical',
-              contents: [
-                {
-                  type: 'text',
-                  text: 'Select a project',
-                  weight: 'bold',
-                  size: 'lg',
+              margin: 'md',
+              spacing: 'sm',
+              contents: projects.map((p) => ({
+                type: 'button',
+                action: {
+                  type: 'message',
+
+                  // User action here
+                  label: p.projectName,
+
+                  // they will reply as this
+                  text: p.projectName,
                 },
-                {
-                  type: 'box',
-                  layout: 'vertical',
-                  margin: 'md',
-                  spacing: 'sm',
-                  contents: projects.map((p) => ({
-                    type: 'button',
-                    action: {
-                      type: 'message',
-                      label: p.projectName,
-                      text: p.id,
-                    },
-                    style: 'primary',
-                  })),
-                },
-              ],
+                style: 'primary',
+              })),
             },
-          },
+          ],
         },
-      ],
+      },
+    });
+
+    await this.lineApi.replyMessage({
+      replyToken,
+      messages,
     });
   }
 }

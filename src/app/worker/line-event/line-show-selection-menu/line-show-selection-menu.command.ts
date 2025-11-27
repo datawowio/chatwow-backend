@@ -26,7 +26,13 @@ export class LineShowSelectionMenuCommand {
     });
 
     const projects = await this.getUserProjects(data.lineAccountId);
-    await lineService.replyProjectSelection(data.replyToken, projects);
+
+    await this.save(lineSession);
+    await lineService.replyProjectSelection(
+      data.replyToken,
+      projects,
+      data.addMessages,
+    );
   }
 
   async save(lineSession: LineSession) {
@@ -38,6 +44,7 @@ export class LineShowSelectionMenuCommand {
       options: {
         filter: {
           lineAccountId,
+          projectStatus: 'ACTIVE',
         },
       },
     });

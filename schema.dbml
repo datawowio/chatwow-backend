@@ -78,6 +78,7 @@ Table "user_verifications" {
   "id" text [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "user_id" uuid [not null]
+  "revoke_at" timestamptz
   "expire_at" timestamptz [not null]
 }
 

@@ -1,11 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { DATE_EXAMPLE } from '@shared/common/common.constant';
+
 export class UserVerificationResponse {
   @ApiProperty({ example: '' })
   id: string;
-
-  @ApiProperty({ example: '123456' })
-  otp: string;
 
   @ApiProperty({ example: '' })
   createdAt: string;
@@ -13,6 +12,9 @@ export class UserVerificationResponse {
   @ApiProperty({ example: '' })
   userId: string;
 
-  @ApiProperty({ example: '' })
+  @ApiProperty({ example: DATE_EXAMPLE })
   expireAt: string;
+
+  @ApiProperty({ example: DATE_EXAMPLE })
+  revokeAt: string | null;
 }

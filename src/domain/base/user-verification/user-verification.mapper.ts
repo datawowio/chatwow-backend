@@ -1,4 +1,4 @@
-import { toDate } from '@shared/common/common.transformer';
+import { toDate, toISO } from '@shared/common/common.transformer';
 
 import type {
   UserVerificationJson,
@@ -6,6 +6,7 @@ import type {
   UserVerificationPlain,
 } from './types/user-verification.domain.type';
 import { UserVerification } from './user-verification.domain';
+import { UserVerificationResponse } from './user-verification.response';
 
 export class UserVerificationMapper {
   static fromPg(pg: UserVerificationPg): UserVerification {
@@ -14,6 +15,7 @@ export class UserVerificationMapper {
       createdAt: toDate(pg.created_at),
       userId: pg.user_id,
       expireAt: toDate(pg.expire_at),
+      revokeAt: toDate(pg.revoke_at),
     };
 
     return new UserVerification(plain);
@@ -29,6 +31,7 @@ export class UserVerificationMapper {
       createdAt: plainData.createdAt,
       userId: plainData.userId,
       expireAt: plainData.expireAt,
+      revokeAt: plainData.revokeAt,
     };
 
     return new UserVerification(plain);
@@ -40,6 +43,7 @@ export class UserVerificationMapper {
       createdAt: toDate(json.createdAt),
       userId: json.userId,
       expireAt: toDate(json.expireAt),
+      revokeAt: toDate(json.revokeAt),
     };
 
     return new UserVerification(plain);
@@ -51,6 +55,7 @@ export class UserVerificationMapper {
       created_at: userVerification.createdAt.toISOString(),
       user_id: userVerification.userId,
       expire_at: userVerification.expireAt.toISOString(),
+      revoke_at: toISO(userVerification.revokeAt),
     };
   }
 
@@ -60,24 +65,29 @@ export class UserVerificationMapper {
       createdAt: userVerification.createdAt,
       userId: userVerification.userId,
       expireAt: userVerification.expireAt,
+      revokeAt: userVerification.revokeAt,
     };
   }
 
   static toJson(userVerification: UserVerification): UserVerificationJson {
     return {
       id: userVerification.id,
-      createdAt: userVerification.createdAt,
+      createdAt: toISO(userVerification.createdAt),
       userId: userVerification.userId,
-      expireAt: userVerification.expireAt,
+      expireAt: toISO(userVerification.expireAt),
+      revokeAt: toISO(userVerification.revokeAt),
     };
   }
 
-  static toResponse(userVerification: UserVerification) {
+  static toResponse(
+    userVerification: UserVerification,
+  ): UserVerificationResponse {
     return {
       id: userVerification.id,
-      createdAt: userVerification.createdAt.toISOString(),
+      createdAt: toISO(userVerification.createdAt),
       userId: userVerification.userId,
-      expireAt: userVerification.expireAt.toISOString(),
+      expireAt: toISO(userVerification.expireAt),
+      revokeAt: toISO(userVerification.revokeAt),
     };
   }
 }
