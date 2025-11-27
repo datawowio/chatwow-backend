@@ -29,7 +29,7 @@ export type JsonPrimitive = boolean | number | string | null;
 
 export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 
-export type LineSessionStatus = "ACTIVE" | "INACTIVE" | "INIT" | "PROJECT_SELECTION";
+export type LineSessionStatus = "ACTIVE" | "INACTIVE";
 
 export type ProjectStatus = "ACTIVE" | "INACTIVE";
 
@@ -78,7 +78,7 @@ export interface LineSessions {
   line_account_id: string;
   line_bot_id: string;
   line_session_status: Generated<LineSessionStatus>;
-  project_id: string | null;
+  project_id: string;
   updated_at: Generated<string>;
 }
 

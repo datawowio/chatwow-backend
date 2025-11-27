@@ -35,4 +35,8 @@ export class LineSessionService {
   private _validate(_lineSession: LineSession) {
     // validation rules can be added here
   }
+
+  async inactiveAll(lineAccountId: string, lineBotId: string): Promise<void> {
+    await this.repo.inactiveAll(lineAccountId, lineBotId);
+  }
 }

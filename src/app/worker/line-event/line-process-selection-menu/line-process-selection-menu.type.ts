@@ -1,9 +1,21 @@
-import { LineMessageMetaData, LineMessageMetaInput } from '../line-event.type';
+import { LineBot } from '@domain/base/line-bot/line-bot.domain';
+import { LineBotJsonState } from '@domain/base/line-bot/types/line-bot.domain.type';
 
-type Data = {
+export type LineProcessSelectionMenuJobData = {
+  lineBot: LineBot;
   lineAccountId: string;
   message: string;
   replyToken: string;
 };
-export type LineProcessSelectionMenuJobData = LineMessageMetaData<Data>;
-export type LineProcessSelectionMenuJobInput = LineMessageMetaInput<Data>;
+export type LineProcessSelectionMenuJobInput = {
+  lineBot: LineBotJsonState;
+  lineAccountId: string;
+  message: string;
+  replyToken: string;
+};
+
+export type GetSessionOpts = {
+  projectId: string;
+  lineBotId: string;
+  lineAccountId: string;
+};

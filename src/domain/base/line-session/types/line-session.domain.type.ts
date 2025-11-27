@@ -15,7 +15,7 @@ export type LineSessionJson = Serialized<LineSessionPlain>;
 export type LineSessionJsonState = WithPgState<LineSessionJson, LineSessionPg>;
 
 export type LineSessionNewData = {
-  projectId?: string;
+  projectId: string;
   lineAccountId: string;
   lineBotId: string;
   latestChatLogId?: string | null;
@@ -23,7 +23,6 @@ export type LineSessionNewData = {
 };
 
 export type LineSessionUpdateData = {
-  projectId?: string | null;
   latestChatLogId?: string | null;
   lineSessionStatus?: LineSessionStatus;
 };

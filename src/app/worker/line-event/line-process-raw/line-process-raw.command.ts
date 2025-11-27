@@ -68,53 +68,42 @@ export class LineProcessRawCommand {
     const message = event.message.text;
 
     const lineBot = entity.lineBot;
-    const lineSession =
-      entity.lineData?.lineSession ||
-      LineSession.new({
-        lineBotId: entity.lineBot.id,
-        lineAccountId: event.source.userId,
-      });
+    const lineAccountId = event.source.userId;
+    const replyToken = event.replyToken;
 
-    if (!entity.lineData || lineSession.lineSessionStatus === 'INIT') {
+    // no line account yet need verification
+    if (!entity.lineData) {
       return this.lineEventQueue.jobProcessVerification({
-        lineSession,
         lineBot,
-        data: {
-          replyToken: event.replyToken,
-          verificationCode: message,
-        },
+        lineAccountId,
+        replyToken,
+        verificationCode: message,
       });
     }
 
-    if (lineSession.lineSessionStatus === 'PROJECT_SELECTION') {
-      return this.lineEventQueue.jobProcessSelectionMenu({
-        lineBot,
-        lineSession,
-        data: {
-          message,
-          replyToken: event.replyToken,
-          lineAccountId: lineSession.lineAccountId,
-        },
-      });
-    }
-
-    if (message === LINE_SELECTION_MENU_KEYWORD || !lineSession.projectId) {
+    if (message === LINE_SELECTION_MENU_KEYWORD) {
       return this.lineEventQueue.jobShowSelectionMenu({
         lineBot,
-        lineSession,
-        data: {
-          replyToken: event.replyToken,
-          lineAccountId: lineSession.lineAccountId,
-        },
+        lineAccountId,
+        replyToken,
+      });
+    }
+
+    if (!entity.lineData.lineSession) {
+      return this.lineEventQueue.jobProcessSelectionMenu({
+        lineBot,
+        lineAccountId,
+        replyToken,
+        message,
       });
     }
 
     return this.lineEventQueue.jobProcessAiChat({
       lineBot,
-      lineSession,
+      lineSession: entity.lineData.lineSession,
       data: {
         message,
-        replyToken: event.replyToken,
+        replyToken,
       },
     });
   }

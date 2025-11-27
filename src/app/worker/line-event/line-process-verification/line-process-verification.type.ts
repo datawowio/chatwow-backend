@@ -1,9 +1,15 @@
-import { LineMessageMetaData, LineMessageMetaInput } from '../line-event.type';
+import { LineBot } from '@domain/base/line-bot/line-bot.domain';
+import { LineBotJsonState } from '@domain/base/line-bot/types/line-bot.domain.type';
 
-type Data = {
+export type LineProcessVerificationJobData = {
+  lineBot: LineBot;
+  lineAccountId: string;
   replyToken: string;
   verificationCode: string;
 };
-
-export type LineProcessVerificationJobData = LineMessageMetaData<Data>;
-export type LineProcessVerificationJobInput = LineMessageMetaInput<Data>;
+export type LineProcessVerificationJobInput = {
+  lineBot: LineBotJsonState;
+  lineAccountId: string;
+  replyToken: string;
+  verificationCode: string;
+};

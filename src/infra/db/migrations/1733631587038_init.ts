@@ -52,7 +52,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     //
     .createType('line_session_status')
-    .asEnum(['ACTIVE', 'PROJECT_SELECTION', 'INIT', 'INACTIVE'])
+    .asEnum(['ACTIVE', 'INACTIVE'])
     .execute();
 
   //
@@ -353,7 +353,7 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.references('line_accounts.id').notNull().onDelete('cascade'),
     )
     .addColumn('project_id', 'uuid', (col) =>
-      col.references('projects.id').onDelete('set null'),
+      col.references('projects.id').notNull().onDelete('cascade'),
     )
     .addColumn('line_bot_id', 'uuid', (col) =>
       col.references('line_bots.id').notNull().onDelete('cascade'),

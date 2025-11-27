@@ -1,5 +1,3 @@
-import { LineAccount } from '@domain/base/line-account/line-account.domain';
-import { LineAccountService } from '@domain/base/line-account/line-account.service';
 import { ProjectChat } from '@domain/base/project-chat/project-chat.domain';
 import { ProjectChatService } from '@domain/base/project-chat/project-chat.service';
 import { ProjectDocument } from '@domain/base/project-document/project-document.domain';
@@ -11,6 +9,8 @@ import { UserGroupUserService } from '@domain/base/user-group-user/user-group-us
 import { UserGroup } from '@domain/base/user-group/user-group.domain';
 import { UserGroupService } from '@domain/base/user-group/user-group.service';
 import { UserManageProjectService } from '@domain/base/user-manage-project/user-manage-project.service';
+import { UserVerification } from '@domain/base/user-verification/user-verification.domain';
+import { UserVerificationService } from '@domain/base/user-verification/user-verification.service';
 import { User } from '@domain/base/user/user.domain';
 import { UserService } from '@domain/base/user/user.service';
 import { Command, CommandRunner } from 'nest-commander';
@@ -24,7 +24,6 @@ import { TransactionService } from '@infra/global/transaction/transaction.servic
 export class InitialsCliSeed extends CommandRunner {
   constructor(
     private userService: UserService,
-    private lineAccountService: LineAccountService,
     private transactionService: TransactionService,
     private userGroupService: UserGroupService,
     private projectService: ProjectService,
@@ -33,6 +32,7 @@ export class InitialsCliSeed extends CommandRunner {
     private userGroupUserService: UserGroupUserService,
     private userGroupProjectService: UserGroupProjectService,
     private userManageProjectService: UserManageProjectService,
+    private userVerificationService: UserVerificationService,
   ) {
     super();
   }
@@ -48,9 +48,6 @@ export class InitialsCliSeed extends CommandRunner {
   }
 
   private async _initAll(): Promise<void> {
-    const superAdminLine = LineAccount.new({
-      id: 'SUPERADMIN_LINE',
-    });
     const superAdmin = User.new({
       actorId: null,
       data: {
@@ -60,8 +57,10 @@ export class InitialsCliSeed extends CommandRunner {
         firstName: 'superadmin',
         lastName: 'superadmin',
         userStatus: 'ACTIVE',
-        lineAccountId: superAdminLine.id,
       },
+    });
+    const superAdminVerification = UserVerification.new({
+      userId: superAdmin.id,
     });
 
     const groupA = UserGroup.new({
@@ -113,8 +112,8 @@ export class InitialsCliSeed extends CommandRunner {
     });
 
     // save db
-    await this.lineAccountService.save(superAdminLine);
     await this.userService.save(superAdmin);
+    await this.userVerificationService.save(superAdminVerification);
     await this.userGroupService.save(groupA);
     await this.projectService.save(projectA);
     await this.userGroupUserService.saveUserRelations(superAdmin.id, [

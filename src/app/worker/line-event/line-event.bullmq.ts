@@ -38,33 +38,24 @@ export class LineEventBullmq extends BaseTaskHandler {
   @QueueTask(LINE_EVENT_JOBS.PROCESS_VERIFICATION)
   async processVerification(input: LineProcessVerificationJobInput) {
     return this.lineProcessVerificationCommand.exec({
-      lineBot: LineBotMapper.fromJsonWithState(input.lineBotJsonState),
-      lineSession: LineSessionMapper.fromJsonWithState(
-        input.lineSessionJsonState,
-      ),
-      data: input.data,
+      ...input,
+      lineBot: LineBotMapper.fromJsonWithState(input.lineBot),
     });
   }
 
   @QueueTask(LINE_EVENT_JOBS.PROCESS_SELECTION_MENU)
   async processSelectionMenu(input: LineProcessSelectionMenuJobInput) {
     return this.lineProcessSelectionMenuCommand.exec({
-      lineBot: LineBotMapper.fromJsonWithState(input.lineBotJsonState),
-      lineSession: LineSessionMapper.fromJsonWithState(
-        input.lineSessionJsonState,
-      ),
-      data: input.data,
+      ...input,
+      lineBot: LineBotMapper.fromJsonWithState(input.lineBot),
     });
   }
 
   @QueueTask(LINE_EVENT_JOBS.SHOW_SELECTION_MENU)
   async showSelectionMenu(input: LineShowSelectionMenuJobInput) {
     return this.lineShowSelectionMenuCommand.exec({
-      lineBot: LineBotMapper.fromJsonWithState(input.lineBotJsonState),
-      lineSession: LineSessionMapper.fromJsonWithState(
-        input.lineSessionJsonState,
-      ),
-      data: input.data,
+      ...input,
+      lineBot: LineBotMapper.fromJsonWithState(input.lineBot),
     });
   }
 

@@ -1,4 +1,3 @@
-import { LineSession } from '@domain/base/line-session/line-session.domain';
 import { LineSessionService } from '@domain/base/line-session/line-session.service';
 import { ProjectMapper } from '@domain/base/project/project.mapper';
 import { ProjectService } from '@domain/base/project/project.service';
@@ -19,24 +18,19 @@ export class LineShowSelectionMenuCommand {
     private projectService: ProjectService,
   ) {}
 
-  async exec({ lineBot, lineSession, data }: LineShowSelectionMenuJobData) {
+  async exec({
+    lineBot,
+    lineAccountId,
+    replyToken,
+    addMessages,
+  }: LineShowSelectionMenuJobData) {
     const lineService = new LineService(lineBot);
-    lineSession.edit({
-      lineSessionStatus: 'PROJECT_SELECTION',
-    });
+    const projects = await this.getUserProjects(lineAccountId);
 
-    const projects = await this.getUserProjects(data.lineAccountId);
+    // inactive all session
+    await this.lineSessionService.inactiveAll(lineAccountId, lineBot.id);
 
-    await this.save(lineSession);
-    await lineService.replyProjectSelection(
-      data.replyToken,
-      projects,
-      data.addMessages,
-    );
-  }
-
-  async save(lineSession: LineSession) {
-    await this.lineSessionService.save(lineSession);
+    await lineService.replyProjectSelection(replyToken, projects, addMessages);
   }
 
   async getUserProjects(lineAccountId: string) {

@@ -34,11 +34,8 @@ export class LineEventQueue extends BaseQueue {
 
   jobProcessVerification(domainData: LineProcessVerificationJobData) {
     const input: LineProcessVerificationJobInput = {
-      lineBotJsonState: LineBotMapper.toJsonWithState(domainData.lineBot),
-      lineSessionJsonState: LineSessionMapper.toJsonWithState(
-        domainData.lineSession,
-      ),
-      data: domainData.data,
+      ...domainData,
+      lineBot: LineBotMapper.toJsonWithState(domainData.lineBot),
     };
 
     this.addJob(LINE_EVENT_JOBS.PROCESS_VERIFICATION, input);
@@ -46,11 +43,8 @@ export class LineEventQueue extends BaseQueue {
 
   jobProcessSelectionMenu(domainData: LineProcessSelectionMenuJobData) {
     const input: LineProcessSelectionMenuJobInput = {
-      lineBotJsonState: LineBotMapper.toJsonWithState(domainData.lineBot),
-      lineSessionJsonState: LineSessionMapper.toJsonWithState(
-        domainData.lineSession,
-      ),
-      data: domainData.data,
+      ...domainData,
+      lineBot: LineBotMapper.toJsonWithState(domainData.lineBot),
     };
 
     this.addJob(LINE_EVENT_JOBS.PROCESS_SELECTION_MENU, input);
@@ -58,11 +52,8 @@ export class LineEventQueue extends BaseQueue {
 
   jobShowSelectionMenu(domainData: LineShowSelectionMenuJobData) {
     const input: LineShowSelectionMenuJobInput = {
-      lineBotJsonState: LineBotMapper.toJsonWithState(domainData.lineBot),
-      lineSessionJsonState: LineSessionMapper.toJsonWithState(
-        domainData.lineSession,
-      ),
-      data: domainData.data,
+      ...domainData,
+      lineBot: LineBotMapper.toJsonWithState(domainData.lineBot),
     };
 
     this.addJob(LINE_EVENT_JOBS.SHOW_SELECTION_MENU, input);

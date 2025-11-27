@@ -44,4 +44,13 @@ export class LineSessionRepo extends BaseRepo {
   async delete(id: string): Promise<void> {
     await this.db.deleteFrom('line_sessions').where('id', '=', id).execute();
   }
+
+  async inactiveAll(lineAccountId: string, lineBotId: string): Promise<void> {
+    await this.db
+      .updateTable('line_sessions')
+      .set({ line_session_status: 'INACTIVE' })
+      .where('line_account_id', '=', lineAccountId)
+      .where('line_bot_id', '=', lineBotId)
+      .execute();
+  }
 }
