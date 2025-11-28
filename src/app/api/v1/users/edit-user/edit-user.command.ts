@@ -51,6 +51,14 @@ export class EditUserCommand implements CommandInterface {
       });
     }
 
+    if (entity.user.role === 'USER') {
+      entity.user.edit({
+        data: {
+          password: null,
+        },
+      });
+    }
+
     if (body.userGroupIds) {
       entity.userGroups = await this.getUserGroups(body.userGroupIds);
     }

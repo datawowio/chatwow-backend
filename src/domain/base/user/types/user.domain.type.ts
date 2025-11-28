@@ -29,7 +29,7 @@ export type UserUpdateData = {
     firstName?: string;
     lastName?: string;
     email?: string;
-    password?: string;
+    password?: string | null;
     role?: UserRole;
     userStatus?: UserStatus;
     lineAccountId?: string;
