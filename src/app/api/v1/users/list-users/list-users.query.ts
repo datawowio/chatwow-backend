@@ -9,6 +9,7 @@ import { filterQbIds } from '@infra/db/db.util';
 
 import { getPagination } from '@shared/common/common.pagination';
 import { QueryInterface } from '@shared/common/common.type';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { usersV1InclusionQb } from '../users.v1.util';
 import { ListUsersDto, ListUsersResponse } from './list-users.dto';
@@ -23,9 +24,7 @@ export class ListUsersQuery implements QueryInterface {
   async exec(query: ListUsersDto): Promise<ListUsersResponse> {
     const { result, totalCount } = await this.getRaw(query);
 
-    return {
-      success: true,
-      key: '',
+    return toHttpSuccess({
       meta: {
         pagination: getPagination(result, totalCount, query.pagination),
       },
@@ -61,7 +60,7 @@ export class ListUsersQuery implements QueryInterface {
           },
         })),
       },
-    };
+    });
   }
 
   async getRaw(query: ListUsersDto) {

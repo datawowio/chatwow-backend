@@ -8,6 +8,7 @@ import { MainDb } from '@infra/db/db.main';
 
 import { QueryInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { usersV1InclusionQb } from '../users.v1.util';
 import { GetUserDto, GetUserResponse } from './get-user.dto';
@@ -18,9 +19,7 @@ export class GetUserQuery implements QueryInterface {
   async exec(id: string, query: GetUserDto): Promise<GetUserResponse> {
     const user = await this.getRaw(id, query);
 
-    return {
-      success: true,
-      key: '',
+    return toHttpSuccess({
       data: {
         user: {
           attributes: userPgToResponse(user),
@@ -53,7 +52,7 @@ export class GetUserQuery implements QueryInterface {
           },
         },
       },
-    };
+    });
   }
 
   async getRaw(id: string, query: GetUserDto) {

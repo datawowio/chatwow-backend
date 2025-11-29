@@ -1,6 +1,7 @@
 import { MainDb } from '@infra/db/db.main';
 
 import { QueryInterface } from '@shared/common/common.type';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { UserSummaryDto, UserSummaryResponse } from './user-summary.dto';
 
@@ -10,9 +11,7 @@ export class UserSummaryQuery implements QueryInterface {
   async exec(query: UserSummaryDto): Promise<UserSummaryResponse> {
     const data = await this.getRaw(query);
 
-    return {
-      success: true,
-      key: '',
+    return toHttpSuccess({
       data: {
         totalUsers: Number(data.totalUsers),
         activeUsers: data.activeUsers ? Number(data.activeUsers) : undefined,
@@ -26,7 +25,7 @@ export class UserSummaryQuery implements QueryInterface {
           ? Number(data.lineLinkedUsers)
           : undefined,
       },
-    };
+    });
   }
 
   async getRaw(query: UserSummaryDto) {

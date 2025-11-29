@@ -11,6 +11,7 @@ import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { getPagination } from '@shared/common/common.pagination';
 import { QueryInterface } from '@shared/common/common.type';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { projectDocumentsV1InclusionQb } from '../project-documents.v1.util';
 import {
@@ -31,9 +32,7 @@ export class ListProjectDocumentsQuery implements QueryInterface {
   ): Promise<ListProjectDocumentsResponse> {
     const { result, totalCount } = await this.getRaw(claims, query);
 
-    return {
-      success: true,
-      key: '',
+    return toHttpSuccess({
       meta: {
         pagination: getPagination(result, totalCount, query.pagination),
       },
@@ -66,7 +65,7 @@ export class ListProjectDocumentsQuery implements QueryInterface {
           },
         })),
       },
-    };
+    });
   }
 
   async getRaw(actor: UserClaims, query: ListProjectDocumentsDto) {

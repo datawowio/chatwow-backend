@@ -12,6 +12,7 @@ import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { QueryInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { userGroupsV1InclusionQb } from '../user-groups.v1.util';
 import { GetUserGroupDto, GetUserGroupResponse } from './get-user-group.dto';
@@ -27,9 +28,7 @@ export class GetUserGroupQuery implements QueryInterface {
   ): Promise<GetUserGroupResponse> {
     const userGroup = await this.getRaw(claims, id, query);
 
-    return {
-      success: true,
-      key: '',
+    return toHttpSuccess({
       data: {
         userGroup: {
           attributes: userGroupPgToResponse(userGroup),
@@ -57,7 +56,7 @@ export class GetUserGroupQuery implements QueryInterface {
           },
         },
       },
-    };
+    });
   }
 
   async getRaw(actor: UserClaims, id: string, query: GetUserGroupDto) {

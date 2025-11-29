@@ -10,6 +10,7 @@ import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { getPagination } from '@shared/common/common.pagination';
 import { QueryInterface } from '@shared/common/common.type';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { userGroupsV1InclusionQb } from '../user-groups.v1.util';
 import {
@@ -31,9 +32,7 @@ export class ListUserGroupsQuery implements QueryInterface {
   ): Promise<ListUserGroupsResponse> {
     const { result, totalCount } = await this.getRaw(claims, query);
 
-    return {
-      success: true,
-      key: '',
+    return toHttpSuccess({
       meta: {
         pagination: getPagination(result, totalCount, query.pagination),
       },
@@ -64,7 +63,7 @@ export class ListUserGroupsQuery implements QueryInterface {
           },
         })),
       },
-    };
+    });
   }
 
   async getRaw(actor: UserClaims, query: ListUserGroupsDto) {

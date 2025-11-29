@@ -13,6 +13,7 @@ import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { QueryInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { projectDocumentsV1InclusionQb } from '../project-documents.v1.util';
 import {
@@ -31,9 +32,7 @@ export class GetProjectDocumentQuery implements QueryInterface {
   ): Promise<GetProjectDocumentResponse> {
     const projectDocument = await this.getRaw(claims, id, query);
 
-    return {
-      success: true,
-      key: '',
+    return toHttpSuccess({
       data: {
         projectDocument: {
           attributes: projectDocumentPgToResponse(projectDocument),
@@ -63,7 +62,7 @@ export class GetProjectDocumentQuery implements QueryInterface {
           },
         },
       },
-    };
+    });
   }
 
   async getRaw(actor: UserClaims, id: string, query: GetProjectDocumentDto) {

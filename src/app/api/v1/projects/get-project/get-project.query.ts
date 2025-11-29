@@ -14,6 +14,7 @@ import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { QueryInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { projectsV1InclusionQb } from '../projects.v1.util';
 import { GetProjectDto, GetProjectResponse } from './get-project.dto';
@@ -29,9 +30,7 @@ export class GetProjectQuery implements QueryInterface {
   ): Promise<GetProjectResponse> {
     const project = await this.getRaw(claims, id, query);
 
-    return {
-      success: true,
-      key: '',
+    return toHttpSuccess({
       data: {
         project: {
           attributes: projectPgToResponse(project),
@@ -81,7 +80,7 @@ export class GetProjectQuery implements QueryInterface {
           },
         },
       },
-    };
+    });
   }
 
   async getRaw(actor: UserClaims, id: string, query: GetProjectDto) {
