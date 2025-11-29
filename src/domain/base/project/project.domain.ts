@@ -1,12 +1,10 @@
 import type { ProjectStatus } from '@infra/db/db';
 
-import { uuidV7 } from '@shared/common/common.crypto';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { ProjectMapper } from './project.mapper';
+import { projectFromPlain } from './project.mapper';
 import type {
-  ProjectNewData,
   ProjectPg,
   ProjectPlain,
   ProjectUpdateData,
@@ -28,25 +26,6 @@ export class Project extends DomainEntity<ProjectPg> {
   constructor(plain: ProjectPlain) {
     super();
     Object.assign(this, plain);
-  }
-
-  static new({ actorId, data }: ProjectNewData) {
-    return ProjectMapper.fromPlain({
-      id: uuidV7(),
-      createdAt: new Date(),
-      createdById: actorId,
-      updatedById: actorId,
-      updatedAt: new Date(),
-      projectName: data.projectName,
-      projectDescription: data.projectDescription || '',
-      projectGuidelineMd: data.projectGuidelineMd || '',
-      projectStatus: data.projectStatus,
-      aiSummaryMd: isDefined(data.aiSummaryMd) ? data.aiSummaryMd : '',
-    });
-  }
-
-  static newBulk(data: ProjectNewData[]) {
-    return data.map((d) => Project.new(d));
   }
 
   edit({ actorId, data }: ProjectUpdateData) {
@@ -74,6 +53,6 @@ export class Project extends DomainEntity<ProjectPg> {
         : this.projectStatus,
     };
 
-    Object.assign(this, plain);
+    return projectFromPlain(plain);
   }
 }

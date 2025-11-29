@@ -5,7 +5,7 @@ import { HealthCheckService, MemoryHealthIndicator } from '@nestjs/terminus';
 
 import { UsePublic } from '@infra/middleware/jwt/jwt.common';
 
-import { HttpResponseMapper } from '@shared/http/http.mapper';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { GetHealthResponse } from './get-health/get-healths.dto';
 
@@ -29,7 +29,7 @@ export class HealthController {
 
     const data = await this.health.check([]);
 
-    return HttpResponseMapper.toSuccess({
+    return toHttpSuccess({
       data: {
         status: data.status,
       },

@@ -2,7 +2,10 @@ import { Session } from '@domain/base/session/session.domain';
 import { SessionService } from '@domain/base/session/session.service';
 import { sessionsTableFilter } from '@domain/base/session/session.util';
 import { User } from '@domain/base/user/user.domain';
-import { UserMapper } from '@domain/base/user/user.mapper';
+import {
+  userFromPgWithState,
+  userToResponse,
+} from '@domain/base/user/user.mapper';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { getAccessToken } from '@domain/orchestration/auth/auth.util';
 import { Injectable } from '@nestjs/common';
@@ -14,7 +17,7 @@ import { shaHashstring } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
-import { HttpResponseMapper } from '@shared/http/http.mapper';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { RefreshResponse } from './refresh.dto';
 
@@ -44,10 +47,10 @@ export class RefreshCommand implements CommandInterface {
     });
 
     return {
-      response: HttpResponseMapper.toSuccess({
+      response: toHttpSuccess({
         data: {
           user: {
-            attributes: UserMapper.toResponse(user),
+            attributes: userToResponse(user),
           },
           token: getAccessToken(user),
         },
@@ -79,6 +82,6 @@ export class RefreshCommand implements CommandInterface {
       throw new ApiException(403, 'invalidSessionToken');
     }
 
-    return UserMapper.fromPgWithState(user);
+    return userFromPgWithState(user);
   }
 }

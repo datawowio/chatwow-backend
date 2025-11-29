@@ -1,16 +1,23 @@
 import { ProjectDocument } from '@domain/base/project-document/project-document.domain';
-import { ProjectDocumentMapper } from '@domain/base/project-document/project-document.mapper';
+import {
+  projectDocumentFromPgWithState,
+  projectDocumentToResponse,
+} from '@domain/base/project-document/project-document.mapper';
 import { ProjectDocumentService } from '@domain/base/project-document/project-document.service';
 import {
   addProjectDocumentActorFilter,
   projectDocumentsTableFilter,
 } from '@domain/base/project-document/project-document.util';
 import { Project } from '@domain/base/project/project.domain';
-import { ProjectMapper } from '@domain/base/project/project.mapper';
+import {
+  projectFromPgWithState,
+  projectToResponse,
+} from '@domain/base/project/project.mapper';
 import { projectsTableFilter } from '@domain/base/project/project.util';
 import { STORED_FILE_OWNER_TABLE } from '@domain/base/stored-file/stored-file.constant';
 import { StoredFile } from '@domain/base/stored-file/stored-file.domain';
-import { StoredFileMapper } from '@domain/base/stored-file/stored-file.mapper';
+import { newStoredFile } from '@domain/base/stored-file/stored-file.factory';
+import { storedFileToResponse } from '@domain/base/stored-file/stored-file.mapper';
 import { StoredFileService } from '@domain/base/stored-file/stored-file.service';
 import { Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
@@ -21,6 +28,7 @@ import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import {
   EditProjectDocumentDto,
@@ -60,25 +68,23 @@ export class EditProjectDocumentCommand implements CommandInterface {
 
     await this.save(entity);
 
-    return {
-      success: true,
-      key: '',
+    return toHttpSuccess({
       data: {
         projectDocument: {
-          attributes: ProjectDocumentMapper.toResponse(entity.projectDocument),
+          attributes: projectDocumentToResponse(entity.projectDocument),
           relations: {
             project: {
-              attributes: ProjectMapper.toResponse(entity.project),
+              attributes: projectToResponse(entity.project),
             },
             storedFile: entity.storedFile
               ? {
-                  attributes: StoredFileMapper.toResponse(entity.storedFile),
+                  attributes: storedFileToResponse(entity.storedFile),
                 }
               : undefined,
           },
         },
       },
-    };
+    });
   }
 
   async find(actor: UserClaims, id: string): Promise<Entity> {
@@ -106,8 +112,8 @@ export class EditProjectDocumentCommand implements CommandInterface {
     }
 
     return {
-      projectDocument: ProjectDocumentMapper.fromPgWithState(projectDocument),
-      project: ProjectMapper.fromPgWithState(projectDocument.project),
+      projectDocument: projectDocumentFromPgWithState(projectDocument),
+      project: projectFromPgWithState(projectDocument.project),
     };
   }
 
@@ -126,7 +132,7 @@ export class EditProjectDocumentCommand implements CommandInterface {
       return;
     }
 
-    entity.storedFile = StoredFile.new({
+    entity.storedFile = newStoredFile({
       ...body.storedFile,
       ownerId: entity.projectDocument.id,
       ownerTable: STORED_FILE_OWNER_TABLE.PROJECT_DOCUMENT,

@@ -5,7 +5,7 @@ import { MainDb } from '@infra/db/db.main';
 import { diff } from '@shared/common/common.func';
 
 import { LineBot } from './line-bot.domain';
-import { LineBotMapper } from './line-bot.mapper';
+import { lineBotFromPgWithState, lineBotToPg } from './line-bot.mapper';
 import { lineBotsTableFilter } from './line-bot.util';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class LineBotService {
       return null;
     }
 
-    return LineBotMapper.fromPgWithState(lineBotPg);
+    return lineBotFromPgWithState(lineBotPg);
   }
 
   async save(lineBot: LineBot) {
@@ -37,7 +37,7 @@ export class LineBotService {
       await this._update(lineBot.id, lineBot);
     }
 
-    lineBot.setPgState(LineBotMapper.toPg);
+    lineBot.setPgState(lineBotToPg);
   }
 
   async saveBulk(lineBots: LineBot[]) {
@@ -55,12 +55,12 @@ export class LineBotService {
   private async _create(lineBot: LineBot) {
     await this.db.write
       .insertInto('line_bots')
-      .values(LineBotMapper.toPg(lineBot))
+      .values(lineBotToPg(lineBot))
       .execute();
   }
 
   private async _update(id: string, lineBot: LineBot) {
-    const data = diff(lineBot.pgState, LineBotMapper.toPg(lineBot));
+    const data = diff(lineBot.pgState, lineBotToPg(lineBot));
     if (!data) {
       return;
     }

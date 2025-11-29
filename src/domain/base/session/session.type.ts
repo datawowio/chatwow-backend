@@ -4,7 +4,7 @@ import { ReqInfo } from '@infra/global/req-storage/req-storage.common';
 
 import type { Plain, Serialized } from '@shared/common/common.type';
 
-import type { Session } from '../session.domain';
+import type { Session } from './session.domain';
 
 export type SessionPg = DBModel<Sessions>;
 export type SessionPlain = Plain<Session>;

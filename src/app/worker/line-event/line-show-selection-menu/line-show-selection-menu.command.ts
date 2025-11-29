@@ -1,5 +1,5 @@
 import { LineSessionService } from '@domain/base/line-session/line-session.service';
-import { ProjectMapper } from '@domain/base/project/project.mapper';
+import { projectFromPgWithState } from '@domain/base/project/project.mapper';
 import { ProjectService } from '@domain/base/project/project.service';
 import { Injectable } from '@nestjs/common';
 
@@ -51,6 +51,6 @@ export class LineShowSelectionMenuCommand {
       .where('id', 'in', ids)
       .execute();
 
-    return projects.map((p) => ProjectMapper.fromPgWithState(p));
+    return projects.map((p) => projectFromPgWithState(p));
   }
 }

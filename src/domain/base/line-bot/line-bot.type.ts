@@ -7,7 +7,7 @@ import type {
   WithPgState,
 } from '@shared/common/common.type';
 
-import type { LineBot } from '../line-bot.domain';
+import type { LineBot } from './line-bot.domain';
 
 export type LineBotPg = DBModel<LineBots>;
 export type LineBotPlain = Plain<LineBot>;

@@ -1,4 +1,5 @@
 import { UserVerification } from '@domain/base/user-verification/user-verification.domain';
+import { newUserVerification } from '@domain/base/user-verification/user-verification.factory';
 import { UserVerificationService } from '@domain/base/user-verification/user-verification.service';
 import type { User } from '@domain/base/user/user.domain';
 import { UserService } from '@domain/base/user/user.service';
@@ -17,7 +18,7 @@ export class SendVerificationQueueCommand implements CommandInterface {
   ) {}
 
   async exec(user: User) {
-    const userVerification = UserVerification.new({
+    const userVerification = newUserVerification({
       userId: user.id,
     });
 

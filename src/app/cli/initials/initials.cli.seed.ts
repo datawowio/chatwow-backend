@@ -1,17 +1,17 @@
-import { ProjectChat } from '@domain/base/project-chat/project-chat.domain';
+import { newProjectChat } from '@domain/base/project-chat/project-chat.factory';
 import { ProjectChatService } from '@domain/base/project-chat/project-chat.service';
-import { ProjectDocument } from '@domain/base/project-document/project-document.domain';
+import { newProjectDocument } from '@domain/base/project-document/project-document.factory';
 import { ProjectDocumentService } from '@domain/base/project-document/project-document.service';
-import { Project } from '@domain/base/project/project.domain';
+import { newProject } from '@domain/base/project/project.factory';
 import { ProjectService } from '@domain/base/project/project.service';
 import { UserGroupProjectService } from '@domain/base/user-group-project/user-group-project.service';
 import { UserGroupUserService } from '@domain/base/user-group-user/user-group-user.service';
-import { UserGroup } from '@domain/base/user-group/user-group.domain';
+import { newUserGroup } from '@domain/base/user-group/user-group.factory';
 import { UserGroupService } from '@domain/base/user-group/user-group.service';
 import { UserManageProjectService } from '@domain/base/user-manage-project/user-manage-project.service';
-import { UserVerification } from '@domain/base/user-verification/user-verification.domain';
+import { newUserVerification } from '@domain/base/user-verification/user-verification.factory';
 import { UserVerificationService } from '@domain/base/user-verification/user-verification.service';
-import { User } from '@domain/base/user/user.domain';
+import { newUser } from '@domain/base/user/user.factory';
 import { UserService } from '@domain/base/user/user.service';
 import { Command, CommandRunner } from 'nest-commander';
 
@@ -48,7 +48,7 @@ export class InitialsCliSeed extends CommandRunner {
   }
 
   private async _initAll(): Promise<void> {
-    const superAdmin = User.new({
+    const superAdmin = newUser({
       actorId: null,
       data: {
         email: 'superadmin@example.com',
@@ -59,11 +59,11 @@ export class InitialsCliSeed extends CommandRunner {
         userStatus: 'ACTIVE',
       },
     });
-    const superAdminVerification = UserVerification.new({
+    const superAdminVerification = newUserVerification({
       userId: superAdmin.id,
     });
 
-    const groupA = UserGroup.new({
+    const groupA = newUserGroup({
       actorId: superAdmin.id,
       data: {
         groupName: 'test group',
@@ -71,7 +71,7 @@ export class InitialsCliSeed extends CommandRunner {
       },
     });
 
-    const projectA = Project.new({
+    const projectA = newProject({
       actorId: superAdmin.id,
       data: {
         projectName: 'local test',
@@ -79,20 +79,20 @@ export class InitialsCliSeed extends CommandRunner {
         projectDescription: 'for local testing',
       },
     });
-    const projectChatA = ProjectChat.new({
+    const projectChatA = newProjectChat({
       chatSender: 'USER',
       message: 'hello',
       projectId: projectA.id,
       userId: superAdmin.id,
     });
-    const projectChatB = ProjectChat.new({
+    const projectChatB = newProjectChat({
       chatSender: 'BOT',
       message: 'hello this is a project chat',
       projectId: projectA.id,
       userId: superAdmin.id,
       parentId: projectChatA.id,
     });
-    const projectDocumentA = ProjectDocument.new({
+    const projectDocumentA = newProjectDocument({
       actorId: superAdmin.id,
       data: {
         projectId: projectA.id,
@@ -101,7 +101,7 @@ export class InitialsCliSeed extends CommandRunner {
         documentDetails: 'This is the details of document A',
       },
     });
-    const projectDocumentB = ProjectDocument.new({
+    const projectDocumentB = newProjectDocument({
       actorId: superAdmin.id,
       data: {
         projectId: projectA.id,

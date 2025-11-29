@@ -8,92 +8,104 @@ import type {
   UserVerificationPlain,
 } from './user-verification.type';
 
-export class UserVerificationMapper {
-  static fromPg(pg: UserVerificationPg): UserVerification {
-    const plain: UserVerificationPlain = {
-      id: pg.id,
-      createdAt: toDate(pg.created_at),
-      userId: pg.user_id,
-      expireAt: toDate(pg.expire_at),
-      revokeAt: toDate(pg.revoke_at),
-      code: pg.code,
-    };
+export function userVerificationFromPg(
+  pg: UserVerificationPg,
+): UserVerification {
+  const plain: UserVerificationPlain = {
+    id: pg.id,
+    createdAt: toDate(pg.created_at),
+    userId: pg.user_id,
+    expireAt: toDate(pg.expire_at),
+    revokeAt: toDate(pg.revoke_at),
+    code: pg.code,
+  };
 
-    return new UserVerification(plain);
-  }
+  return new UserVerification(plain);
+}
 
-  static fromPgWithState(pg: UserVerificationPg): UserVerification {
-    return this.fromPg(pg).setPgState(this.toPg);
-  }
+export function userVerificationFromPgWithState(
+  pg: UserVerificationPg,
+): UserVerification {
+  return userVerificationFromPg(pg).setPgState(userVerificationToPg);
+}
 
-  static fromPlain(plainData: UserVerificationPlain): UserVerification {
-    const plain: UserVerificationPlain = {
-      id: plainData.id,
-      createdAt: plainData.createdAt,
-      userId: plainData.userId,
-      expireAt: plainData.expireAt,
-      revokeAt: plainData.revokeAt,
-      code: plainData.code,
-    };
+export function userVerificationFromPlain(
+  plainData: UserVerificationPlain,
+): UserVerification {
+  const plain: UserVerificationPlain = {
+    id: plainData.id,
+    createdAt: plainData.createdAt,
+    userId: plainData.userId,
+    expireAt: plainData.expireAt,
+    revokeAt: plainData.revokeAt,
+    code: plainData.code,
+  };
 
-    return new UserVerification(plain);
-  }
+  return new UserVerification(plain);
+}
 
-  static fromJson(json: UserVerificationJson): UserVerification {
-    const plain: UserVerificationPlain = {
-      id: json.id,
-      createdAt: toDate(json.createdAt),
-      userId: json.userId,
-      expireAt: toDate(json.expireAt),
-      revokeAt: toDate(json.revokeAt),
-      code: json.code,
-    };
+export function userVerificationFromJson(
+  json: UserVerificationJson,
+): UserVerification {
+  const plain: UserVerificationPlain = {
+    id: json.id,
+    createdAt: toDate(json.createdAt),
+    userId: json.userId,
+    expireAt: toDate(json.expireAt),
+    revokeAt: toDate(json.revokeAt),
+    code: json.code,
+  };
 
-    return new UserVerification(plain);
-  }
+  return new UserVerification(plain);
+}
 
-  static toPg(userVerification: UserVerification): UserVerificationPg {
-    return {
-      id: userVerification.id,
-      created_at: userVerification.createdAt.toISOString(),
-      user_id: userVerification.userId,
-      expire_at: userVerification.expireAt.toISOString(),
-      revoke_at: toISO(userVerification.revokeAt),
-      code: userVerification.code,
-    };
-  }
+export function userVerificationToPg(
+  userVerification: UserVerification,
+): UserVerificationPg {
+  return {
+    id: userVerification.id,
+    created_at: userVerification.createdAt.toISOString(),
+    user_id: userVerification.userId,
+    expire_at: userVerification.expireAt.toISOString(),
+    revoke_at: toISO(userVerification.revokeAt),
+    code: userVerification.code,
+  };
+}
 
-  static toPlain(userVerification: UserVerification): UserVerificationPlain {
-    return {
-      id: userVerification.id,
-      createdAt: userVerification.createdAt,
-      userId: userVerification.userId,
-      expireAt: userVerification.expireAt,
-      revokeAt: userVerification.revokeAt,
-      code: userVerification.code,
-    };
-  }
+export function userVerificationToPlain(
+  userVerification: UserVerification,
+): UserVerificationPlain {
+  return {
+    id: userVerification.id,
+    createdAt: userVerification.createdAt,
+    userId: userVerification.userId,
+    expireAt: userVerification.expireAt,
+    revokeAt: userVerification.revokeAt,
+    code: userVerification.code,
+  };
+}
 
-  static toJson(userVerification: UserVerification): UserVerificationJson {
-    return {
-      id: userVerification.id,
-      createdAt: toISO(userVerification.createdAt),
-      userId: userVerification.userId,
-      expireAt: toISO(userVerification.expireAt),
-      revokeAt: toISO(userVerification.revokeAt),
-      code: userVerification.code,
-    };
-  }
+export function userVerificationToJson(
+  userVerification: UserVerification,
+): UserVerificationJson {
+  return {
+    id: userVerification.id,
+    createdAt: toISO(userVerification.createdAt),
+    userId: userVerification.userId,
+    expireAt: toISO(userVerification.expireAt),
+    revokeAt: toISO(userVerification.revokeAt),
+    code: userVerification.code,
+  };
+}
 
-  static toResponse(
-    userVerification: UserVerification,
-  ): UserVerificationResponse {
-    return {
-      id: userVerification.id,
-      createdAt: toISO(userVerification.createdAt),
-      userId: userVerification.userId,
-      expireAt: toISO(userVerification.expireAt),
-      revokeAt: toISO(userVerification.revokeAt),
-    };
-  }
+export function userVerificationToResponse(
+  userVerification: UserVerification,
+): UserVerificationResponse {
+  return {
+    id: userVerification.id,
+    createdAt: toISO(userVerification.createdAt),
+    userId: userVerification.userId,
+    expireAt: toISO(userVerification.expireAt),
+    revokeAt: toISO(userVerification.revokeAt),
+  };
 }

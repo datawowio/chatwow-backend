@@ -11,7 +11,7 @@ import {
   Text,
 } from '@react-email/components';
 import type { UserVerification } from '@domain/base/user-verification/user-verification.domain';
-import { UserVerificationFactory } from '@domain/base/user-verification/user-verification.factory';
+import { mockUserVerification } from '@domain/base/user-verification/user-verification.factory';
 import { Logo } from '../asset/logo';
 
 type DefaultProps = {
@@ -19,7 +19,7 @@ type DefaultProps = {
 };
 
 export default function TemplateSendVerificationCode({ userVerification }: DefaultProps) {
-  userVerification ??= UserVerificationFactory.mock({});
+  userVerification ??= mockUserVerification({});
 
   const verificationCode = userVerification.code;
 

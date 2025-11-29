@@ -13,8 +13,8 @@ import {
   Text,
 } from '@react-email/components';
 import { User } from '@domain/base/user/user.domain';
-import { UserFactory } from '@domain/base/user/user.factory';
 import { Logo } from '../asset/logo';
+import { mockUser } from '@domain/base/user/user.factory';
 
 type DefaultProps = {
   user: User;
@@ -22,7 +22,7 @@ type DefaultProps = {
 };
 
 export default function TemplateForgotPassword({ user, url }: DefaultProps) {
-  user ??= UserFactory.mock({});
+  user ??= mockUser({});
   url ??= 'http://localhost:8001';
 
   const firstName = user.firstName || 'there';

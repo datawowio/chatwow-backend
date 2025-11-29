@@ -1,7 +1,10 @@
 import { Session } from '@domain/base/session/session.domain';
 import { SessionService } from '@domain/base/session/session.service';
 import { User } from '@domain/base/user/user.domain';
-import { UserMapper } from '@domain/base/user/user.mapper';
+import {
+  userFromPgWithState,
+  userToResponse,
+} from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { getAccessToken, signIn } from '@domain/orchestration/auth/auth.util';
@@ -12,7 +15,7 @@ import { TransactionService } from '@infra/db/transaction/transaction.service';
 
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
-import { HttpResponseMapper } from '@shared/http/http.mapper';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { SignInDto, SignInResponse } from './sign-in.dto';
 
@@ -45,10 +48,10 @@ export class SignInCommand implements CommandInterface {
     });
 
     return {
-      response: HttpResponseMapper.toSuccess({
+      response: toHttpSuccess({
         data: {
           user: {
-            attributes: UserMapper.toResponse(user),
+            attributes: userToResponse(user),
           },
           token: getAccessToken(user),
         },
@@ -69,7 +72,7 @@ export class SignInCommand implements CommandInterface {
       throw new ApiException(404, 'invalidCredentials');
     }
 
-    return UserMapper.fromPgWithState(domain);
+    return userFromPgWithState(domain);
   }
 
   async save({ user, session }: Entity): Promise<void> {

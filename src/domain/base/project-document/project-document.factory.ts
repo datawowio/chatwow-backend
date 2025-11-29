@@ -4,38 +4,61 @@ import { uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { isDefined } from '@shared/common/common.validator';
 
-import { ProjectDocumentMapper } from './project-document.mapper';
-import type { ProjectDocumentPlain } from './project-document.type';
+import { ProjectDocument } from './project-document.domain';
+import { projectDocumentFromPlain } from './project-document.mapper';
+import type {
+  ProjectDocumentNewData,
+  ProjectDocumentPlain,
+} from './project-document.type';
 
-export class ProjectDocumentFactory {
-  static mock(data: SetRequired<Partial<ProjectDocumentPlain>, 'projectId'>) {
-    return ProjectDocumentMapper.fromPlain({
-      id: isDefined(data.id) ? data.id : uuidV7(),
-      documentStatus: isDefined(data.documentStatus)
-        ? data.documentStatus
-        : 'ACTIVE',
-      documentDetails: isDefined(data.documentDetails)
-        ? data.documentDetails
-        : '',
-      projectId: data.projectId,
-      createdAt: isDefined(data.createdAt)
-        ? data.createdAt
-        : myDayjs().toDate(),
-      aiSummaryMd: isDefined(data.aiSummaryMd) ? data.aiSummaryMd : '',
-      createdById: isDefined(data.createdById) ? data.createdById : null,
-      updatedById: isDefined(data.updatedById) ? data.updatedById : null,
-      updatedAt: isDefined(data.updatedAt)
-        ? data.updatedAt
-        : myDayjs().toDate(),
-    });
-  }
+export function newProjectDocument({
+  actorId,
+  data,
+}: ProjectDocumentNewData): ProjectDocument {
+  return projectDocumentFromPlain({
+    id: uuidV7(),
+    createdAt: myDayjs().toDate(),
+    createdById: actorId,
+    updatedById: actorId,
+    projectId: data.projectId,
+    updatedAt: myDayjs().toDate(),
+    documentDetails: data.documentDetails || '',
+    documentStatus: data.documentStatus || 'ACTIVE',
+    aiSummaryMd: data.aiSummaryMd || '',
+  });
+}
 
-  static mockBulk(
-    amount: number,
-    data: SetRequired<Partial<ProjectDocumentPlain>, 'projectId'>,
-  ) {
-    return Array(amount)
-      .fill(0)
-      .map(() => this.mock(data));
-  }
+export function newProjectDocuments(
+  data: ProjectDocumentNewData[],
+): ProjectDocument[] {
+  return data.map((d) => newProjectDocument(d));
+}
+
+export function mockProjectDocument(
+  data: SetRequired<Partial<ProjectDocumentPlain>, 'projectId'>,
+): ProjectDocument {
+  return projectDocumentFromPlain({
+    id: isDefined(data.id) ? data.id : uuidV7(),
+    documentStatus: isDefined(data.documentStatus)
+      ? data.documentStatus
+      : 'ACTIVE',
+    documentDetails: isDefined(data.documentDetails)
+      ? data.documentDetails
+      : '',
+    projectId: data.projectId,
+    createdAt: isDefined(data.createdAt) ? data.createdAt : myDayjs().toDate(),
+    aiSummaryMd: isDefined(data.aiSummaryMd) ? data.aiSummaryMd : '',
+    createdById: isDefined(data.createdById) ? data.createdById : null,
+    updatedById: isDefined(data.updatedById) ? data.updatedById : null,
+    updatedAt: isDefined(data.updatedAt) ? data.updatedAt : myDayjs().toDate(),
+  });
+}
+
+export function mockProjectDocuments(
+  amount: number,
+  data: SetRequired<Partial<ProjectDocumentPlain>, 'projectId'>,
+): ProjectDocument[] {
+  return Array(amount)
+    .fill(0)
+    .map(() => mockProjectDocument(data));
 }

@@ -1,11 +1,12 @@
 import { LineAccount } from '@domain/base/line-account/line-account.domain';
+import { newLineAccount } from '@domain/base/line-account/line-account.factory';
 import { LineAccountService } from '@domain/base/line-account/line-account.service';
 import { UserVerification } from '@domain/base/user-verification/user-verification.domain';
-import { UserVerificationMapper } from '@domain/base/user-verification/user-verification.mapper';
+import { userVerificationFromPgWithState } from '@domain/base/user-verification/user-verification.mapper';
 import { UserVerificationService } from '@domain/base/user-verification/user-verification.service';
 import { usersVerificationsTableFilter } from '@domain/base/user-verification/user-verification.util';
 import { User } from '@domain/base/user/user.domain';
-import { UserMapper } from '@domain/base/user/user.mapper';
+import { userFromPgWithState } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { LineEventQueue } from '@domain/orchestration/queue/line-event/line-event.queue';
@@ -58,7 +59,7 @@ export class LineProcessVerificationCommand {
     }
 
     const { user, userVerification } = res;
-    const lineAccount = LineAccount.new({
+    const lineAccount = newLineAccount({
       id: lineAccountId,
     });
     user.edit({
@@ -116,8 +117,8 @@ export class LineProcessVerificationCommand {
     }
 
     return {
-      user: UserMapper.fromPgWithState(res.user),
-      userVerification: UserVerificationMapper.fromPgWithState(res),
+      user: userFromPgWithState(res.user),
+      userVerification: userVerificationFromPgWithState(res),
     };
   }
 }

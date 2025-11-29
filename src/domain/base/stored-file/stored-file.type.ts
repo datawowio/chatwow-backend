@@ -3,8 +3,8 @@ import type { DBModel } from '@infra/db/db.common';
 
 import type { Plain, Serialized } from '@shared/common/common.type';
 
-import type { STORED_FILE_OWNER_TABLE } from '../stored-file.constant';
-import type { StoredFile } from '../stored-file.domain';
+import type { STORED_FILE_OWNER_TABLE } from './stored-file.constant';
+import type { StoredFile } from './stored-file.domain';
 
 export type StoredFilePg = DBModel<StoredFiles>;
 export type StoredFilePlain = Plain<StoredFile>;

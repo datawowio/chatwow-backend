@@ -5,7 +5,10 @@ import { MainDb } from '@infra/db/db.main';
 import { diff } from '@shared/common/common.func';
 
 import { LineChatLog } from './line-chat-log.domain';
-import { LineChatLogMapper } from './line-chat-log.mapper';
+import {
+  lineChatLogFromPgWithState,
+  lineChatLogToPg,
+} from './line-chat-log.mapper';
 
 @Injectable()
 export class LineChatLogService {
@@ -23,7 +26,7 @@ export class LineChatLogService {
       return null;
     }
 
-    return LineChatLogMapper.fromPgWithState(lineChatLogPg);
+    return lineChatLogFromPgWithState(lineChatLogPg);
   }
 
   async save(lineChatLog: LineChatLog) {
@@ -35,7 +38,7 @@ export class LineChatLogService {
       await this._update(lineChatLog.id, lineChatLog);
     }
 
-    lineChatLog.setPgState(LineChatLogMapper.toPg);
+    lineChatLog.setPgState(lineChatLogToPg);
   }
 
   async saveBulk(lineChatLogs: LineChatLog[]) {
@@ -56,12 +59,12 @@ export class LineChatLogService {
   private async _create(lineChatLog: LineChatLog) {
     await this.db.write
       .insertInto('line_chat_logs')
-      .values(LineChatLogMapper.toPg(lineChatLog))
+      .values(lineChatLogToPg(lineChatLog))
       .execute();
   }
 
   private async _update(id: string, lineChatLog: LineChatLog) {
-    const data = diff(lineChatLog.pgState, LineChatLogMapper.toPg(lineChatLog));
+    const data = diff(lineChatLog.pgState, lineChatLogToPg(lineChatLog));
     if (!data) {
       return;
     }

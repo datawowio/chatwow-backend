@@ -1,8 +1,8 @@
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
+import { userGroupUserFromPlain } from './user-group-user.mapper';
 import type {
-  UserGroupUserNewData,
   UserGroupUserPg,
   UserGroupUserPlain,
   UserGroupUserUpdateData,
@@ -17,17 +17,6 @@ export class UserGroupUser extends DomainEntity<UserGroupUserPg> {
     Object.assign(this, plain);
   }
 
-  static new(data: UserGroupUserNewData) {
-    return {
-      userId: data.userId || null,
-      userGroupId: data.userGroupId || null,
-    } as UserGroupUserPlain;
-  }
-
-  static newBulk(data: UserGroupUserNewData[]) {
-    return data.map((d) => UserGroupUser.new(d));
-  }
-
   edit(data: UserGroupUserUpdateData) {
     const plain: UserGroupUserPlain = {
       userId: isDefined(data.userId) ? data.userId : this.userId,
@@ -36,6 +25,6 @@ export class UserGroupUser extends DomainEntity<UserGroupUserPg> {
         : this.userGroupId,
     };
 
-    Object.assign(this, plain);
+    return userGroupUserFromPlain(plain);
   }
 }

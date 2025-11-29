@@ -1,16 +1,8 @@
 import type { ChatSender } from '@infra/db/db';
 
-import { uuidV7 } from '@shared/common/common.crypto';
-import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
-import { isDefined } from '@shared/common/common.validator';
 
-import { ProjectChatMapper } from './project-chat.mapper';
-import type {
-  ProjectChatNewData,
-  ProjectChatPg,
-  ProjectChatPlain,
-} from './project-chat.type';
+import type { ProjectChatPg, ProjectChatPlain } from './project-chat.type';
 
 export class ProjectChat extends DomainEntity<ProjectChatPg> {
   readonly id: string;
@@ -24,17 +16,5 @@ export class ProjectChat extends DomainEntity<ProjectChatPg> {
   constructor(plain: ProjectChatPlain) {
     super();
     Object.assign(this, plain);
-  }
-
-  static new(data: ProjectChatNewData): ProjectChat {
-    return ProjectChatMapper.fromPlain({
-      id: uuidV7(),
-      createdAt: myDayjs().toDate(),
-      chatSender: data.chatSender,
-      projectId: data.projectId,
-      message: data.message,
-      userId: data.userId,
-      parentId: isDefined(data.parentId) ? data.parentId : null,
-    });
   }
 }

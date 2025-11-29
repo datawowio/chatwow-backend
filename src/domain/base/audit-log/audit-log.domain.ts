@@ -1,15 +1,8 @@
 import type { ActionType, ActorType } from '@infra/db/db';
 
-import { uuidV7 } from '@shared/common/common.crypto';
-import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 
-import { AuditLogMapper } from './audit-log.mapper';
-import type {
-  AuditLogNewData,
-  AuditLogPg,
-  AuditLogPlain,
-} from './audit-log.type';
+import type { AuditLogPg, AuditLogPlain } from './audit-log.type';
 
 export class AuditLog extends DomainEntity<AuditLogPg> {
   readonly id: string;
@@ -25,19 +18,5 @@ export class AuditLog extends DomainEntity<AuditLogPg> {
   constructor(plain: AuditLogPlain) {
     super();
     Object.assign(this, plain);
-  }
-
-  static new(data: AuditLogNewData): AuditLog {
-    return AuditLogMapper.fromPlain({
-      id: uuidV7(),
-      createdAt: myDayjs().toDate(),
-      actorType: data.actorType,
-      actionType: data.actionType,
-      actionDetail: data.actionDetail || '',
-      createdById: data.createdById,
-      ownerTable: data.ownerTable,
-      ownerId: data.ownerId,
-      rawData: data.rawData,
-    });
   }
 }

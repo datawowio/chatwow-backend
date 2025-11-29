@@ -1,12 +1,12 @@
-import { ProjectDocumentMapper } from '@domain/base/project-document/project-document.mapper';
-import { ProjectMapper } from '@domain/base/project/project.mapper';
+import { projectDocumentPgToResponse } from '@domain/base/project-document/project-document.mapper';
+import { projectPgToResponse } from '@domain/base/project/project.mapper';
 import {
   addProjectActorFilter,
   projectsTableFilter,
 } from '@domain/base/project/project.util';
-import { StoredFileMapper } from '@domain/base/stored-file/stored-file.mapper';
-import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
-import { UserMapper } from '@domain/base/user/user.mapper';
+import { storedFilePgToResponse } from '@domain/base/stored-file/stored-file.mapper';
+import { userGroupPgToResponse } from '@domain/base/user-group/user-group.mapper';
+import { userPgToResponse } from '@domain/base/user/user.mapper';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
@@ -20,9 +20,7 @@ import { GetProjectDto, GetProjectResponse } from './get-project.dto';
 
 @Injectable()
 export class GetProjectQuery implements QueryInterface {
-  constructor(
-    private db: MainDb,
-  ) {}
+  constructor(private db: MainDb) {}
 
   async exec(
     claims: UserClaims,
@@ -36,33 +34,31 @@ export class GetProjectQuery implements QueryInterface {
       key: '',
       data: {
         project: {
-          attributes: ProjectMapper.pgToResponse(project),
+          attributes: projectPgToResponse(project),
           relations: {
             manageUsers:
               project.manageUsers &&
               project.manageUsers.map((user) => ({
-                attributes: UserMapper.pgToResponse(user),
+                attributes: userPgToResponse(user),
               })),
             projectDocuments:
               project.projectDocuments &&
               project.projectDocuments.map((doc) => ({
-                attributes: ProjectDocumentMapper.pgToResponse(doc),
+                attributes: projectDocumentPgToResponse(doc),
                 relations: {
                   createdBy: doc.createdBy
                     ? {
-                        attributes: UserMapper.pgToResponse(doc.createdBy),
+                        attributes: userPgToResponse(doc.createdBy),
                       }
                     : undefined,
                   updatedBy: doc.updatedBy
                     ? {
-                        attributes: UserMapper.pgToResponse(doc.updatedBy),
+                        attributes: userPgToResponse(doc.updatedBy),
                       }
                     : undefined,
                   storedFile: doc.storedFile
                     ? {
-                        attributes: StoredFileMapper.pgToResponse(
-                          doc.storedFile,
-                        ),
+                        attributes: storedFilePgToResponse(doc.storedFile),
                       }
                     : undefined,
                 },
@@ -70,16 +66,16 @@ export class GetProjectQuery implements QueryInterface {
             userGroups:
               project.userGroups &&
               project.userGroups.map((group) => ({
-                attributes: UserGroupMapper.pgToResponse(group),
+                attributes: userGroupPgToResponse(group),
               })),
             createdBy: project.createdBy
               ? {
-                  attributes: UserMapper.pgToResponse(project.createdBy),
+                  attributes: userPgToResponse(project.createdBy),
                 }
               : undefined,
             updatedBy: project.updatedBy
               ? {
-                  attributes: UserMapper.pgToResponse(project.updatedBy),
+                  attributes: userPgToResponse(project.updatedBy),
                 }
               : undefined,
           },

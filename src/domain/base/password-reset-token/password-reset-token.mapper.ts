@@ -13,105 +13,121 @@ import type {
   PasswordResetTokenPlain,
 } from './password-reset-token.type';
 
-export class PasswordResetTokenMapper {
-  static fromPg(pg: PasswordResetTokenPg): PasswordResetToken {
-    const plain: PasswordResetTokenPlain = {
-      id: pg.id,
-      userId: pg.user_id,
-      tokenHash: pg.token_hash,
-      createdAt: toDate(pg.created_at),
-      expireAt: toDate(pg.expire_at),
-      revokeAt: toDate(pg.revoke_at),
-    };
+export function passwordResetTokenFromPg(
+  pg: PasswordResetTokenPg,
+): PasswordResetToken {
+  const plain: PasswordResetTokenPlain = {
+    id: pg.id,
+    userId: pg.user_id,
+    tokenHash: pg.token_hash,
+    createdAt: toDate(pg.created_at),
+    expireAt: toDate(pg.expire_at),
+    revokeAt: toDate(pg.revoke_at),
+  };
 
-    return new PasswordResetToken(plain);
-  }
+  return new PasswordResetToken(plain);
+}
 
-  static fromPgWithState(pg: PasswordResetTokenPg): PasswordResetToken {
-    return this.fromPg(pg).setPgState(this.toPg);
-  }
+export function passwordResetTokenFromPgWithState(
+  pg: PasswordResetTokenPg,
+): PasswordResetToken {
+  return passwordResetTokenFromPg(pg).setPgState(passwordResetTokenToPg);
+}
 
-  static fromPlain(plainData: PasswordResetTokenPlain): PasswordResetToken {
-    const plain: PasswordResetTokenPlain = {
-      id: plainData.id,
-      userId: plainData.userId,
-      tokenHash: plainData.tokenHash,
-      createdAt: plainData.createdAt,
-      expireAt: plainData.expireAt,
-      revokeAt: plainData.revokeAt,
-    };
+export function passwordResetTokenFromPlain(
+  plainData: PasswordResetTokenPlain,
+): PasswordResetToken {
+  const plain: PasswordResetTokenPlain = {
+    id: plainData.id,
+    userId: plainData.userId,
+    tokenHash: plainData.tokenHash,
+    createdAt: plainData.createdAt,
+    expireAt: plainData.expireAt,
+    revokeAt: plainData.revokeAt,
+  };
 
-    return new PasswordResetToken(plain);
-  }
+  return new PasswordResetToken(plain);
+}
 
-  static fromJson(json: PasswordResetTokenJson): PasswordResetToken {
-    const plain: PasswordResetTokenPlain = {
-      id: json.id,
-      userId: json.userId,
-      tokenHash: json.tokenHash,
-      createdAt: toDate(json.createdAt),
-      expireAt: toDate(json.expireAt),
-      revokeAt: toDate(json.revokeAt),
-    };
+export function passwordResetTokenFromJson(
+  json: PasswordResetTokenJson,
+): PasswordResetToken {
+  const plain: PasswordResetTokenPlain = {
+    id: json.id,
+    userId: json.userId,
+    tokenHash: json.tokenHash,
+    createdAt: toDate(json.createdAt),
+    expireAt: toDate(json.expireAt),
+    revokeAt: toDate(json.revokeAt),
+  };
 
-    return new PasswordResetToken(plain);
-  }
-  static fromJsonState(
-    jsonState: WithPgState<PasswordResetTokenJson, PasswordResetTokenPg>,
-  ) {
-    const domain = PasswordResetTokenMapper.fromJson(jsonState.data);
-    domain.setPgState(jsonState.state);
+  return new PasswordResetToken(plain);
+}
 
-    return domain;
-  }
+export function passwordResetTokenFromJsonState(
+  jsonState: WithPgState<PasswordResetTokenJson, PasswordResetTokenPg>,
+): PasswordResetToken {
+  const domain = passwordResetTokenFromJson(jsonState.data);
+  domain.setPgState(jsonState.state);
 
-  static toPg(t: PasswordResetToken): PasswordResetTokenPg {
-    return {
-      id: t.id,
-      user_id: t.userId,
-      token_hash: t.tokenHash,
-      created_at: toISO(t.createdAt),
-      expire_at: toISO(t.expireAt),
-      revoke_at: toISO(t.revokeAt),
-    };
-  }
+  return domain;
+}
 
-  static toPlain(t: PasswordResetToken): PasswordResetTokenPlain {
-    return {
-      id: t.id,
-      userId: t.userId,
-      tokenHash: t.tokenHash,
-      createdAt: t.createdAt,
-      expireAt: t.expireAt,
-      revokeAt: t.revokeAt,
-    };
-  }
+export function passwordResetTokenToPg(
+  t: PasswordResetToken,
+): PasswordResetTokenPg {
+  return {
+    id: t.id,
+    user_id: t.userId,
+    token_hash: t.tokenHash,
+    created_at: toISO(t.createdAt),
+    expire_at: toISO(t.expireAt),
+    revoke_at: toISO(t.revokeAt),
+  };
+}
 
-  static toJson(t: PasswordResetToken): PasswordResetTokenJson {
-    return {
-      id: t.id,
-      userId: t.userId,
-      tokenHash: t.tokenHash,
-      createdAt: toISO(t.createdAt),
-      expireAt: toISO(t.expireAt),
-      revokeAt: toISO(t.revokeAt),
-    };
-  }
-  static toJsonState(
-    t: PasswordResetToken,
-  ): WithPgState<PasswordResetTokenJson, PasswordResetTokenPg> {
-    return {
-      state: t.pgState,
-      data: PasswordResetTokenMapper.toJson(t),
-    };
-  }
+export function passwordResetTokenToPlain(
+  t: PasswordResetToken,
+): PasswordResetTokenPlain {
+  return {
+    id: t.id,
+    userId: t.userId,
+    tokenHash: t.tokenHash,
+    createdAt: t.createdAt,
+    expireAt: t.expireAt,
+    revokeAt: t.revokeAt,
+  };
+}
 
-  static toResponse(t: PasswordResetToken): PasswordResetTokenResponse {
-    return {
-      id: t.id,
-      createdAt: toResponseDate(t.createdAt),
-      expireAt: toResponseDate(t.expireAt),
-      revokedAt: toResponseDate(t.revokeAt),
-    };
-  }
+export function passwordResetTokenToJson(
+  t: PasswordResetToken,
+): PasswordResetTokenJson {
+  return {
+    id: t.id,
+    userId: t.userId,
+    tokenHash: t.tokenHash,
+    createdAt: toISO(t.createdAt),
+    expireAt: toISO(t.expireAt),
+    revokeAt: toISO(t.revokeAt),
+  };
+}
+
+export function passwordResetTokenToJsonState(
+  t: PasswordResetToken,
+): WithPgState<PasswordResetTokenJson, PasswordResetTokenPg> {
+  return {
+    state: t.pgState,
+    data: passwordResetTokenToJson(t),
+  };
+}
+
+export function passwordResetTokenToResponse(
+  t: PasswordResetToken,
+): PasswordResetTokenResponse {
+  return {
+    id: t.id,
+    createdAt: toResponseDate(t.createdAt),
+    expireAt: toResponseDate(t.expireAt),
+    revokedAt: toResponseDate(t.revokeAt),
+  };
 }

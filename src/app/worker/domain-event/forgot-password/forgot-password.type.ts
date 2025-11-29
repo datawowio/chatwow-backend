@@ -1,8 +1,8 @@
 import type { PasswordResetToken } from '@domain/base/password-reset-token/password-reset-token.domain';
-import type {
+import {
   PasswordResetTokenJson,
   PasswordResetTokenPg,
-} from '@domain/base/password-reset-token/types/password-reset-token.domain.type';
+} from '@domain/base/password-reset-token/password-reset-token.type';
 import type { User } from '@domain/base/user/user.domain';
 import type { UserJson, UserPg } from '@domain/base/user/user.type';
 

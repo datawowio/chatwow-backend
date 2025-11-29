@@ -1,13 +1,20 @@
 import { Project } from '@domain/base/project/project.domain';
-import { ProjectMapper } from '@domain/base/project/project.mapper';
+import {
+  projectFromPgWithState,
+  projectToResponse,
+} from '@domain/base/project/project.mapper';
 import { projectsTableFilter } from '@domain/base/project/project.util';
 import { UserGroupProjectService } from '@domain/base/user-group-project/user-group-project.service';
 import { UserGroupUserService } from '@domain/base/user-group-user/user-group-user.service';
 import { UserGroup } from '@domain/base/user-group/user-group.domain';
-import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
+import { newUserGroup } from '@domain/base/user-group/user-group.factory';
+import { userGroupToResponse } from '@domain/base/user-group/user-group.mapper';
 import { UserGroupService } from '@domain/base/user-group/user-group.service';
 import { User } from '@domain/base/user/user.domain';
-import { UserMapper } from '@domain/base/user/user.mapper';
+import {
+  userFromPgWithState,
+  userToResponse,
+} from '@domain/base/user/user.mapper';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { Injectable } from '@nestjs/common';
 
@@ -17,6 +24,7 @@ import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import {
   CreateUserGroupDto,
@@ -44,7 +52,7 @@ export class CreateUserGroupCommand implements CommandInterface {
     claims: UserClaims,
     body: CreateUserGroupDto,
   ): Promise<CreateUserGroupResponse> {
-    const userGroup = UserGroup.new({
+    const userGroup = newUserGroup({
       actorId: claims.userId,
       data: body.userGroup,
     });
@@ -55,23 +63,21 @@ export class CreateUserGroupCommand implements CommandInterface {
 
     await this.save({ userGroup, users, projects });
 
-    return {
-      success: true,
-      key: '',
+    return toHttpSuccess({
       data: {
         userGroup: {
-          attributes: UserGroupMapper.toResponse(userGroup),
+          attributes: userGroupToResponse(userGroup),
           relations: {
             users: users.map((user) => ({
-              attributes: UserMapper.toResponse(user),
+              attributes: userToResponse(user),
             })),
             projects: projects.map((project) => ({
-              attributes: ProjectMapper.toResponse(project),
+              attributes: projectToResponse(project),
             })),
           },
         },
       },
-    };
+    });
   }
 
   async save(entity: Entity): Promise<void> {
@@ -104,7 +110,7 @@ export class CreateUserGroupCommand implements CommandInterface {
       throw new ApiException(404, 'someUsersNotFound');
     }
 
-    return users.map((u) => UserMapper.fromPgWithState(u));
+    return users.map((u) => userFromPgWithState(u));
   }
 
   async findProjects(projectIds?: string[]) {
@@ -123,6 +129,6 @@ export class CreateUserGroupCommand implements CommandInterface {
       throw new ApiException(404, 'someProjectsNotFound');
     }
 
-    return projects.map((p) => ProjectMapper.fromPgWithState(p));
+    return projects.map((p) => projectFromPgWithState(p));
   }
 }

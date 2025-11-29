@@ -1,17 +1,11 @@
 import type { UserRole, UserStatus } from '@infra/db/db';
 
-import { hashString, uuidV7 } from '@shared/common/common.crypto';
+import { hashString } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { UserMapper } from './user.mapper';
-import type {
-  UserNewData,
-  UserPg,
-  UserPlain,
-  UserUpdateData,
-} from './user.type';
+import type { UserPg, UserPlain, UserUpdateData } from './user.type';
 
 export class User extends DomainEntity<UserPg> {
   readonly id: string;
@@ -31,28 +25,6 @@ export class User extends DomainEntity<UserPg> {
   constructor(plain: UserPlain) {
     super();
     Object.assign(this, plain);
-  }
-
-  static new({ actorId, data }: UserNewData): User {
-    return UserMapper.fromPlain({
-      id: uuidV7(),
-      firstName: data.firstName,
-      lastName: data.lastName,
-      createdAt: myDayjs().toDate(),
-      updatedAt: myDayjs().toDate(),
-      createdById: actorId || null,
-      updatedById: actorId || null,
-      email: data.email,
-      password: data.password ? hashString(data.password) : null,
-      role: data.role,
-      userStatus: isDefined(data.userStatus) ? data.userStatus : 'ACTIVE',
-      lineAccountId: data.lineAccountId || null,
-      lastSignedInAt: null,
-    });
-  }
-
-  static newBulk(data: UserNewData[]) {
-    return data.map((d) => User.new(d));
   }
 
   edit({ actorId, data }: UserUpdateData) {

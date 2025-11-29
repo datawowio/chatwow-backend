@@ -12,7 +12,10 @@ import { DayjsDuration } from '@shared/common/common.type';
 
 import { GetPresignUploadUrlOpts } from './stored-file.common.type';
 import { StoredFile } from './stored-file.domain';
-import { StoredFileMapper } from './stored-file.mapper';
+import {
+  storedFileFromPgWithState,
+  storedFileToPg,
+} from './stored-file.mapper';
 import { getStoredFileKey } from './stored-file.util';
 
 @Injectable()
@@ -34,7 +37,7 @@ export class StoredFileService {
       return null;
     }
 
-    const storedFile = StoredFileMapper.fromPgWithState(storedFilePg);
+    const storedFile = storedFileFromPgWithState(storedFilePg);
     return storedFile;
   }
 
@@ -57,14 +60,14 @@ export class StoredFileService {
     await this.db.write
       //
       .insertInto('stored_files')
-      .values(StoredFileMapper.toPg(storedFile))
+      .values(storedFileToPg(storedFile))
       .execute();
 
-    storedFile.setPgState(StoredFileMapper.toPg);
+    storedFile.setPgState(storedFileToPg);
   }
 
   private async _update(id: string, storedFile: StoredFile): Promise<void> {
-    const data = diff(storedFile.pgState, StoredFileMapper.toPg(storedFile));
+    const data = diff(storedFile.pgState, storedFileToPg(storedFile));
     if (!data) {
       return;
     }

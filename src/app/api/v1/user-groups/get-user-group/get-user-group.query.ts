@@ -1,10 +1,10 @@
-import { ProjectMapper } from '@domain/base/project/project.mapper';
-import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
+import { projectPgToResponse } from '@domain/base/project/project.mapper';
+import { userGroupPgToResponse } from '@domain/base/user-group/user-group.mapper';
 import {
   addUserGroupActorFilter,
   userGroupsTableFilter,
 } from '@domain/base/user-group/user-group.utils';
-import { UserMapper } from '@domain/base/user/user.mapper';
+import { userPgToResponse } from '@domain/base/user/user.mapper';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
@@ -18,9 +18,7 @@ import { GetUserGroupDto, GetUserGroupResponse } from './get-user-group.dto';
 
 @Injectable()
 export class GetUserGroupQuery implements QueryInterface {
-  constructor(
-    private db: MainDb,
-  ) {}
+  constructor(private db: MainDb) {}
 
   async exec(
     claims: UserClaims,
@@ -34,26 +32,26 @@ export class GetUserGroupQuery implements QueryInterface {
       key: '',
       data: {
         userGroup: {
-          attributes: UserGroupMapper.pgToResponse(userGroup),
+          attributes: userGroupPgToResponse(userGroup),
           relations: {
             projects:
               userGroup.projects &&
               userGroup.projects.map((project) => ({
-                attributes: ProjectMapper.pgToResponse(project),
+                attributes: projectPgToResponse(project),
               })),
             users:
               userGroup.users &&
               userGroup.users.map((user) => ({
-                attributes: UserMapper.pgToResponse(user),
+                attributes: userPgToResponse(user),
               })),
             createdBy: userGroup.createdBy
               ? {
-                  attributes: UserMapper.pgToResponse(userGroup.createdBy),
+                  attributes: userPgToResponse(userGroup.createdBy),
                 }
               : undefined,
             updatedBy: userGroup.updatedBy
               ? {
-                  attributes: UserMapper.pgToResponse(userGroup.updatedBy),
+                  attributes: userPgToResponse(userGroup.updatedBy),
                 }
               : undefined,
           },

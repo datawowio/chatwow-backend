@@ -9,7 +9,8 @@ import { diff } from '@shared/common/common.func';
 import { ApiException } from '@shared/http/http.exception';
 
 import { Session } from './session.domain';
-import { SessionMapper } from './session.mapper';
+import { newSession } from './session.factory';
+import { sessionFromPgWithState, sessionToPg } from './session.mapper';
 
 @Injectable()
 export class SessionService {
@@ -25,7 +26,7 @@ export class SessionService {
       throw new ApiException(400, 'noDeviceUid');
     }
 
-    const session = Session.new({
+    const session = newSession({
       token,
       userId,
       deviceUid,
@@ -45,7 +46,7 @@ export class SessionService {
       .where('id', '=', id)
       .executeTakeFirst();
     if (!pg) return null;
-    return SessionMapper.fromPgWithState(pg);
+    return sessionFromPgWithState(pg);
   }
 
   async save(session: Session) {
@@ -55,7 +56,7 @@ export class SessionService {
     } else {
       await this._update(session.id, session);
     }
-    session.setPgState(SessionMapper.toPg);
+    session.setPgState(sessionToPg);
   }
 
   async saveBulk(sessions: Session[]) {
@@ -83,12 +84,12 @@ export class SessionService {
   private async _create(session: Session) {
     await this.db.write
       .insertInto('sessions')
-      .values(SessionMapper.toPg(session))
+      .values(sessionToPg(session))
       .execute();
   }
 
   private async _update(id: string, session: Session) {
-    const data = diff(session.pgState, SessionMapper.toPg(session));
+    const data = diff(session.pgState, sessionToPg(session));
     if (!data) return;
     await this.db.write
       .updateTable('sessions')

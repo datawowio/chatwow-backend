@@ -1,14 +1,10 @@
 import { ReqInfo } from '@infra/global/req-storage/req-storage.common';
 
-import { shaHashstring, uuidV7 } from '@shared/common/common.crypto';
-import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { SESSION_DEFAULT_EXPIRY_SECONDS } from './session.constant';
-import { SessionMapper } from './session.mapper';
+import { sessionFromPlain } from './session.mapper';
 import type {
-  SessionNewData,
   SessionPg,
   SessionPlain,
   SessionUpdateData,
@@ -29,25 +25,6 @@ export class Session extends DomainEntity<SessionPg> {
     Object.assign(this, plain);
   }
 
-  static new(data: SessionNewData) {
-    return SessionMapper.fromPlain({
-      id: uuidV7(),
-      userId: data.userId,
-      tokenHash: shaHashstring(data.token),
-      deviceUid: data.deviceUid,
-      createdAt: myDayjs().toDate(),
-      expireAt: isDefined(data.expireAt)
-        ? data.expireAt
-        : myDayjs().add(SESSION_DEFAULT_EXPIRY_SECONDS, 'seconds').toDate(),
-      revokeAt: null,
-      info: data.info,
-    });
-  }
-
-  static newBulk(data: SessionNewData[]) {
-    return data.map((d) => Session.new(d));
-  }
-
   edit(data: SessionUpdateData) {
     const plain: SessionPlain = {
       id: this.id,
@@ -60,6 +37,6 @@ export class Session extends DomainEntity<SessionPg> {
       info: isDefined(data.info) ? data.info : this.info,
     };
 
-    Object.assign(this, plain);
+    return sessionFromPlain(plain);
   }
 }

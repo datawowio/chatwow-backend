@@ -3,14 +3,13 @@ import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { StoredFileMapper } from './stored-file.mapper';
-import { getStoredFileKey } from './stored-file.util';
+import { storedFileFromPlain } from './stored-file.mapper';
 import type {
-  StoredFileNewData,
   StoredFilePg,
   StoredFilePlain,
   StoredFileUpdateData,
 } from './stored-file.type';
+import { getStoredFileKey } from './stored-file.util';
 
 export class StoredFile extends DomainEntity<StoredFilePg> {
   readonly id: string;
@@ -33,35 +32,6 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
   constructor(plain: StoredFilePlain) {
     super();
     Object.assign(this, plain);
-  }
-
-  static new(data: StoredFileNewData) {
-    return StoredFileMapper.fromPlain({
-      id: data.id,
-      refName: data.refName || 'DEFAULT',
-      ownerTable: data.ownerTable,
-      ownerId: data.ownerId,
-      filename: data.filename,
-      filesizeByte: data.filesizeByte || 0,
-      storageName: data.storageName || 's3',
-      isPublic: data.isPublic || false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      extension: getFileExtension(data.filename),
-      checksum: null,
-      expireAt: data.expireAt || null,
-      keyPath: getStoredFileKey({
-        id: data.id,
-        ownerTable: data.ownerTable,
-        isPublic: data.isPublic || false,
-      }),
-      presignUrl: null,
-      mimeType: null,
-    });
-  }
-
-  static newBulk(data: StoredFileNewData[]) {
-    return data.map((d) => StoredFile.new(d));
   }
 
   edit(data: StoredFileUpdateData) {
@@ -94,7 +64,7 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
       isPublic: isDefined(data.isPublic) ? data.isPublic : this.isPublic,
     };
 
-    Object.assign(this, plain);
+    return storedFileFromPlain(plain);
   }
 
   isFileChanged() {

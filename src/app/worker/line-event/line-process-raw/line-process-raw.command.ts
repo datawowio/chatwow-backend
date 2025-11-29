@@ -1,9 +1,9 @@
 import { LineAccount } from '@domain/base/line-account/line-account.domain';
-import { LineAccountMapper } from '@domain/base/line-account/line-account.mapper';
+import { lineAccountFromPgWithState } from '@domain/base/line-account/line-account.mapper';
 import { LineBot } from '@domain/base/line-bot/line-bot.domain';
 import { LineBotService } from '@domain/base/line-bot/line-bot.service';
 import { LineSession } from '@domain/base/line-session/line-session.domain';
-import { LineSessionMapper } from '@domain/base/line-session/line-session.mapper';
+import { lineSessionFromPgWithState } from '@domain/base/line-session/line-session.mapper';
 import { lineSessionsTableFilter } from '@domain/base/line-session/line-session.util';
 import { LineEventQueue } from '@domain/orchestration/queue/line-event/line-event.queue';
 import { Injectable } from '@nestjs/common';
@@ -139,9 +139,9 @@ export class LineProcessRawCommand {
     return {
       lineBot,
       lineData: {
-        lineAccount: LineAccountMapper.fromPgWithState(raw),
+        lineAccount: lineAccountFromPgWithState(raw),
         lineSession: raw.activeSession
-          ? LineSessionMapper.fromPgWithState(raw.activeSession)
+          ? lineSessionFromPgWithState(raw.activeSession)
           : null,
       },
     };

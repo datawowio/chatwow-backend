@@ -10,7 +10,7 @@ import { isDefined } from '@shared/common/common.validator';
 import { ApiException } from '@shared/http/http.exception';
 
 import { User } from './user.domain';
-import { UserMapper } from './user.mapper';
+import { userFromPgWithState, userToPg } from './user.mapper';
 import { usersTableFilter } from './user.util';
 import { UserCountQueryOptions, UserQueryOptions } from './user.zod';
 
@@ -64,7 +64,7 @@ export class UserService {
       return null;
     }
 
-    const user = UserMapper.fromPgWithState(userPg);
+    const user = userFromPgWithState(userPg);
     return user;
   }
 
@@ -77,7 +77,7 @@ export class UserService {
       await this._update(user.id, user);
     }
 
-    user.setPgState(UserMapper.toPg);
+    user.setPgState(userToPg);
   }
 
   async saveBulk(users: User[]) {
@@ -101,13 +101,13 @@ export class UserService {
       this.db.write
         //
         .insertInto('users')
-        .values(UserMapper.toPg(user))
+        .values(userToPg(user))
         .execute(),
     );
   }
 
   private async _update(id: string, user: User) {
-    const data = diff(user.pgState, UserMapper.toPg(user));
+    const data = diff(user.pgState, userToPg(user));
     if (!data) {
       return;
     }

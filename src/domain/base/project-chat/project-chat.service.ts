@@ -5,7 +5,10 @@ import { MainDb } from '@infra/db/db.main';
 import { diff } from '@shared/common/common.func';
 
 import { ProjectChat } from './project-chat.domain';
-import { ProjectChatMapper } from './project-chat.mapper';
+import {
+  projectChatFromPgWithState,
+  projectChatToPg,
+} from './project-chat.mapper';
 
 @Injectable()
 export class ProjectChatService {
@@ -23,7 +26,7 @@ export class ProjectChatService {
       return null;
     }
 
-    const domain = ProjectChatMapper.fromPgWithState(userPg);
+    const domain = projectChatFromPgWithState(userPg);
     return domain;
   }
 
@@ -36,7 +39,7 @@ export class ProjectChatService {
       await this._update(projectChat.id, projectChat);
     }
 
-    projectChat.setPgState(ProjectChatMapper.toPg);
+    projectChat.setPgState(projectChatToPg);
   }
 
   async saveBulk(lineSessions: ProjectChat[]) {
@@ -55,12 +58,12 @@ export class ProjectChatService {
     await this.db.write
       //
       .insertInto('project_chats')
-      .values(ProjectChatMapper.toPg(domain))
+      .values(projectChatToPg(domain))
       .execute();
   }
 
   private async _update(id: string, domain: ProjectChat): Promise<void> {
-    const data = diff(domain.pgState, ProjectChatMapper.toPg(domain));
+    const data = diff(domain.pgState, projectChatToPg(domain));
     if (!data) {
       return;
     }

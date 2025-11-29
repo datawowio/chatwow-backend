@@ -1,5 +1,5 @@
-import { LineBotMapper } from '@domain/base/line-bot/line-bot.mapper';
-import { LineSessionMapper } from '@domain/base/line-session/line-session.mapper';
+import { lineBotFromJsonWithState } from '@domain/base/line-bot/line-bot.mapper';
+import { lineSessionFromJsonWithState } from '@domain/base/line-session/line-session.mapper';
 import { Injectable } from '@nestjs/common';
 
 import { LINE_EVENT_JOBS } from '@app/worker/worker.job';
@@ -39,7 +39,7 @@ export class LineEventBullmq extends BaseTaskHandler {
   async processVerification(input: LineProcessVerificationJobInput) {
     return this.lineProcessVerificationCommand.exec({
       ...input,
-      lineBot: LineBotMapper.fromJsonWithState(input.lineBot),
+      lineBot: lineBotFromJsonWithState(input.lineBot),
     });
   }
 
@@ -47,7 +47,7 @@ export class LineEventBullmq extends BaseTaskHandler {
   async processSelectionMenu(input: LineProcessSelectionMenuJobInput) {
     return this.lineProcessSelectionMenuCommand.exec({
       ...input,
-      lineBot: LineBotMapper.fromJsonWithState(input.lineBot),
+      lineBot: lineBotFromJsonWithState(input.lineBot),
     });
   }
 
@@ -55,17 +55,15 @@ export class LineEventBullmq extends BaseTaskHandler {
   async showSelectionMenu(input: LineShowSelectionMenuJobInput) {
     return this.lineShowSelectionMenuCommand.exec({
       ...input,
-      lineBot: LineBotMapper.fromJsonWithState(input.lineBot),
+      lineBot: lineBotFromJsonWithState(input.lineBot),
     });
   }
 
   @QueueTask(LINE_EVENT_JOBS.PROCESS_AI_CHAT)
   async processAiChat(input: LineProcessAiChatJobInput) {
     return this.lineProcessAiChatCommand.exec({
-      lineBot: LineBotMapper.fromJsonWithState(input.lineBotJsonState),
-      lineSession: LineSessionMapper.fromJsonWithState(
-        input.lineSessionJsonState,
-      ),
+      lineBot: lineBotFromJsonWithState(input.lineBotJsonState),
+      lineSession: lineSessionFromJsonWithState(input.lineSessionJsonState),
       data: input.data,
     });
   }

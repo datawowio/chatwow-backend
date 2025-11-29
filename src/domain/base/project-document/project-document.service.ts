@@ -8,7 +8,10 @@ import { diff, getUniqueIds } from '@shared/common/common.func';
 import { isDefined } from '@shared/common/common.validator';
 
 import { ProjectDocument } from './project-document.domain';
-import { ProjectDocumentMapper } from './project-document.mapper';
+import {
+  projectDocumentFromPgWithState,
+  projectDocumentToPg,
+} from './project-document.mapper';
 import {
   addProjectDocumentActorFilter,
   projectDocumentsTableFilter,
@@ -68,8 +71,7 @@ export class ProjectDocumentService {
       return null;
     }
 
-    const projectDocument =
-      ProjectDocumentMapper.fromPgWithState(projectDocumentPg);
+    const projectDocument = projectDocumentFromPgWithState(projectDocumentPg);
     return projectDocument;
   }
 
@@ -82,7 +84,7 @@ export class ProjectDocumentService {
       await this._update(projectDocument.id, projectDocument);
     }
 
-    projectDocument.setPgState(ProjectDocumentMapper.toPg);
+    projectDocument.setPgState(projectDocumentToPg);
   }
 
   async saveBulk(projectDocuments: ProjectDocument[]) {
@@ -105,7 +107,7 @@ export class ProjectDocumentService {
     await this.db.write
       //
       .insertInto('project_documents')
-      .values(ProjectDocumentMapper.toPg(projectDocument))
+      .values(projectDocumentToPg(projectDocument))
       .execute();
   }
 
@@ -115,7 +117,7 @@ export class ProjectDocumentService {
   ): Promise<void> {
     const data = diff(
       projectDocument.pgState,
-      ProjectDocumentMapper.toPg(projectDocument),
+      projectDocumentToPg(projectDocument),
     );
     if (!data) {
       return;

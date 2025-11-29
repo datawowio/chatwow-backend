@@ -8,7 +8,7 @@ import { diff, getUniqueIds } from '@shared/common/common.func';
 import { isDefined } from '@shared/common/common.validator';
 
 import { Project } from './project.domain';
-import { ProjectMapper } from './project.mapper';
+import { projectFromPgWithState, projectToPg } from './project.mapper';
 import { addProjectActorFilter, projectsTableFilter } from './project.util';
 import { ProjectFilterOptions, ProjectQueryOptions } from './project.zod';
 
@@ -60,7 +60,7 @@ export class ProjectService {
       return null;
     }
 
-    const project = ProjectMapper.fromPgWithState(projectPg);
+    const project = projectFromPgWithState(projectPg);
     return project;
   }
 
@@ -73,7 +73,7 @@ export class ProjectService {
       await this._update(project.id, project);
     }
 
-    project.setPgState(ProjectMapper.toPg);
+    project.setPgState(projectToPg);
   }
 
   async saveBulk(projects: Project[]) {
@@ -92,12 +92,12 @@ export class ProjectService {
     await this.db.write
       //
       .insertInto('projects')
-      .values(ProjectMapper.toPg(project))
+      .values(projectToPg(project))
       .execute();
   }
 
   private async _update(id: string, project: Project): Promise<void> {
-    const data = diff(project.pgState, ProjectMapper.toPg(project));
+    const data = diff(project.pgState, projectToPg(project));
     if (!data) {
       return;
     }

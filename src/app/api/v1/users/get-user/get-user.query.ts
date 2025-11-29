@@ -1,9 +1,8 @@
-import { LineAccountMapper } from '@domain/base/line-account/line-account.mapper';
-import { ProjectMapper } from '@domain/base/project/project.mapper';
-import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
-import { UserMapper } from '@domain/base/user/user.mapper';
+import { lineAccountPgToResponse } from '@domain/base/line-account/line-account.mapper';
+import { projectPgToResponse } from '@domain/base/project/project.mapper';
+import { userGroupPgToResponse } from '@domain/base/user-group/user-group.mapper';
+import { userPgToResponse } from '@domain/base/user/user.mapper';
 import { usersTableFilter } from '@domain/base/user/user.util';
-
 
 import { MainDb } from '@infra/db/db.main';
 
@@ -14,9 +13,7 @@ import { usersV1InclusionQb } from '../users.v1.util';
 import { GetUserDto, GetUserResponse } from './get-user.dto';
 
 export class GetUserQuery implements QueryInterface {
-  constructor(
-    private db: MainDb,
-  ) {}
+  constructor(private db: MainDb) {}
 
   async exec(id: string, query: GetUserDto): Promise<GetUserResponse> {
     const user = await this.getRaw(id, query);
@@ -26,31 +23,31 @@ export class GetUserQuery implements QueryInterface {
       key: '',
       data: {
         user: {
-          attributes: UserMapper.pgToResponse(user),
+          attributes: userPgToResponse(user),
           relations: {
             lineAccount: user.lineAccount
               ? {
-                  attributes: LineAccountMapper.pgToResponse(user.lineAccount),
+                  attributes: lineAccountPgToResponse(user.lineAccount),
                 }
               : undefined,
             manageProjects: user.manageProjects
               ? user.manageProjects.map((project) => ({
-                  attributes: ProjectMapper.pgToResponse(project),
+                  attributes: projectPgToResponse(project),
                 }))
               : undefined,
             userGroups: user.userGroups
               ? user.userGroups.map((group) => ({
-                  attributes: UserGroupMapper.pgToResponse(group),
+                  attributes: userGroupPgToResponse(group),
                 }))
               : undefined,
             createdBy: user.createdBy
               ? {
-                  attributes: UserMapper.pgToResponse(user.createdBy),
+                  attributes: userPgToResponse(user.createdBy),
                 }
               : undefined,
             updatedBy: user.updatedBy
               ? {
-                  attributes: UserMapper.pgToResponse(user.updatedBy),
+                  attributes: userPgToResponse(user.updatedBy),
                 }
               : undefined,
           },

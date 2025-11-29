@@ -1,6 +1,12 @@
-import { PasswordResetTokenMapper } from '@domain/base/password-reset-token/password-reset-token.mapper';
+import {
+  passwordResetTokenFromPgWithState,
+  passwordResetTokenToResponse,
+} from '@domain/base/password-reset-token/password-reset-token.mapper';
 import { passwordResetTokensTableFilter } from '@domain/base/password-reset-token/password-reset-token.util';
-import { UserMapper } from '@domain/base/user/user.mapper';
+import {
+  userFromPgWithState,
+  userToResponse,
+} from '@domain/base/user/user.mapper';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { getAccessToken } from '@domain/orchestration/auth/auth.util';
 import { Injectable } from '@nestjs/common';
@@ -12,7 +18,7 @@ import { shaHashstring } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { QueryInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
-import { HttpResponseMapper } from '@shared/http/http.mapper';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import {
   CheckResetPasswordDto,
@@ -21,9 +27,7 @@ import {
 
 @Injectable()
 export class CheckResetPasswordQuery implements QueryInterface {
-  constructor(
-    private db: MainDb,
-  ) {}
+  constructor(private db: MainDb) {}
 
   async exec(
     query: CheckResetPasswordDto,
@@ -33,13 +37,13 @@ export class CheckResetPasswordQuery implements QueryInterface {
       throw new ApiException(403, 'tokenExpired');
     }
 
-    return HttpResponseMapper.toSuccess({
+    return toHttpSuccess({
       data: {
         user: {
-          attributes: UserMapper.toResponse(entity.user),
+          attributes: userToResponse(entity.user),
           relations: {
             passwordResetToken: {
-              attributes: PasswordResetTokenMapper.toResponse(
+              attributes: passwordResetTokenToResponse(
                 entity.passwordResetToken,
               ),
             },
@@ -74,8 +78,8 @@ export class CheckResetPasswordQuery implements QueryInterface {
     }
 
     return {
-      user: UserMapper.fromPgWithState(pg.user),
-      passwordResetToken: PasswordResetTokenMapper.fromPgWithState(pg),
+      user: userFromPgWithState(pg.user),
+      passwordResetToken: passwordResetTokenFromPgWithState(pg),
     };
   }
 }

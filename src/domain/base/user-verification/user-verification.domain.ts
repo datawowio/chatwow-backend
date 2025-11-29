@@ -1,16 +1,12 @@
-import { uuidV7 } from '@shared/common/common.crypto';
-import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { UserVerificationMapper } from './user-verification.mapper';
+import { userVerificationFromPlain } from './user-verification.mapper';
 import type {
-  UserVerificationNewData,
   UserVerificationPg,
   UserVerificationPlain,
   UserVerificationUpdateData,
 } from './user-verification.type';
-import { generateVerificationCode } from './user-verification.util';
 
 export class UserVerification extends DomainEntity<UserVerificationPg> {
   readonly id: string;
@@ -25,23 +21,6 @@ export class UserVerification extends DomainEntity<UserVerificationPg> {
     Object.assign(this, plain);
   }
 
-  static new(data: UserVerificationNewData) {
-    const now = myDayjs();
-
-    return UserVerificationMapper.fromPlain({
-      id: uuidV7(),
-      code: generateVerificationCode(),
-      createdAt: now.toDate(),
-      userId: data.userId,
-      expireAt: now.add(10, 'minutes').toDate(),
-      revokeAt: null,
-    });
-  }
-
-  static newBulk(data: UserVerificationNewData[]) {
-    return data.map((d) => UserVerification.new(d));
-  }
-
   edit(data: UserVerificationUpdateData) {
     const plain: UserVerificationPlain = {
       id: this.id,
@@ -54,6 +33,6 @@ export class UserVerification extends DomainEntity<UserVerificationPg> {
       expireAt: isDefined(data.expireAt) ? data.expireAt : this.expireAt,
     };
 
-    Object.assign(this, plain);
+    return userVerificationFromPlain(plain);
   }
 }

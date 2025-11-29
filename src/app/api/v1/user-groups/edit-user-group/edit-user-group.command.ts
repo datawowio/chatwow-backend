@@ -1,13 +1,19 @@
 import { Project } from '@domain/base/project/project.domain';
-import { ProjectMapper } from '@domain/base/project/project.mapper';
+import {
+  projectFromPgWithState,
+  projectToResponse,
+} from '@domain/base/project/project.mapper';
 import { projectsTableFilter } from '@domain/base/project/project.util';
 import { UserGroupProjectService } from '@domain/base/user-group-project/user-group-project.service';
 import { UserGroupUserService } from '@domain/base/user-group-user/user-group-user.service';
 import { UserGroup } from '@domain/base/user-group/user-group.domain';
-import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
+import { userGroupToResponse } from '@domain/base/user-group/user-group.mapper';
 import { UserGroupService } from '@domain/base/user-group/user-group.service';
 import { User } from '@domain/base/user/user.domain';
-import { UserMapper } from '@domain/base/user/user.mapper';
+import {
+  userFromPgWithState,
+  userToResponse,
+} from '@domain/base/user/user.mapper';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { Injectable } from '@nestjs/common';
 
@@ -66,17 +72,17 @@ export class EditUserGroupCommand implements CommandInterface {
       key: '',
       data: {
         userGroup: {
-          attributes: UserGroupMapper.toResponse(entity.userGroup),
+          attributes: userGroupToResponse(entity.userGroup),
           relations: {
             users:
               entity.users &&
               entity.users.map((user) => ({
-                attributes: UserMapper.toResponse(user),
+                attributes: userToResponse(user),
               })),
             projects:
               entity.projects &&
               entity.projects.map((project) => ({
-                attributes: ProjectMapper.toResponse(project),
+                attributes: projectToResponse(project),
               })),
           },
         },
@@ -129,7 +135,7 @@ export class EditUserGroupCommand implements CommandInterface {
       throw new ApiException(404, 'someUsersNotFound');
     }
 
-    return users.map((u) => UserMapper.fromPgWithState(u));
+    return users.map((u) => userFromPgWithState(u));
   }
 
   async findProjects(projectIds?: string[]) {
@@ -148,6 +154,6 @@ export class EditUserGroupCommand implements CommandInterface {
       throw new ApiException(404, 'someProjectsNotFound');
     }
 
-    return projects.map((p) => ProjectMapper.fromPgWithState(p));
+    return projects.map((p) => projectFromPgWithState(p));
   }
 }

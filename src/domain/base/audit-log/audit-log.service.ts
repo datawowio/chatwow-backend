@@ -5,7 +5,7 @@ import { MainDb } from '@infra/db/db.main';
 import { diff } from '@shared/common/common.func';
 
 import { AuditLog } from './audit-log.domain';
-import { AuditLogMapper } from './audit-log.mapper';
+import { auditLogFromPgWithState, auditLogToPg } from './audit-log.mapper';
 
 @Injectable()
 export class AuditLogService {
@@ -23,7 +23,7 @@ export class AuditLogService {
       return null;
     }
 
-    const auditLog = AuditLogMapper.fromPgWithState(userPg);
+    const auditLog = auditLogFromPgWithState(userPg);
     return auditLog;
   }
 
@@ -36,7 +36,7 @@ export class AuditLogService {
       await this._update(auditLog.id, auditLog);
     }
 
-    auditLog.setPgState(AuditLogMapper.toPg);
+    auditLog.setPgState(auditLogToPg);
   }
 
   async saveBulk(lineSessions: AuditLog[]) {
@@ -55,12 +55,12 @@ export class AuditLogService {
     await this.db.write
       //
       .insertInto('audit_logs')
-      .values(AuditLogMapper.toPg(auditLog))
+      .values(auditLogToPg(auditLog))
       .execute();
   }
 
   private async _update(id: string, auditLog: AuditLog): Promise<void> {
-    const data = diff(auditLog.pgState, AuditLogMapper.toPg(auditLog));
+    const data = diff(auditLog.pgState, auditLogToPg(auditLog));
     if (!data) {
       return;
     }

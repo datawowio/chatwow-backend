@@ -1,15 +1,13 @@
-import { uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
+import { userGroupFromPlain } from './user-group.mapper';
 import type {
-  UserGroupNewData,
   UserGroupPg,
   UserGroupPlain,
   UserGroupUpdateData,
 } from './user-group.type';
-import { UserGroupMapper } from './user-group.mapper';
 
 export class UserGroup extends DomainEntity<UserGroupPg> {
   readonly id: string;
@@ -25,22 +23,6 @@ export class UserGroup extends DomainEntity<UserGroupPg> {
     Object.assign(this, plain);
   }
 
-  static new({ actorId, data }: UserGroupNewData) {
-    return UserGroupMapper.fromPlain({
-      id: uuidV7(),
-      createdById: actorId,
-      updatedById: actorId,
-      groupName: data.groupName,
-      description: data.description || '',
-      createdAt: myDayjs().toDate(),
-      updatedAt: myDayjs().toDate(),
-    });
-  }
-
-  static newBulk(data: UserGroupNewData[]) {
-    return data.map((d) => UserGroup.new(d));
-  }
-
   edit({ actorId, data }: UserGroupUpdateData) {
     const plain: UserGroupPlain = {
       id: this.id,
@@ -54,6 +36,6 @@ export class UserGroup extends DomainEntity<UserGroupPg> {
         : this.description,
     };
 
-    Object.assign(this, plain);
+    return userGroupFromPlain(plain);
   }
 }

@@ -3,7 +3,7 @@ import type { DBModel } from '@infra/db/db.common';
 
 import type { Plain, Serialized } from '@shared/common/common.type';
 
-import type { ProjectChat } from '../project-chat.domain';
+import type { ProjectChat } from './project-chat.domain';
 
 export type ProjectChatPg = DBModel<ProjectChats>;
 export type ProjectChatPlain = Plain<ProjectChat>;

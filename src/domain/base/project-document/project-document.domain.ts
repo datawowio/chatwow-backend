@@ -1,13 +1,11 @@
 import type { DocumentStatus } from '@infra/db/db';
 
-import { uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { ProjectDocumentMapper } from './project-document.mapper';
+import { projectDocumentFromPlain } from './project-document.mapper';
 import type {
-  ProjectDocumentNewData,
   ProjectDocumentPg,
   ProjectDocumentPlain,
   ProjectDocumentUpdateData,
@@ -29,24 +27,6 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
     Object.assign(this, plain);
   }
 
-  static new({ actorId, data }: ProjectDocumentNewData) {
-    return ProjectDocumentMapper.fromPlain({
-      id: uuidV7(),
-      createdAt: myDayjs().toDate(),
-      createdById: actorId,
-      updatedById: actorId,
-      projectId: data.projectId,
-      updatedAt: myDayjs().toDate(),
-      documentDetails: data.documentDetails || '',
-      documentStatus: data.documentStatus || 'ACTIVE',
-      aiSummaryMd: data.aiSummaryMd || '',
-    });
-  }
-
-  static newBulk(data: ProjectDocumentNewData[]) {
-    return data.map((d) => ProjectDocument.new(d));
-  }
-
   edit({ actorId, data }: ProjectDocumentUpdateData) {
     const plain: ProjectDocumentPlain = {
       id: this.id,
@@ -66,6 +46,6 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
       projectId: isDefined(data.projectId) ? data.projectId : this.projectId,
     };
 
-    Object.assign(this, plain);
+    return projectDocumentFromPlain(plain);
   }
 }

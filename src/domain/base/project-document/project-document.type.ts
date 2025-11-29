@@ -3,7 +3,7 @@ import type { DBModel } from '@infra/db/db.common';
 
 import type { Plain, Serialized } from '@shared/common/common.type';
 
-import type { ProjectDocument } from '../project-document.domain';
+import type { ProjectDocument } from './project-document.domain';
 
 export type ProjectDocumentPg = DBModel<ProjectDocuments>;
 export type ProjectDocumentPlain = Plain<ProjectDocument>;

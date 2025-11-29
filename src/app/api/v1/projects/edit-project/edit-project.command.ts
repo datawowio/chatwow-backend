@@ -1,5 +1,5 @@
 import { Project } from '@domain/base/project/project.domain';
-import { ProjectMapper } from '@domain/base/project/project.mapper';
+import { projectToResponse } from '@domain/base/project/project.mapper';
 import { ProjectService } from '@domain/base/project/project.service';
 import { Injectable } from '@nestjs/common';
 
@@ -8,6 +8,7 @@ import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { EditProjectDto, EditProjectResponse } from './edit-project.dto';
 
@@ -34,15 +35,13 @@ export class EditProjectCommand implements CommandInterface {
 
     await this.save(project);
 
-    return {
-      success: true,
-      key: '',
+    return toHttpSuccess({
       data: {
         project: {
-          attributes: ProjectMapper.toResponse(project),
+          attributes: projectToResponse(project),
         },
       },
-    };
+    });
   }
 
   async save(project: Project): Promise<void> {

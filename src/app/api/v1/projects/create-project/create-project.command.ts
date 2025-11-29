@@ -1,16 +1,22 @@
 import { ProjectDocument } from '@domain/base/project-document/project-document.domain';
-import { ProjectDocumentMapper } from '@domain/base/project-document/project-document.mapper';
+import { newProjectDocument } from '@domain/base/project-document/project-document.factory';
+import { projectDocumentToResponse } from '@domain/base/project-document/project-document.mapper';
 import { ProjectDocumentService } from '@domain/base/project-document/project-document.service';
 import { Project } from '@domain/base/project/project.domain';
-import { ProjectMapper } from '@domain/base/project/project.mapper';
+import { newProject } from '@domain/base/project/project.factory';
+import { projectToResponse } from '@domain/base/project/project.mapper';
 import { ProjectService } from '@domain/base/project/project.service';
 import { STORED_FILE_OWNER_TABLE } from '@domain/base/stored-file/stored-file.constant';
 import { StoredFile } from '@domain/base/stored-file/stored-file.domain';
-import { StoredFileMapper } from '@domain/base/stored-file/stored-file.mapper';
+import { newStoredFile } from '@domain/base/stored-file/stored-file.factory';
+import { storedFileToResponse } from '@domain/base/stored-file/stored-file.mapper';
 import { StoredFileService } from '@domain/base/stored-file/stored-file.service';
 import { UserGroupProjectService } from '@domain/base/user-group-project/user-group-project.service';
 import { UserGroup } from '@domain/base/user-group/user-group.domain';
-import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
+import {
+  userGroupFromPgWithState,
+  userGroupToResponse,
+} from '@domain/base/user-group/user-group.mapper';
 import { UserGroupService } from '@domain/base/user-group/user-group.service';
 import { userGroupsTableFilter } from '@domain/base/user-group/user-group.utils';
 import { Injectable } from '@nestjs/common';
@@ -21,6 +27,7 @@ import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { CreateProjectDto, CreateProjectResponse } from './create-project.dto';
 
@@ -50,7 +57,7 @@ export class CreateProjectCommand implements CommandInterface {
     claims: UserClaims,
     body: CreateProjectDto,
   ): Promise<CreateProjectResponse> {
-    const project = Project.new({
+    const project = newProject({
       actorId: claims.userId,
       data: {
         ...body.project,
@@ -63,7 +70,7 @@ export class CreateProjectCommand implements CommandInterface {
 
     if (body.projectDocuments) {
       for (const pd of body.projectDocuments) {
-        const projectDocument = ProjectDocument.new({
+        const projectDocument = newProjectDocument({
           actorId: claims.userId,
           data: {
             projectId: project.id,
@@ -71,7 +78,7 @@ export class CreateProjectCommand implements CommandInterface {
             documentDetails: pd.documentDetails,
           },
         });
-        const storedFile = StoredFile.new({
+        const storedFile = newStoredFile({
           ...pd.storedFile,
           ownerTable: STORED_FILE_OWNER_TABLE.PROJECT_DOCUMENT,
           ownerId: projectDocument.id,
@@ -90,28 +97,26 @@ export class CreateProjectCommand implements CommandInterface {
       projectDocumentsFiles,
     });
 
-    return {
-      success: true,
-      key: '',
+    return toHttpSuccess({
       data: {
         project: {
-          attributes: ProjectMapper.toResponse(project),
+          attributes: projectToResponse(project),
           relations: {
             userGroups: userGroups.map((g) => ({
-              attributes: UserGroupMapper.toResponse(g),
+              attributes: userGroupToResponse(g),
             })),
             projectDocuments: projectDocumentsFiles.map((pd) => ({
-              attributes: ProjectDocumentMapper.toResponse(pd.projectDocument),
+              attributes: projectDocumentToResponse(pd.projectDocument),
               relations: {
                 storedFile: {
-                  attributes: StoredFileMapper.toResponse(pd.storedFile),
+                  attributes: storedFileToResponse(pd.storedFile),
                 },
               },
             })),
           },
         },
       },
-    };
+    });
   }
 
   async save(entity: Entity): Promise<void> {
@@ -153,6 +158,6 @@ export class CreateProjectCommand implements CommandInterface {
       throw new ApiException(400, 'userGroupsNotFound');
     }
 
-    return rawRes.map((r) => UserGroupMapper.fromPgWithState(r));
+    return rawRes.map((r) => userGroupFromPgWithState(r));
   }
 }

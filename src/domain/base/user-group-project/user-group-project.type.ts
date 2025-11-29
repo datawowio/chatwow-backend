@@ -3,7 +3,7 @@ import type { DBModel } from '@infra/db/db.common';
 
 import type { Plain, Serialized } from '@shared/common/common.type';
 
-import type { UserGroupProject } from '../user-group-project.domain';
+import type { UserGroupProject } from './user-group-project.domain';
 
 export type UserGroupProjectPg = DBModel<UserGroupProjects>;
 export type UserGroupProjectPlain = Plain<UserGroupProject>;

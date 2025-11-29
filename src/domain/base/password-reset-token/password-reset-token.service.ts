@@ -6,7 +6,10 @@ import myDayjs from '@shared/common/common.dayjs';
 import { diff } from '@shared/common/common.func';
 
 import { PasswordResetToken } from './password-reset-token.domain';
-import { PasswordResetTokenMapper } from './password-reset-token.mapper';
+import {
+  passwordResetTokenFromPgWithState,
+  passwordResetTokenToPg,
+} from './password-reset-token.mapper';
 
 @Injectable()
 export class PasswordResetTokenService {
@@ -21,7 +24,7 @@ export class PasswordResetTokenService {
 
     if (!pg) return null;
 
-    return PasswordResetTokenMapper.fromPgWithState(pg);
+    return passwordResetTokenFromPgWithState(pg);
   }
 
   async save(token: PasswordResetToken) {
@@ -33,7 +36,7 @@ export class PasswordResetTokenService {
       await this._update(token.id, token);
     }
 
-    token.setPgState(PasswordResetTokenMapper.toPg);
+    token.setPgState(passwordResetTokenToPg);
   }
 
   async saveBulk(tokens: PasswordResetToken[]) {
@@ -63,12 +66,12 @@ export class PasswordResetTokenService {
   private async _create(token: PasswordResetToken) {
     await this.db.write
       .insertInto('password_reset_tokens')
-      .values(PasswordResetTokenMapper.toPg(token))
+      .values(passwordResetTokenToPg(token))
       .execute();
   }
 
   private async _update(id: string, token: PasswordResetToken) {
-    const data = diff(token.pgState, PasswordResetTokenMapper.toPg(token));
+    const data = diff(token.pgState, passwordResetTokenToPg(token));
 
     if (!data) return;
     await this.db.write

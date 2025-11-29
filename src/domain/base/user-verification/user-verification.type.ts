@@ -3,7 +3,7 @@ import type { DBModel } from '@infra/db/db.common';
 
 import type { Plain, Serialized } from '@shared/common/common.type';
 
-import type { UserVerification } from '../user-verification.domain';
+import type { UserVerification } from './user-verification.domain';
 
 export type UserVerificationPg = DBModel<UserVerifications>;
 export type UserVerificationPlain = Plain<UserVerification>;

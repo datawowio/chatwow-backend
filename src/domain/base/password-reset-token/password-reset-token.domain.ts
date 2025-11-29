@@ -1,12 +1,8 @@
-import { shaHashstring, uuidV7 } from '@shared/common/common.crypto';
-import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { PASSWORD_RESET_DEFAULT_EXPIRY_SECONDS } from './password-reset-token.constant';
-import { PasswordResetTokenMapper } from './password-reset-token.mapper';
+import { passwordResetTokenFromPlain } from './password-reset-token.mapper';
 import type {
-  PasswordResetTokenNewData,
   PasswordResetTokenPg,
   PasswordResetTokenPlain,
   PasswordResetTokenUpdateData,
@@ -25,25 +21,6 @@ export class PasswordResetToken extends DomainEntity<PasswordResetTokenPg> {
     Object.assign(this, plain);
   }
 
-  static new(data: PasswordResetTokenNewData) {
-    return PasswordResetTokenMapper.fromPlain({
-      id: uuidV7(),
-      userId: data.userId,
-      tokenHash: shaHashstring(data.token),
-      createdAt: myDayjs().toDate(),
-      expireAt: isDefined(data.expireAt)
-        ? data.expireAt
-        : myDayjs()
-            .add(PASSWORD_RESET_DEFAULT_EXPIRY_SECONDS, 'seconds')
-            .toDate(),
-      revokeAt: null,
-    });
-  }
-
-  static newBulk(data: PasswordResetTokenNewData[]) {
-    return data.map((d) => PasswordResetToken.new(d));
-  }
-
   edit(data: PasswordResetTokenUpdateData) {
     const plain: PasswordResetTokenPlain = {
       id: this.id,
@@ -54,6 +31,6 @@ export class PasswordResetToken extends DomainEntity<PasswordResetTokenPg> {
       revokeAt: isDefined(data.revokeAt) ? data.revokeAt : this.revokeAt,
     };
 
-    Object.assign(this, plain);
+    return passwordResetTokenFromPlain(plain);
   }
 }

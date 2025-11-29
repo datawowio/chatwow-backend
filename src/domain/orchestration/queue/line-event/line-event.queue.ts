@@ -1,5 +1,5 @@
-import { LineBotMapper } from '@domain/base/line-bot/line-bot.mapper';
-import { LineSessionMapper } from '@domain/base/line-session/line-session.mapper';
+import { lineBotToJsonWithState } from '@domain/base/line-bot/line-bot.mapper';
+import { lineSessionToJsonWithState } from '@domain/base/line-session/line-session.mapper';
 import { Injectable } from '@nestjs/common';
 
 import {
@@ -35,7 +35,7 @@ export class LineEventQueue extends BaseQueue {
   jobProcessVerification(domainData: LineProcessVerificationJobData) {
     const input: LineProcessVerificationJobInput = {
       ...domainData,
-      lineBot: LineBotMapper.toJsonWithState(domainData.lineBot),
+      lineBot: lineBotToJsonWithState(domainData.lineBot),
     };
 
     this.addJob(LINE_EVENT_JOBS.PROCESS_VERIFICATION, input);
@@ -44,7 +44,7 @@ export class LineEventQueue extends BaseQueue {
   jobProcessSelectionMenu(domainData: LineProcessSelectionMenuJobData) {
     const input: LineProcessSelectionMenuJobInput = {
       ...domainData,
-      lineBot: LineBotMapper.toJsonWithState(domainData.lineBot),
+      lineBot: lineBotToJsonWithState(domainData.lineBot),
     };
 
     this.addJob(LINE_EVENT_JOBS.PROCESS_SELECTION_MENU, input);
@@ -53,7 +53,7 @@ export class LineEventQueue extends BaseQueue {
   jobShowSelectionMenu(domainData: LineShowSelectionMenuJobData) {
     const input: LineShowSelectionMenuJobInput = {
       ...domainData,
-      lineBot: LineBotMapper.toJsonWithState(domainData.lineBot),
+      lineBot: lineBotToJsonWithState(domainData.lineBot),
     };
 
     this.addJob(LINE_EVENT_JOBS.SHOW_SELECTION_MENU, input);
@@ -61,10 +61,8 @@ export class LineEventQueue extends BaseQueue {
 
   jobProcessAiChat(domainData: LineProcessAiChatJobData) {
     const input: LineProcessAiChatJobInput = {
-      lineBotJsonState: LineBotMapper.toJsonWithState(domainData.lineBot),
-      lineSessionJsonState: LineSessionMapper.toJsonWithState(
-        domainData.lineSession,
-      ),
+      lineBotJsonState: lineBotToJsonWithState(domainData.lineBot),
+      lineSessionJsonState: lineSessionToJsonWithState(domainData.lineSession),
       data: domainData.data,
     };
 

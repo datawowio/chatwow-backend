@@ -1,11 +1,13 @@
 import { ProjectDocument } from '@domain/base/project-document/project-document.domain';
-import { ProjectDocumentMapper } from '@domain/base/project-document/project-document.mapper';
+import { newProjectDocument } from '@domain/base/project-document/project-document.factory';
+import { projectDocumentToResponse } from '@domain/base/project-document/project-document.mapper';
 import { ProjectDocumentService } from '@domain/base/project-document/project-document.service';
-import { ProjectMapper } from '@domain/base/project/project.mapper';
+import { projectToResponse } from '@domain/base/project/project.mapper';
 import { ProjectService } from '@domain/base/project/project.service';
 import { STORED_FILE_OWNER_TABLE } from '@domain/base/stored-file/stored-file.constant';
 import { StoredFile } from '@domain/base/stored-file/stored-file.domain';
-import { StoredFileMapper } from '@domain/base/stored-file/stored-file.mapper';
+import { newStoredFile } from '@domain/base/stored-file/stored-file.factory';
+import { storedFileToResponse } from '@domain/base/stored-file/stored-file.mapper';
 import { StoredFileService } from '@domain/base/stored-file/stored-file.service';
 import { Injectable } from '@nestjs/common';
 
@@ -14,6 +16,7 @@ import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import {
   CreateProjectDocumentDto,
@@ -38,7 +41,7 @@ export class CreateProjectDocumentCommand implements CommandInterface {
     claims: UserClaims,
     body: CreateProjectDocumentDto,
   ): Promise<CreateProjectDocumentResponse> {
-    const projectDocument = ProjectDocument.new({
+    const projectDocument = newProjectDocument({
       actorId: claims.userId,
       data: body.projectDocument,
     });
@@ -47,7 +50,7 @@ export class CreateProjectDocumentCommand implements CommandInterface {
       body.projectDocument.projectId,
     );
 
-    const storedFile = StoredFile.new({
+    const storedFile = newStoredFile({
       ...body.storedFile,
       ownerId: projectDocument.id,
       ownerTable: STORED_FILE_OWNER_TABLE.PROJECT_DOCUMENT,
@@ -58,23 +61,21 @@ export class CreateProjectDocumentCommand implements CommandInterface {
       storedFile,
     });
 
-    return {
-      success: true,
-      key: '',
+    return toHttpSuccess({
       data: {
         projectDocument: {
-          attributes: ProjectDocumentMapper.toResponse(projectDocument),
+          attributes: projectDocumentToResponse(projectDocument),
           relations: {
             project: {
-              attributes: ProjectMapper.toResponse(project),
+              attributes: projectToResponse(project),
             },
             storedFile: {
-              attributes: StoredFileMapper.toResponse(storedFile),
+              attributes: storedFileToResponse(storedFile),
             },
           },
         },
       },
-    };
+    });
   }
 
   async save(entity: Entity): Promise<void> {

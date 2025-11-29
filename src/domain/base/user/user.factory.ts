@@ -2,42 +2,57 @@ import { hashString, uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { isDefined } from '@shared/common/common.validator';
 
-import { UserMapper } from './user.mapper';
-import type { UserPlain } from './user.type';
+import type { User } from './user.domain';
+import { userFromPlain } from './user.mapper';
+import type { UserNewData, UserPlain } from './user.type';
 
-export class UserFactory {
-  static mock(data: Partial<UserPlain>) {
-    return UserMapper.fromPlain({
-      id: isDefined(data.id) ? data.id : uuidV7(),
-      createdAt: isDefined(data.createdAt)
-        ? data.createdAt
-        : myDayjs().toDate(),
-      updatedAt: isDefined(data.updatedAt)
-        ? data.updatedAt
-        : myDayjs().toDate(),
-      email: isDefined(data.email) ? data.email : 'test@example.com',
-      password: isDefined(data.password)
-        ? data.password
-          ? hashString(data.password)
-          : null
-        : hashString('password'),
-      role: isDefined(data.role) ? data.role : 'USER',
-      userStatus: isDefined(data.userStatus) ? data.userStatus : 'ACTIVE',
-      lineAccountId: isDefined(data.lineAccountId) ? data.lineAccountId : null,
-      lastSignedInAt: isDefined(data.lastSignedInAt)
-        ? data.lastSignedInAt
-        : null,
+export function newUser({ actorId, data }: UserNewData): User {
+  return userFromPlain({
+    id: uuidV7(),
+    firstName: data.firstName,
+    lastName: data.lastName,
+    createdAt: myDayjs().toDate(),
+    updatedAt: myDayjs().toDate(),
+    createdById: actorId || null,
+    updatedById: actorId || null,
+    email: data.email,
+    password: data.password ? hashString(data.password) : null,
+    role: data.role,
+    userStatus: isDefined(data.userStatus) ? data.userStatus : 'ACTIVE',
+    lineAccountId: data.lineAccountId || null,
+    lastSignedInAt: null,
+  });
+}
 
-      firstName: isDefined(data.firstName) ? data.firstName : 'firstname',
-      lastName: isDefined(data.lastName) ? data.lastName : 'lastname',
-      createdById: isDefined(data.createdById) ? data.createdById : null,
-      updatedById: isDefined(data.updatedById) ? data.updatedById : null,
-    });
-  }
+export function newUsers(data: UserNewData[]) {
+  return data.map((d) => newUser(d));
+}
 
-  static mockBulk(amount: number, data: Partial<UserPlain>) {
-    return Array(amount)
-      .fill(0)
-      .map(() => this.mock(data));
-  }
+export function mockUser(data: Partial<UserPlain>) {
+  return userFromPlain({
+    id: isDefined(data.id) ? data.id : uuidV7(),
+    createdAt: isDefined(data.createdAt) ? data.createdAt : myDayjs().toDate(),
+    updatedAt: isDefined(data.updatedAt) ? data.updatedAt : myDayjs().toDate(),
+    email: isDefined(data.email) ? data.email : 'test@example.com',
+    password: isDefined(data.password)
+      ? data.password
+        ? hashString(data.password)
+        : null
+      : hashString('password'),
+    role: isDefined(data.role) ? data.role : 'USER',
+    userStatus: isDefined(data.userStatus) ? data.userStatus : 'ACTIVE',
+    lineAccountId: isDefined(data.lineAccountId) ? data.lineAccountId : null,
+    lastSignedInAt: isDefined(data.lastSignedInAt) ? data.lastSignedInAt : null,
+
+    firstName: isDefined(data.firstName) ? data.firstName : 'firstname',
+    lastName: isDefined(data.lastName) ? data.lastName : 'lastname',
+    createdById: isDefined(data.createdById) ? data.createdById : null,
+    updatedById: isDefined(data.updatedById) ? data.updatedById : null,
+  });
+}
+
+export function mockUsers(amount: number, data: Partial<UserPlain>) {
+  return Array(amount)
+    .fill(0)
+    .map(() => mockUser(data));
 }

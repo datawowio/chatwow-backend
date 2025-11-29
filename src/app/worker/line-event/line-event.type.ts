@@ -1,7 +1,7 @@
 import type { LineBot } from '@domain/base/line-bot/line-bot.domain';
-import { LineBotJsonState } from '@domain/base/line-bot/types/line-bot.domain.type';
+import { LineBotJsonState } from '@domain/base/line-bot/line-bot.type';
 import type { LineSession } from '@domain/base/line-session/line-session.domain';
-import { LineSessionJsonState } from '@domain/base/line-session/types/line-session.domain.type';
+import { LineSessionJsonState } from '@domain/base/line-session/line-session.type';
 
 export type LineBaseJobConfig = {
   channelAccessToken: string;

@@ -1,11 +1,11 @@
-import { ProjectDocumentMapper } from '@domain/base/project-document/project-document.mapper';
+import { projectDocumentPgToResponse } from '@domain/base/project-document/project-document.mapper';
 import {
   addProjectDocumentActorFilter,
   projectDocumentsTableFilter,
 } from '@domain/base/project-document/project-document.util';
-import { ProjectMapper } from '@domain/base/project/project.mapper';
-import { StoredFileMapper } from '@domain/base/stored-file/stored-file.mapper';
-import { UserMapper } from '@domain/base/user/user.mapper';
+import { projectPgToResponse } from '@domain/base/project/project.mapper';
+import { storedFilePgToResponse } from '@domain/base/stored-file/stored-file.mapper';
+import { userPgToResponse } from '@domain/base/user/user.mapper';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
@@ -22,9 +22,7 @@ import {
 
 @Injectable()
 export class GetProjectDocumentQuery implements QueryInterface {
-  constructor(
-    private db: MainDb,
-  ) {}
+  constructor(private db: MainDb) {}
 
   async exec(
     claims: UserClaims,
@@ -38,34 +36,28 @@ export class GetProjectDocumentQuery implements QueryInterface {
       key: '',
       data: {
         projectDocument: {
-          attributes: ProjectDocumentMapper.pgToResponse(projectDocument),
+          attributes: projectDocumentPgToResponse(projectDocument),
           relations: {
             storedFile: projectDocument.storedFile
               ? {
-                  attributes: StoredFileMapper.pgToResponse(
+                  attributes: storedFilePgToResponse(
                     projectDocument.storedFile,
                   ),
                 }
               : undefined,
             project: projectDocument.project
               ? {
-                  attributes: ProjectMapper.pgToResponse(
-                    projectDocument.project,
-                  ),
+                  attributes: projectPgToResponse(projectDocument.project),
                 }
               : undefined,
             createdBy: projectDocument.createdBy
               ? {
-                  attributes: UserMapper.pgToResponse(
-                    projectDocument.createdBy,
-                  ),
+                  attributes: userPgToResponse(projectDocument.createdBy),
                 }
               : undefined,
             updatedBy: projectDocument.updatedBy
               ? {
-                  attributes: UserMapper.pgToResponse(
-                    projectDocument.updatedBy,
-                  ),
+                  attributes: userPgToResponse(projectDocument.updatedBy),
                 }
               : undefined,
           },

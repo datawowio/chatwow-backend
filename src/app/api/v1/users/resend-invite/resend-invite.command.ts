@@ -2,6 +2,7 @@ import { UserService } from '@domain/base/user/user.service';
 import { DomainEventQueue } from '@domain/orchestration/queue/domain-event/domain-event.queue';
 
 import { ApiException } from '@shared/http/http.exception';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { ResendInviteResponse } from './resend-invite.dto';
 
@@ -15,11 +16,9 @@ export class ResendInviteCommand {
     const user = await this.find(userId);
     this.domainEventQueue.jobSendVerification(user);
 
-    return {
-      success: true,
-      key: '',
+    return toHttpSuccess({
       data: {},
-    };
+    });
   }
 
   async find(userId: string) {

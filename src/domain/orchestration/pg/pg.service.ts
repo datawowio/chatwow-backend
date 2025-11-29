@@ -1,17 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Kysely } from 'kysely';
 
-import { READ_DB, ReadDB } from '@infra/db/db.common';
+import { MainDb } from '@infra/db/db.main';
 
 @Injectable()
 export class PgService {
-  constructor(
-    @Inject(READ_DB)
-    private readDb: ReadDB,
-  ) {}
+  constructor(private db: MainDb) {}
 
   async getTableEnums(opts: { table: string; enumType?: string }) {
-    const raw = await (this.readDb as Kysely<any>)
+    const raw = await (this.db.read as Kysely<any>)
       .selectFrom('information_schema.columns as c')
       .innerJoin('pg_type as t', 't.typname', 'c.udt_name')
       .innerJoin('pg_enum as e', 'e.enumtypid', 't.oid')

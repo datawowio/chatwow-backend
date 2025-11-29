@@ -1,12 +1,12 @@
 import { User } from '@domain/base/user/user.domain';
-import { UserMapper } from '@domain/base/user/user.mapper';
+import { userToResponse } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
 
 import { ApiException } from '@shared/http/http.exception';
-import { HttpResponseMapper } from '@shared/http/http.mapper';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { DeleteUserResponse } from './delete-user.dto';
 
@@ -25,10 +25,10 @@ export class DeleteUserCommand {
 
     await this.userService.delete(user.id);
 
-    return HttpResponseMapper.toSuccess({
+    return toHttpSuccess({
       data: {
         user: {
-          attributes: UserMapper.toResponse(user),
+          attributes: userToResponse(user),
         },
       },
     });

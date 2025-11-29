@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
 
-import { UserGroupUserMapper } from './user-group-user.mapper';
+import { userGroupUserToPg } from './user-group-user.mapper';
 
 @Injectable()
 export class UserGroupUserService {
@@ -19,7 +19,7 @@ export class UserGroupUserService {
     }
 
     const insertData = userGroupIds.map((userGroupId) =>
-      UserGroupUserMapper.toPg({
+      userGroupUserToPg({
         userGroupId,
         userId,
       }),
@@ -42,7 +42,7 @@ export class UserGroupUserService {
     }
 
     const insertData = userIds.map((userId) =>
-      UserGroupUserMapper.toPg({
+      userGroupUserToPg({
         userGroupId,
         userId,
       }),

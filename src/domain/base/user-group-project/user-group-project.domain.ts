@@ -1,13 +1,12 @@
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
+import { userGroupProjectFromPlain } from './user-group-project.mapper';
 import type {
-  UserGroupProjectNewData,
   UserGroupProjectPg,
   UserGroupProjectPlain,
   UserGroupProjectUpdateData,
 } from './user-group-project.type';
-import { UserGroupProjectMapper } from './user-group-project.mapper';
 
 export class UserGroupProject extends DomainEntity<UserGroupProjectPg> {
   readonly projectId: string;
@@ -18,17 +17,6 @@ export class UserGroupProject extends DomainEntity<UserGroupProjectPg> {
     Object.assign(this, plain);
   }
 
-  static new(data: UserGroupProjectNewData) {
-    return UserGroupProjectMapper.fromPlain({
-      projectId: data.projectId,
-      userGroupId: data.userGroupId,
-    });
-  }
-
-  static newBulk(data: UserGroupProjectNewData[]) {
-    return data.map((d) => UserGroupProject.new(d));
-  }
-
   edit(data: UserGroupProjectUpdateData) {
     const plain: UserGroupProjectPlain = {
       projectId: isDefined(data.projectId) ? data.projectId : this.projectId,
@@ -37,6 +25,6 @@ export class UserGroupProject extends DomainEntity<UserGroupProjectPg> {
         : this.userGroupId,
     };
 
-    Object.assign(this, plain);
+    return userGroupProjectFromPlain(plain);
   }
 }

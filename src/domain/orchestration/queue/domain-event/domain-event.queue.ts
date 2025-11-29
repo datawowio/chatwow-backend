@@ -1,6 +1,6 @@
-import { PasswordResetTokenMapper } from '@domain/base/password-reset-token/password-reset-token.mapper';
+import { passwordResetTokenToJsonState } from '@domain/base/password-reset-token/password-reset-token.mapper';
 import { User } from '@domain/base/user/user.domain';
-import { UserMapper } from '@domain/base/user/user.mapper';
+import { userToJsonState } from '@domain/base/user/user.mapper';
 import { Injectable } from '@nestjs/common';
 
 import { ForgotPasswordJobData } from '@app/worker/domain-event/forgot-password/forgot-password.type';
@@ -15,16 +15,13 @@ export class DomainEventQueue extends BaseQueue {
   queueName = QUEUE.DOMAIN_EVENT;
 
   jobSendVerification(user: User) {
-    this.addJob(
-      DOMAIN_EVENT_JOBS.SEND_VERIFICATION,
-      UserMapper.toJsonState(user),
-    );
+    this.addJob(DOMAIN_EVENT_JOBS.SEND_VERIFICATION, userToJsonState(user));
   }
 
   jobResetPassword(data: ForgotPasswordJobData) {
     const jobData: ForgotPasswordJobInput = {
-      user: UserMapper.toJsonState(data.user),
-      passwordResetToken: PasswordResetTokenMapper.toJsonState(
+      user: userToJsonState(data.user),
+      passwordResetToken: passwordResetTokenToJsonState(
         data.passwordResetToken,
       ),
       plainToken: data.plainToken,

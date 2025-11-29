@@ -1,9 +1,15 @@
 import { PasswordResetToken } from '@domain/base/password-reset-token/password-reset-token.domain';
-import { PasswordResetTokenMapper } from '@domain/base/password-reset-token/password-reset-token.mapper';
+import {
+  passwordResetTokenFromPgWithState,
+  passwordResetTokenToResponse,
+} from '@domain/base/password-reset-token/password-reset-token.mapper';
 import { PasswordResetTokenService } from '@domain/base/password-reset-token/password-reset-token.service';
 import { passwordResetTokensTableFilter } from '@domain/base/password-reset-token/password-reset-token.util';
 import { User } from '@domain/base/user/user.domain';
-import { UserMapper } from '@domain/base/user/user.mapper';
+import {
+  userFromPgWithState,
+  userToResponse,
+} from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { getAccessToken } from '@domain/orchestration/auth/auth.util';
@@ -17,7 +23,7 @@ import { shaHashstring } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
-import { HttpResponseMapper } from '@shared/http/http.mapper';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { ResetPasswordDto, ResetPasswordResponse } from './reset-password.dto';
 
@@ -64,13 +70,13 @@ export class ResetPasswordCommand implements CommandInterface {
 
     await this.save(entity);
 
-    return HttpResponseMapper.toSuccess({
+    return toHttpSuccess({
       data: {
         user: {
-          attributes: UserMapper.toResponse(entity.user),
+          attributes: userToResponse(entity.user),
           relations: {
             passwordResetToken: {
-              attributes: PasswordResetTokenMapper.toResponse(
+              attributes: passwordResetTokenToResponse(
                 entity.passwordResetToken,
               ),
             },
@@ -115,8 +121,8 @@ export class ResetPasswordCommand implements CommandInterface {
     }
 
     return {
-      user: UserMapper.fromPgWithState(pg.user),
-      passwordResetToken: PasswordResetTokenMapper.fromPgWithState(pg),
+      user: userFromPgWithState(pg.user),
+      passwordResetToken: passwordResetTokenFromPgWithState(pg),
     };
   }
 }

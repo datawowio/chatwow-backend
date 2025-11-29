@@ -8,7 +8,7 @@ import { diff, getUniqueIds } from '@shared/common/common.func';
 import { isDefined } from '@shared/common/common.validator';
 
 import { UserGroup } from './user-group.domain';
-import { UserGroupMapper } from './user-group.mapper';
+import { userGroupFromPgWithState, userGroupToPg } from './user-group.mapper';
 import {
   addUserGroupActorFilter,
   userGroupsTableFilter,
@@ -63,7 +63,7 @@ export class UserGroupService {
       return null;
     }
 
-    const userGroup = UserGroupMapper.fromPgWithState(userGroupPg);
+    const userGroup = userGroupFromPgWithState(userGroupPg);
     return userGroup;
   }
 
@@ -76,7 +76,7 @@ export class UserGroupService {
       await this._update(userGroup.id, userGroup);
     }
 
-    userGroup.setPgState(UserGroupMapper.toPg);
+    userGroup.setPgState(userGroupToPg);
   }
 
   async saveBulk(userGroups: UserGroup[]) {
@@ -95,12 +95,12 @@ export class UserGroupService {
     await this.db.write
       //
       .insertInto('user_groups')
-      .values(UserGroupMapper.toPg(userGroup))
+      .values(userGroupToPg(userGroup))
       .execute();
   }
 
   private async _update(id: string, userGroup: UserGroup): Promise<void> {
-    const data = diff(userGroup.pgState, UserGroupMapper.toPg(userGroup));
+    const data = diff(userGroup.pgState, userGroupToPg(userGroup));
     if (!data) {
       return;
     }

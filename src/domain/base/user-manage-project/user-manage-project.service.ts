@@ -4,7 +4,7 @@ import { MainDb } from '@infra/db/db.main';
 
 import myDayjs from '@shared/common/common.dayjs';
 
-import { UserManageProjectMapper } from './user-manage-project.mapper';
+import { userManageProjectToPg } from './user-manage-project.mapper';
 
 @Injectable()
 export class UserManageProjectService {
@@ -21,7 +21,7 @@ export class UserManageProjectService {
     }
 
     const insertData = projectIds.map((projectId) =>
-      UserManageProjectMapper.toPg({
+      userManageProjectToPg({
         createdAt: myDayjs().toDate(),
         userId,
         projectId,
@@ -44,7 +44,7 @@ export class UserManageProjectService {
     }
 
     const insertData = userIds.map((userId) =>
-      UserManageProjectMapper.toPg({
+      userManageProjectToPg({
         createdAt: myDayjs().toDate(),
         userId,
         projectId,

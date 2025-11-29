@@ -1,15 +1,20 @@
 import { PasswordResetToken } from '@domain/base/password-reset-token/password-reset-token.domain';
+import { newPasswordResetToken } from '@domain/base/password-reset-token/password-reset-token.factory';
 import { PasswordResetTokenService } from '@domain/base/password-reset-token/password-reset-token.service';
 import { Project } from '@domain/base/project/project.domain';
-import { ProjectMapper } from '@domain/base/project/project.mapper';
+import { projectFromPgWithState } from '@domain/base/project/project.mapper';
 import { projectsTableFilter } from '@domain/base/project/project.util';
 import { UserGroupUserService } from '@domain/base/user-group-user/user-group-user.service';
 import { UserGroup } from '@domain/base/user-group/user-group.domain';
-import { UserGroupMapper } from '@domain/base/user-group/user-group.mapper';
+import {
+  userGroupFromPgWithState,
+  userGroupToResponse,
+} from '@domain/base/user-group/user-group.mapper';
 import { userGroupsTableFilter } from '@domain/base/user-group/user-group.utils';
 import { UserManageProjectService } from '@domain/base/user-manage-project/user-manage-project.service';
 import { User } from '@domain/base/user/user.domain';
-import { UserMapper } from '@domain/base/user/user.mapper';
+import { newUser } from '@domain/base/user/user.factory';
+import { userToResponse } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { DomainEventQueue } from '@domain/orchestration/queue/domain-event/domain-event.queue';
 import { Injectable } from '@nestjs/common';
@@ -21,7 +26,7 @@ import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 import { shaHashstring } from '@shared/common/common.crypto';
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
-import { HttpResponseMapper } from '@shared/http/http.mapper';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { AddUserDto, AddUserResponse } from './add-user.dto';
 
@@ -45,7 +50,7 @@ export class AddUserCommand implements CommandInterface {
   ) {}
 
   async exec(claims: UserClaims, body: AddUserDto): Promise<AddUserResponse> {
-    const user = User.new({
+    const user = newUser({
       actorId: claims.userId,
       data: body.user,
     });
@@ -66,7 +71,7 @@ export class AddUserCommand implements CommandInterface {
 
     const token = shaHashstring();
     if (user.role !== 'USER') {
-      entity.passwordResetToken = PasswordResetToken.new({
+      entity.passwordResetToken = newPasswordResetToken({
         userId: user.id,
         token,
       });
@@ -91,13 +96,13 @@ export class AddUserCommand implements CommandInterface {
       });
     }
 
-    return HttpResponseMapper.toSuccess({
+    return toHttpSuccess({
       data: {
         user: {
-          attributes: UserMapper.toResponse(entity.user),
+          attributes: userToResponse(entity.user),
           relations: {
             userGroups: entity.userGroups.map((g) => ({
-              attributes: UserGroupMapper.toResponse(g),
+              attributes: userGroupToResponse(g),
             })),
           },
         },
@@ -150,7 +155,7 @@ export class AddUserCommand implements CommandInterface {
       throw new ApiException(400, 'invalidGroupId');
     }
 
-    return rawGroups.map((g) => UserGroupMapper.fromPgWithState(g));
+    return rawGroups.map((g) => userGroupFromPgWithState(g));
   }
 
   async getProjects(ids?: string[]) {
@@ -169,6 +174,6 @@ export class AddUserCommand implements CommandInterface {
       throw new ApiException(400, 'invalidProjectId');
     }
 
-    return rawProjects.map((p) => ProjectMapper.fromPgWithState(p));
+    return rawProjects.map((p) => projectFromPgWithState(p));
   }
 }

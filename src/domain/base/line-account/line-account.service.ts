@@ -5,7 +5,10 @@ import { MainDb } from '@infra/db/db.main';
 import { diff } from '@shared/common/common.func';
 
 import { LineAccount } from './line-account.domain';
-import { LineAccountMapper } from './line-account.mapper';
+import {
+  lineAccountFromPgWithState,
+  lineAccountToPg,
+} from './line-account.mapper';
 import { lineAccountsTableFilter } from './line-account.util';
 
 @Injectable()
@@ -25,7 +28,7 @@ export class LineAccountService {
       return null;
     }
 
-    return LineAccountMapper.fromPgWithState(lineAccountPg);
+    return lineAccountFromPgWithState(lineAccountPg);
   }
 
   async save(lineAccount: LineAccount) {
@@ -36,7 +39,7 @@ export class LineAccountService {
       await this._update(lineAccount.id, lineAccount);
     }
 
-    lineAccount.setPgState(LineAccountMapper.toPg);
+    lineAccount.setPgState(lineAccountToPg);
   }
 
   async saveBulk(lineAccounts: LineAccount[]) {
@@ -57,12 +60,12 @@ export class LineAccountService {
   private async _create(lineAccount: LineAccount) {
     await this.db.write
       .insertInto('line_accounts')
-      .values(LineAccountMapper.toPg(lineAccount))
+      .values(lineAccountToPg(lineAccount))
       .execute();
   }
 
   private async _update(id: string, lineAccount: LineAccount) {
-    const data = diff(lineAccount.pgState, LineAccountMapper.toPg(lineAccount));
+    const data = diff(lineAccount.pgState, lineAccountToPg(lineAccount));
     if (!data) {
       return;
     }

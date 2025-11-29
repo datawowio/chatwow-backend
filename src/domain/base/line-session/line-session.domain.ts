@@ -1,13 +1,11 @@
 import { LineSessionStatus } from '@infra/db/db';
 
-import { uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { LineSessionMapper } from './line-session.mapper';
+import { lineSessionFromPlain } from './line-session.mapper';
 import type {
-  LineSessionNewData,
   LineSessionPg,
   LineSessionPlain,
   LineSessionUpdateData,
@@ -28,27 +26,6 @@ export class LineSession extends DomainEntity<LineSessionPg> {
     Object.assign(this, plain);
   }
 
-  static new(data: LineSessionNewData): LineSession {
-    return LineSessionMapper.fromPlain({
-      id: uuidV7(),
-      createdAt: myDayjs().toDate(),
-      updatedAt: myDayjs().toDate(),
-      projectId: data.projectId,
-      lineBotId: data.lineBotId,
-      latestChatLogId: isDefined(data.latestChatLogId)
-        ? data.latestChatLogId
-        : null,
-      lineAccountId: data.lineAccountId,
-      lineSessionStatus: isDefined(data.lineSessionStatus)
-        ? data.lineSessionStatus
-        : 'ACTIVE',
-    });
-  }
-
-  static newBulk(data: LineSessionNewData[]) {
-    return data.map((d) => LineSession.new(d));
-  }
-
   edit(data: LineSessionUpdateData) {
     const plain: LineSessionPlain = {
       id: this.id,
@@ -66,6 +43,6 @@ export class LineSession extends DomainEntity<LineSessionPg> {
         : this.latestChatLogId,
     };
 
-    Object.assign(this, plain);
+    return lineSessionFromPlain(plain);
   }
 }

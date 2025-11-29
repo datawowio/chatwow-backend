@@ -1,5 +1,5 @@
 import { LineBot } from '@domain/base/line-bot/line-bot.domain';
-import { LineBotJsonState } from '@domain/base/line-bot/types/line-bot.domain.type';
+import { LineBotJsonState } from '@domain/base/line-bot/line-bot.type';
 
 export type LineProcessVerificationJobData = {
   lineBot: LineBot;

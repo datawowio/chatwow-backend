@@ -3,7 +3,7 @@ import type { DBModel } from '@infra/db/db.common';
 
 import type { Plain, Serialized } from '@shared/common/common.type';
 
-import type { AuditLog } from '../audit-log.domain';
+import type { AuditLog } from './audit-log.domain';
 
 export type AuditLogPg = DBModel<AuditLogs>;
 export type AuditLogPlain = Plain<AuditLog>;

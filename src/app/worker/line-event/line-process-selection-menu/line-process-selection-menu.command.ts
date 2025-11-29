@@ -1,7 +1,8 @@
 import { LineSession } from '@domain/base/line-session/line-session.domain';
-import { LineSessionMapper } from '@domain/base/line-session/line-session.mapper';
+import { newLineSession } from '@domain/base/line-session/line-session.factory';
+import { lineSessionFromPgWithState } from '@domain/base/line-session/line-session.mapper';
 import { LineSessionService } from '@domain/base/line-session/line-session.service';
-import { ProjectMapper } from '@domain/base/project/project.mapper';
+import { projectFromPgWithState } from '@domain/base/project/project.mapper';
 import { ProjectService } from '@domain/base/project/project.service';
 import { Injectable } from '@nestjs/common';
 
@@ -81,7 +82,7 @@ export class LineProcessSelectionMenuCommand {
       .where('id', 'in', ids)
       .execute();
 
-    return projects.map((p) => ProjectMapper.fromPgWithState(p));
+    return projects.map((p) => projectFromPgWithState(p));
   }
 
   async getSession({ projectId, lineBotId, lineAccountId }: GetSessionOpts) {
@@ -95,10 +96,10 @@ export class LineProcessSelectionMenuCommand {
       .executeTakeFirst();
 
     if (rawSession) {
-      return LineSessionMapper.fromPgWithState(rawSession);
+      return lineSessionFromPgWithState(rawSession);
     }
 
-    return LineSession.new({
+    return newLineSession({
       lineAccountId,
       lineBotId,
       projectId,

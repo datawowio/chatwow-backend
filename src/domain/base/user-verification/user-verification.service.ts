@@ -9,7 +9,10 @@ import { diff, renderHtml } from '@shared/common/common.func';
 
 import type { User } from '../user/user.domain';
 import type { UserVerification } from './user-verification.domain';
-import { UserVerificationMapper } from './user-verification.mapper';
+import {
+  userVerificationFromPgWithState,
+  userVerificationToPg,
+} from './user-verification.mapper';
 
 @Injectable()
 export class UserVerificationService {
@@ -30,7 +33,7 @@ export class UserVerificationService {
       return null;
     }
 
-    return UserVerificationMapper.fromPgWithState(userVerificationPg);
+    return userVerificationFromPgWithState(userVerificationPg);
   }
 
   async save(userVerification: UserVerification) {
@@ -42,7 +45,7 @@ export class UserVerificationService {
       await this._update(userVerification.id, userVerification);
     }
 
-    userVerification.setPgState(UserVerificationMapper.toPg);
+    userVerification.setPgState(userVerificationToPg);
   }
 
   async saveBulk(userVerifications: UserVerification[]) {
@@ -82,14 +85,14 @@ export class UserVerificationService {
   private async _create(userVerification: UserVerification) {
     await this.db.write
       .insertInto('user_verifications')
-      .values(UserVerificationMapper.toPg(userVerification))
+      .values(userVerificationToPg(userVerification))
       .execute();
   }
 
   private async _update(id: string, userVerification: UserVerification) {
     const data = diff(
       userVerification.pgState,
-      UserVerificationMapper.toPg(userVerification),
+      userVerificationToPg(userVerification),
     );
     if (!data) {
       return;

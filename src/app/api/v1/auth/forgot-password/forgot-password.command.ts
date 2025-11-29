@@ -1,7 +1,8 @@
 import { PasswordResetToken } from '@domain/base/password-reset-token/password-reset-token.domain';
+import { newPasswordResetToken } from '@domain/base/password-reset-token/password-reset-token.factory';
 import { PasswordResetTokenService } from '@domain/base/password-reset-token/password-reset-token.service';
 import { User } from '@domain/base/user/user.domain';
-import { UserMapper } from '@domain/base/user/user.mapper';
+import { userFromPgWithState } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { DomainEventQueue } from '@domain/orchestration/queue/domain-event/domain-event.queue';
@@ -12,7 +13,7 @@ import { TransactionService } from '@infra/db/transaction/transaction.service';
 
 import { shaHashstring } from '@shared/common/common.crypto';
 import { CommandInterface } from '@shared/common/common.type';
-import { HttpResponseMapper } from '@shared/http/http.mapper';
+import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import {
   ForgotPasswordDto,
@@ -38,13 +39,13 @@ export class ForgotPasswordCommand implements CommandInterface {
   async exec(body: ForgotPasswordDto): Promise<ForgotPasswordResponse> {
     const user = await this.find(body);
     if (!user) {
-      return HttpResponseMapper.toSuccess({
+      return toHttpSuccess({
         data: {},
       });
     }
 
     const token = shaHashstring();
-    const passwordResetToken = PasswordResetToken.new({
+    const passwordResetToken = newPasswordResetToken({
       userId: user.id,
       token,
     });
@@ -62,7 +63,7 @@ export class ForgotPasswordCommand implements CommandInterface {
     });
 
     // for security always success
-    return HttpResponseMapper.toSuccess({
+    return toHttpSuccess({
       data: {},
     });
   }
@@ -91,6 +92,6 @@ export class ForgotPasswordCommand implements CommandInterface {
       return null;
     }
 
-    return UserMapper.fromPgWithState(user);
+    return userFromPgWithState(user);
   }
 }

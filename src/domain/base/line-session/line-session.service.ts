@@ -5,7 +5,10 @@ import { MainDb } from '@infra/db/db.main';
 import { diff } from '@shared/common/common.func';
 
 import { LineSession } from './line-session.domain';
-import { LineSessionMapper } from './line-session.mapper';
+import {
+  lineSessionFromPgWithState,
+  lineSessionToPg,
+} from './line-session.mapper';
 
 @Injectable()
 export class LineSessionService {
@@ -23,7 +26,7 @@ export class LineSessionService {
       return null;
     }
 
-    return LineSessionMapper.fromPgWithState(lineSessionPg);
+    return lineSessionFromPgWithState(lineSessionPg);
   }
 
   async save(lineSession: LineSession) {
@@ -35,7 +38,7 @@ export class LineSessionService {
       await this._update(lineSession.id, lineSession);
     }
 
-    lineSession.setPgState(LineSessionMapper.toPg);
+    lineSession.setPgState(lineSessionToPg);
   }
 
   async saveBulk(lineSessions: LineSession[]) {
@@ -56,12 +59,12 @@ export class LineSessionService {
   private async _create(lineSession: LineSession) {
     await this.db.write
       .insertInto('line_sessions')
-      .values(LineSessionMapper.toPg(lineSession))
+      .values(lineSessionToPg(lineSession))
       .execute();
   }
 
   private async _update(id: string, lineSession: LineSession) {
-    const data = diff(lineSession.pgState, LineSessionMapper.toPg(lineSession));
+    const data = diff(lineSession.pgState, lineSessionToPg(lineSession));
     if (!data) return;
 
     await this.db.write
