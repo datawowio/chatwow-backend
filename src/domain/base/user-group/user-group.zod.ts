@@ -10,6 +10,7 @@ export const userGroupFilterZod = z
   .object({
     groupName: z.string().optional(),
     userIds: parmUuidsZod.optional(),
+    projectIds: parmUuidsZod.optional(),
     search: z.string().optional(),
   })
   .optional();

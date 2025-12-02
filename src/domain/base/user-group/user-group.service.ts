@@ -134,6 +134,15 @@ export class UserGroupService {
           .innerJoin('users', 'users.id', 'user_group_users.user_id')
           .where('users.id', 'in', filter!.userIds!),
       )
+      .$if(!!filter?.projectIds?.length, (q) =>
+        q
+          .innerJoin(
+            'user_group_projects',
+            'user_group_projects.user_group_id',
+            'user_groups.id',
+          )
+          .where('user_group_projects.project_id', 'in', filter!.projectIds!),
+      )
       .$if(isDefined(filter?.search), (q) => {
         const search = `%${filter!.search!}%`;
 
