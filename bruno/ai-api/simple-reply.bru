@@ -1,0 +1,71 @@
+meta {
+  name: simple-reply
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{ai_url}}/simple-reply
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "meta": {
+      "char_limit": 4000,
+      // "text" | "markdown"
+      "reply_type": "text",
+      "session_id": "019adf57-978c-764f-aa51-137af7fdbbd4"
+    },
+    "request": {
+      "content": "please explain the doc",
+      "content_type": "text",
+      "content_role": "message",
+      "attachments": []
+    },
+    "resources": [
+      {
+        "content": "This PDF document contains user Manual to record documents in OS WOW platform. The agent should focus on how to use this platform. Key information includes what user can do in this platform.",
+        "content_type": "markdown",
+        "content_role": "project",
+        "attachments": []
+      },
+      {
+        "content": "This PDF is a user manual for the Document Record & Control (DRC) module within the WOW OS platform, developed by DataWow. The manual provides step-by-step instructions for internal users on how to record, manage, and track documents and their transfers within an organization. The focus is on ensuring transparency, traceability, and compliance in document handling.",
+        "content_type": "markdown",
+        "content_role": "project_document",
+        "attachments": [
+          {
+            "mime_type": "image",
+            "extension": "jpg",
+            "filename": "test.jpg",
+            "presign_url": "http://presign.com",
+            "key_path": "stored_file/ASDKASDSD"
+          }
+        ]
+      }
+    ]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  ```json
+  {
+    "reply": {
+      "type": "markdown",
+      "content": "**YAY**"
+    },
+    "metadata": {
+      // range 0 -> 10000
+      "confidence_score": 10000,
+      "token_used": 10
+    }
+  }
+  ```
+}

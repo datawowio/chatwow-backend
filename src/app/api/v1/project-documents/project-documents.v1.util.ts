@@ -1,4 +1,5 @@
 import { projectsTableFilter } from '@domain/base/project/project.util';
+import { STORED_FILE_REF_NAME } from '@domain/base/stored-file/stored-file.constant';
 import { usersTableFilter } from '@domain/base/user/user.util';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 import type z from 'zod';
@@ -34,6 +35,7 @@ export function projectDocumentsV1InclusionQb(
         jsonObjectFrom(
           eb
             .selectFrom('stored_files')
+            .where('ref_name', '=', STORED_FILE_REF_NAME.DEFAULT)
             .whereRef('stored_files.owner_id', '=', 'project_documents.id')
             .selectAll(),
         ).as('storedFile'),

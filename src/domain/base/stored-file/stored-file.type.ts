@@ -3,7 +3,10 @@ import type { DBModel } from '@infra/db/db.common';
 
 import type { Plain, Serialized } from '@shared/common/common.type';
 
-import type { STORED_FILE_OWNER_TABLE } from './stored-file.constant';
+import type {
+  STORED_FILE_OWNER_TABLE,
+  STORED_FILE_REF_NAME,
+} from './stored-file.constant';
 import type { StoredFile } from './stored-file.domain';
 
 export type StoredFilePg = DBModel<StoredFiles>;
@@ -17,7 +20,7 @@ export type StoredFileNewData = {
   ownerId: string;
   filename: string;
   filesizeByte?: number;
-  refName?: string;
+  refName?: STORED_FILE_REF_NAME;
   storageName?: string;
   isPublic?: boolean;
   expireAt?: Date;
@@ -27,7 +30,7 @@ export type StoredFileUpdateData = {
   id?: string;
   filename?: string;
   ownerId?: string;
-  refName?: string;
+  refName?: STORED_FILE_REF_NAME;
   expireAt?: Date;
   isPublic?: boolean;
   filesizeByte?: number;

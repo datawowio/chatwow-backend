@@ -1,9 +1,18 @@
-import { LineMessageMetaData, LineMessageMetaInput } from '../line-event.type';
+import { LineBot } from '@domain/base/line-bot/line-bot.domain';
+import { LineBotJsonState } from '@domain/base/line-bot/line-bot.type';
+import { LineSession } from '@domain/base/line-session/line-session.domain';
+import { LineSessionJsonState } from '@domain/base/line-session/line-session.type';
 
-type Data = {
-  message: string;
+export type LineProcessAiChatJobData = {
+  lineBot: LineBot;
+  lineSession: LineSession;
   replyToken: string;
+  message: string;
 };
 
-export type LineProcessAiChatJobData = LineMessageMetaData<Data>;
-export type LineProcessAiChatJobInput = LineMessageMetaInput<Data>;
+export type LineProcessAiChatJobInput = {
+  lineBot: LineBotJsonState;
+  lineSession: LineSessionJsonState;
+  replyToken: string;
+  message: string;
+};

@@ -1,4 +1,5 @@
 import { projectDocumentsTableFilter } from '@domain/base/project-document/project-document.util';
+import { STORED_FILE_REF_NAME } from '@domain/base/stored-file/stored-file.constant';
 import {
   addUserGroupActorFilter,
   userGroupsTableFilter,
@@ -84,6 +85,7 @@ export function projectsV1InclusionQb(
                   eb
                     .selectFrom('stored_files')
                     .selectAll()
+                    .where('ref_name', '=', STORED_FILE_REF_NAME.DEFAULT)
                     .whereRef(
                       'stored_files.owner_id',
                       '=',

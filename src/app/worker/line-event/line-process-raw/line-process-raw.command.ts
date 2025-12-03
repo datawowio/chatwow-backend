@@ -100,10 +100,8 @@ export class LineProcessRawCommand {
     return this.lineEventQueue.jobProcessAiChat({
       lineBot,
       lineSession: entity.lineData.lineSession,
-      data: {
-        message,
-        replyToken,
-      },
+      replyToken,
+      message,
     });
   }
 

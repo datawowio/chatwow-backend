@@ -62,9 +62,10 @@ export class LineEventBullmq extends BaseTaskHandler {
   @QueueTask(LINE_EVENT_JOBS.PROCESS_AI_CHAT)
   async processAiChat(input: LineProcessAiChatJobInput) {
     return this.lineProcessAiChatCommand.exec({
-      lineBot: lineBotFromJsonWithState(input.lineBotJsonState),
-      lineSession: lineSessionFromJsonWithState(input.lineSessionJsonState),
-      data: input.data,
+      lineBot: lineBotFromJsonWithState(input.lineBot),
+      lineSession: lineSessionFromJsonWithState(input.lineSession),
+      replyToken: input.replyToken,
+      message: input.message,
     });
   }
 }

@@ -53,6 +53,9 @@ export type AppConfig = {
     defaultAccessToken: string;
     defaultSecret: string;
   };
+  ai: {
+    url: string;
+  };
 };
 
 export const config = (): AppConfig => ({
@@ -109,5 +112,8 @@ export const config = (): AppConfig => ({
   line: {
     defaultAccessToken: get('LINE_DEFAULT_ACCESS_TOKEN').default('').asString(),
     defaultSecret: get('LINE_DEFAULT_SECRET').default('').asString(),
+  },
+  ai: {
+    url: get('AI_URL').required().asString(),
   },
 });

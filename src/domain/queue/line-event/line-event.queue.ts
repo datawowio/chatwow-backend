@@ -61,9 +61,10 @@ export class LineEventQueue extends BaseQueue {
 
   jobProcessAiChat(domainData: LineProcessAiChatJobData) {
     const input: LineProcessAiChatJobInput = {
-      lineBotJsonState: lineBotToJsonWithState(domainData.lineBot),
-      lineSessionJsonState: lineSessionToJsonWithState(domainData.lineSession),
-      data: domainData.data,
+      lineBot: lineBotToJsonWithState(domainData.lineBot),
+      lineSession: lineSessionToJsonWithState(domainData.lineSession),
+      replyToken: domainData.replyToken,
+      message: domainData.message,
     };
 
     this.addJob(LINE_EVENT_JOBS.PROCESS_AI_CHAT, input);

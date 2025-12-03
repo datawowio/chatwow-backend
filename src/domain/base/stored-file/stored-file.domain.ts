@@ -3,6 +3,7 @@ import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
+import { STORED_FILE_REF_NAME } from './stored-file.constant';
 import { storedFileFromPlain } from './stored-file.mapper';
 import type {
   StoredFilePg,
@@ -13,7 +14,7 @@ import { getStoredFileKey } from './stored-file.util';
 
 export class StoredFile extends DomainEntity<StoredFilePg> {
   readonly id: string;
-  readonly refName: string;
+  readonly refName: STORED_FILE_REF_NAME;
   readonly keyPath: string;
   readonly ownerTable: string;
   readonly ownerId: string;

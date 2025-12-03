@@ -302,9 +302,9 @@ export async function up(db: Kysely<any>): Promise<void> {
   // STORED FILES INDEXES
   //
   await db.schema
-    .createIndex('stored_files_owner_id_idx')
+    .createIndex('stored_files_owner_id_ref_name_idx')
     .on('stored_files')
-    .column('owner_id')
+    .columns(['owner_id', 'ref_name'])
     .execute();
 
   //
