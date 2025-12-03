@@ -31,6 +31,8 @@ import {
 } from './reset-password/reset-password.dto';
 import { SignInCommand } from './sign-in/sign-in.command';
 import { SignInDto, SignInResponse } from './sign-in/sign-in.dto';
+import { SignOutCommand } from './sign-out/sign-out.command';
+import { SignOutResponse } from './sign-out/sign-out.dto';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthV1Controller {
@@ -40,6 +42,7 @@ export class AuthV1Controller {
     private forgotPasswordCommand: ForgotPasswordCommand,
     private resetPasswordCommand: ResetPasswordCommand,
     private checkResetPasswordCommand: CheckResetPasswordQuery,
+    private signOutCommand: SignOutCommand,
   ) {}
 
   @Post('sign-in')
@@ -53,6 +56,18 @@ export class AuthV1Controller {
     setRefreshCookie(res, plainToken);
 
     return response;
+  }
+
+  @Post('sign-out')
+  @UsePublic()
+  @ApiResponse({ type: () => SignOutResponse })
+  async signOut(@Req() req: FastifyRequest): Promise<SignOutResponse> {
+    const reqToken = getRefreshCookie(req);
+    if (!reqToken) {
+      throw new ApiException(403, 'invalidSessionToken');
+    }
+
+    return this.signOutCommand.exec(reqToken);
   }
 
   @Post('refresh')

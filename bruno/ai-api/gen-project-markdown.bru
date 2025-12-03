@@ -1,0 +1,28 @@
+meta {
+  name: gen-project-markdown
+  type: http
+  seq: 2
+}
+
+post {
+  url: a
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "meta": {
+      "char_limit": 4000,
+      "reply_type": "text"
+    },
+    "data": {
+      
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

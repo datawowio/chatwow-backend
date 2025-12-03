@@ -173,7 +173,7 @@ Table "stored_files" {
   "expire_at" timestamptz
 
   Indexes {
-    owner_id [type: btree, name: "stored_files_owner_id_idx"]
+    (owner_id, ref_name) [type: btree, name: "stored_files_owner_id_ref_name_idx"]
   }
 }
 

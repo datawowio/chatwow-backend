@@ -16,6 +16,8 @@ import { UseRoleGuard } from '@infra/middleware/role-guard/role.guard';
 
 import { AddUserCommand } from './add-user/add-user.command';
 import { AddUserDto, AddUserResponse } from './add-user/add-user.dto';
+import { CheckMeDto, CheckMeResponse } from './check-me/check-me.dto';
+import { CheckMeQuery } from './check-me/check-me.query';
 import { DeleteUserCommand } from './delete-user/delete-user.command';
 import { DeleteUserResponse } from './delete-user/delete-user.dto';
 import { EditUserCommand } from './edit-user/edit-user.command';
@@ -26,6 +28,8 @@ import { ListUsersDto, ListUsersResponse } from './list-users/list-users.dto';
 import { ListUsersQuery } from './list-users/list-users.query';
 import { ResendInviteCommand } from './resend-invite/resend-invite.command';
 import { ResendInviteResponse } from './resend-invite/resend-invite.dto';
+import { UpdateMeCommand } from './update-me/update-me.command';
+import { UpdateMeDto, UpdateMeResponse } from './update-me/update-me.dto';
 import {
   UserSummaryDto,
   UserSummaryResponse,
@@ -43,6 +47,8 @@ export class UsersV1Controller {
     private resendInviteCommand: ResendInviteCommand,
     private userSummaryQuery: UserSummaryQuery,
     private deleteUserCommand: DeleteUserCommand,
+    private checkMeQuery: CheckMeQuery,
+    private updateMeCommand: UpdateMeCommand,
   ) {}
 
   @Get()
@@ -78,6 +84,24 @@ export class UsersV1Controller {
     @Query() query: GetUserDto,
   ): Promise<GetUserResponse> {
     return this.getUserQuery.exec(claims.userId, query);
+  }
+
+  @Patch('me')
+  @ApiResponse({ type: () => UpdateMeResponse })
+  async updateSelf(
+    @UserClaims() claims: UserClaims,
+    @Body() body: UpdateMeDto,
+  ): Promise<UpdateMeResponse> {
+    return this.updateMeCommand.exec(claims.userId, body);
+  }
+
+  @Post('me/check')
+  @ApiResponse({ type: () => CheckMeResponse })
+  async checkMe(
+    @UserClaims() claims: UserClaims,
+    @Body() body: CheckMeDto,
+  ): Promise<CheckMeResponse> {
+    return this.checkMeQuery.exec(claims.userId, body);
   }
 
   @Get(':id')

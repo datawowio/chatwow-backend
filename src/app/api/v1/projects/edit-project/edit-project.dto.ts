@@ -1,5 +1,7 @@
 import { PROJECT_STATUS } from '@domain/base/project/project.constant';
 import { ProjectResponse } from '@domain/base/project/project.response';
+import { UserGroupResponse } from '@domain/base/user-group/user-group.response';
+import { UserResponse } from '@domain/base/user/user.response';
 import { ApiProperty } from '@nestjs/swagger';
 import z from 'zod';
 
@@ -18,15 +20,38 @@ const zod = z.object({
       projectStatus: z.enum(PROJECT_STATUS).optional(),
     })
     .optional(),
+  manageUserIds: z.array(z.string().uuid()).optional(),
+  userGroupIds: z.array(z.string().uuid()).optional(),
 });
 
 export class EditProjectDto extends zodDto(zod) {}
 
 // ================ Response ================
 
+class EditProjectManageUsers implements IDomainData {
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
+class EditProjectUserGroups implements IDomainData {
+  @ApiProperty({ type: () => UserGroupResponse })
+  attributes: UserGroupResponse;
+}
+
+class EditProjectProjectRelations {
+  @ApiProperty({ type: () => EditProjectManageUsers, isArray: true })
+  manageUsers?: EditProjectManageUsers[];
+
+  @ApiProperty({ type: () => EditProjectUserGroups, isArray: true })
+  userGroups?: EditProjectUserGroups[];
+}
+
 class EditProjectProject implements IDomainData {
   @ApiProperty({ type: () => ProjectResponse })
   attributes: ProjectResponse;
+
+  @ApiProperty({ type: () => EditProjectProjectRelations })
+  relations: EditProjectProjectRelations;
 }
 
 export class EditProjectData {

@@ -77,6 +77,14 @@ export class SessionService {
       .execute();
   }
 
+  async revokeUserSession(userId: string) {
+    await this.db.write
+      .updateTable('sessions')
+      .set('revoke_at', myDayjs().toISOString())
+      .where('user_id', '=', userId)
+      .execute();
+  }
+
   private _validate(_session: Session) {
     // validation rules
   }

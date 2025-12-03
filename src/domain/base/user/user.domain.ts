@@ -1,6 +1,6 @@
 import type { UserRole, UserStatus } from '@infra/db/db';
 
-import { hashString } from '@shared/common/common.crypto';
+import { hashString, isMatchedHash } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
@@ -56,5 +56,13 @@ export class User extends DomainEntity<UserPg> {
     };
 
     Object.assign(this, plain);
+  }
+
+  isPasswordValid(rawPassword: string) {
+    if (!this.password) {
+      return false;
+    }
+
+    return isMatchedHash(rawPassword, this.password);
   }
 }

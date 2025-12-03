@@ -25,7 +25,7 @@ export class LineProcessAiChatCommand {
     const lineService = new LineService(body.lineBot);
 
     const entity = await this.find(body.lineSession.projectId);
-    this.aiApiService.chat({
+    await this.aiApiService.chat({
       request: {
         content: '',
       },

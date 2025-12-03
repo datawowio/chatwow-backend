@@ -67,6 +67,17 @@ export class UserGroupService {
     return userGroup;
   }
 
+  async findMany(ids: string[]): Promise<UserGroup[]> {
+    const userGroupPgs = await this.db.read
+      .selectFrom('user_groups')
+      .selectAll('user_groups')
+      .where('id', 'in', ids)
+      .where(userGroupsTableFilter)
+      .execute();
+
+    return userGroupPgs.map((pg) => userGroupFromPgWithState(pg));
+  }
+
   async save(userGroup: UserGroup) {
     this._validate(userGroup);
 

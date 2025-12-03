@@ -1,7 +1,7 @@
 import type { User } from '@domain/base/user/user.domain';
 import { ok } from 'neverthrow';
 
-import { encodeUserJwt, isMatchedHash } from '@shared/common/common.crypto';
+import { encodeUserJwt } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 import { ApiException } from '@shared/http/http.exception';
 
@@ -14,7 +14,7 @@ export function signIn({ user, password }: SignInOpts) {
     throw new ApiException(400, 'invalidAuth');
   }
 
-  const matched = isMatchedHash(password, user.password);
+  const matched = user.isPasswordValid(password);
   if (!matched) {
     throw new ApiException(400, 'invalidAuth');
   }

@@ -68,6 +68,17 @@ export class UserService {
     return user;
   }
 
+  async findMany(ids: string[]) {
+    const userPgs = await this.db.read
+      .selectFrom('users')
+      .selectAll()
+      .where('id', 'in', ids)
+      .where(usersTableFilter)
+      .execute();
+
+    return userPgs.map((u) => userFromPgWithState(u));
+  }
+
   async save(user: User) {
     this._validate(user);
 
