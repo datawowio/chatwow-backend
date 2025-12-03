@@ -1,5 +1,7 @@
 import type { Provider } from '@nestjs/common';
 
+import { AmqpClientProvider } from './amqp/amqp.provider';
+import { AmqpService } from './amqp/amqp.service';
 import { RedisCacheProvider } from './cache/cache.provider';
 import { CacheService } from './cache/cache.service';
 import { NodeMailerProvider } from './email/email.provider';
@@ -15,6 +17,7 @@ export const GLOBAL_PROVIDER: Provider[] = [
   RedisCacheProvider,
   NodeMailerProvider,
   StorageProvider,
+  AmqpClientProvider,
 
   // Service
   LoggerService,
@@ -23,4 +26,5 @@ export const GLOBAL_PROVIDER: Provider[] = [
   LangService,
   ReqStorage,
   StorageService,
+  AmqpService,
 ];

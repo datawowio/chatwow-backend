@@ -9,6 +9,7 @@ export type AppConfig = {
     cookieSecret: string;
     apiPort: number;
     workerPort: number;
+    cronPort: number;
     memThreshold: number;
     enableSwagger: boolean;
     enableBullboard: boolean;
@@ -53,6 +54,9 @@ export type AppConfig = {
     defaultAccessToken: string;
     defaultSecret: string;
   };
+  amqp: {
+    url: string;
+  };
   ai: {
     url: string;
   };
@@ -65,6 +69,7 @@ export const config = (): AppConfig => ({
     corsOrigin: get('CORS_ORIGIN').required().asString().split(','),
     cookieSecret: get('COOKIE_SECRET').required().asString(),
     apiPort: get('API_PORT').default(3000).asPortNumber(),
+    cronPort: get('CRON_PORT').default(3002).asPortNumber(),
     workerPort: get('WORKER_PORT').default(3001).asPortNumber(),
     enableSwagger: get('ENABLE_SWAGGER').default('true').asBool(),
     enableBullboard: get('ENABLE_BULLBOARD').default('true').asBool(),
@@ -112,6 +117,11 @@ export const config = (): AppConfig => ({
   line: {
     defaultAccessToken: get('LINE_DEFAULT_ACCESS_TOKEN').default('').asString(),
     defaultSecret: get('LINE_DEFAULT_SECRET').default('').asString(),
+  },
+  amqp: {
+    url: get('AMQP_URL')
+      .default('amqp://admin:admin@localhost:5672')
+      .asString(),
   },
   ai: {
     url: get('AI_URL').required().asString(),

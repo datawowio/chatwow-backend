@@ -3,6 +3,7 @@ import { LineAccountModule } from './base/line-account/line-account.module';
 import { LineBotModule } from './base/line-bot/line-bot.module';
 import { LineChatLogModule } from './base/line-chat-log/line-chat-log.module';
 import { LineSessionModule } from './base/line-session/line-session.module';
+import { MessageTaskModule } from './base/message-task/message-task.module';
 import { PasswordResetTokenModule } from './base/password-reset-token/password-reset-token.module';
 import { ProjectChatModule } from './base/project-chat/project-chat.module';
 import { ProjectDocumentModule } from './base/project-document/project-document.module';
@@ -38,6 +39,7 @@ export const DOMAIN_PROVIDER = [
   SessionModule,
   PasswordResetTokenModule,
   LineBotModule,
+  MessageTaskModule,
 
   QueueModule,
   PgModule,

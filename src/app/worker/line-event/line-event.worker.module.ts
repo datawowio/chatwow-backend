@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 
-import { createBullmqHandler } from '@shared/common/common.worker';
+import { createMqHandler } from '@shared/common/common.worker';
 
-import { QUEUE } from '../worker.queue';
-import { LineEventBullmq } from './line-event.bullmq';
+import { MQ_EXCHANGE } from '../worker.constant';
+import { LineEventAmqp } from './line-event.amqp';
 import { LineProcessAiChatCommand } from './line-process-ai-chat/line-process-ai-chat.command';
 import { LineProcessRawCommand } from './line-process-raw/line-process-raw.command';
 import { LineProcessSelectionMenuCommand } from './line-process-selection-menu/line-process-selection-menu.command';
@@ -19,7 +19,7 @@ import { LineShowSelectionMenuCommand } from './line-show-selection-menu/line-sh
     LineProcessAiChatCommand,
 
     //
-    createBullmqHandler(QUEUE.LINE_EVENT, LineEventBullmq),
+    createMqHandler(MQ_EXCHANGE.LINE_EVENT.name, LineEventAmqp),
   ],
 })
 export class LineEventWorkerModule {}

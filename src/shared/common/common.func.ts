@@ -128,3 +128,22 @@ export function renderHtml(template: React.JSX.Element) {
 export function prettyPrintJson(obj: object) {
   return JSON.stringify(obj, null, 2);
 }
+
+export function valueOr<T>(val: T | undefined, defaultVal: T) {
+  if (val === undefined) {
+    return defaultVal;
+  }
+
+  return val;
+}
+
+export function orUndefined<T, V>(
+  val: T | undefined | null,
+  cb: (data: T) => V,
+): V | undefined {
+  if (!val) {
+    return undefined;
+  }
+
+  return cb(val);
+}

@@ -2,19 +2,20 @@ import { passwordResetTokenFromJsonState } from '@domain/base/password-reset-tok
 import { userFromJsonState } from '@domain/base/user/user.mapper';
 import { Injectable } from '@nestjs/common';
 
-import { DOMAIN_EVENT_JOBS } from '@app/worker/worker.job';
+import { BaseAmqpHandler } from '@infra/global/amqp/amqp.abstract';
 
-import { BaseTaskHandler } from '@shared/task/task.abstract';
 import { QueueTask } from '@shared/task/task.decorator';
 
+import { DOMAIN_EVENT_QUEUES } from '../worker.constant';
+import { OmitTaskMeta } from '../worker.type';
 import { ForgotPasswordQueueCommand } from './forgot-password/forgot-password.command';
 import type { ForgotPasswordJobInput } from './forgot-password/forgot-password.type';
 import { ForgotPasswordJobData } from './forgot-password/forgot-password.type';
 import { SendVerificationQueueCommand } from './send-verification/send-verification.command';
-import type { SendVerificationJobData } from './send-verification/send-verification.type';
+import type { SendVerificationJobInput } from './send-verification/send-verification.type';
 
 @Injectable()
-export class DomainEventBullmq extends BaseTaskHandler {
+export class DomainEventAmqp extends BaseAmqpHandler {
   constructor(
     private senVerificationQueueCommand: SendVerificationQueueCommand,
     private forgotPasswordQueueCommand: ForgotPasswordQueueCommand,
@@ -22,13 +23,13 @@ export class DomainEventBullmq extends BaseTaskHandler {
     super();
   }
 
-  @QueueTask(DOMAIN_EVENT_JOBS.SEND_VERIFICATION)
-  async processSendVerification(data: SendVerificationJobData) {
+  @QueueTask(DOMAIN_EVENT_QUEUES.SEND_VERIFICATION)
+  async processSendVerification(data: OmitTaskMeta<SendVerificationJobInput>) {
     return this.senVerificationQueueCommand.exec(userFromJsonState(data));
   }
 
-  @QueueTask(DOMAIN_EVENT_JOBS.FORGOT_PASSWORD)
-  async processForgotPassword(data: ForgotPasswordJobInput) {
+  @QueueTask(DOMAIN_EVENT_QUEUES.FORGOT_PASSWORD)
+  async processForgotPassword(data: OmitTaskMeta<ForgotPasswordJobInput>) {
     const dispatchData: ForgotPasswordJobData = {
       user: userFromJsonState(data.user),
       passwordResetToken: passwordResetTokenFromJsonState(

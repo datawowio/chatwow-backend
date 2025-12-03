@@ -31,6 +31,8 @@ export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 
 export type LineSessionStatus = "ACTIVE" | "INACTIVE";
 
+export type MessageStatus = "DEAD" | "FAIL" | "INVALID_PAYLOAD" | "SUCCESS";
+
 export type ProjectStatus = "ACTIVE" | "INACTIVE";
 
 export type UserRole = "ADMIN" | "MANAGER" | "USER";
@@ -79,6 +81,20 @@ export interface LineSessions {
   line_bot_id: string;
   line_session_status: Generated<LineSessionStatus>;
   project_id: string;
+  updated_at: Generated<string>;
+}
+
+export interface MessageTasks {
+  attempts: Generated<number>;
+  created_at: Generated<string>;
+  exchange_name: string;
+  expire_at: string;
+  id: string;
+  last_error: string | null;
+  max_attempts: Generated<number>;
+  message_status: MessageStatus;
+  payload: Json;
+  queue_name: string;
   updated_at: Generated<string>;
 }
 
@@ -213,6 +229,7 @@ export interface DB {
   line_bots: LineBots;
   line_chat_logs: LineChatLogs;
   line_sessions: LineSessions;
+  message_tasks: MessageTasks;
   password_reset_tokens: PasswordResetTokens;
   project_chats: ProjectChats;
   project_documents: ProjectDocuments;

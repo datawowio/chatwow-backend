@@ -45,18 +45,17 @@ services:
     volumes:
       - ./_docker_volumes/redis:/data
 
-  bullboard:
-    image: nauverse/bull-board:latest
+  rabbitmq:
+    image: rabbitmq:3-management
     ports:
-      - "2999:3000" # UI at http://localhost:2999
+      - "5672:5672" # RabbitMQ port
+      - "15672:15672" # Management console port
     environment:
-      REDIS_URL: redis://redis:6379
-      BULL_VERSION: BULLMQ
-      BULL_PREFIX: bull
-      USER_USERNAME: admin
-      USER_PASSWORD: admin
-    depends_on:
-      - redis
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    volumes:
+      - ./_docker_volumes/rabbitmq/data:/var/lib/rabbitmq
+      - ./_docker_volumes/rabbitmq/log:/var/log/rabbitmq
 
   # Enable this to use file uploading to minio
   minio:

@@ -110,7 +110,7 @@ export abstract class BaseTaskHandler {
     }
 
     // handle task pipe
-    const parser = metadata.parser;
+    const parser = metadata.validator;
     if (parser) {
       try {
         job.data = parser(job.data);

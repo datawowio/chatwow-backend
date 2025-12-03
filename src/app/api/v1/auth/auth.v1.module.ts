@@ -6,6 +6,7 @@ import { ForgotPasswordCommand } from './forgot-password/forgot-password.command
 import { RefreshCommand } from './refresh/refresh.command';
 import { ResetPasswordCommand } from './reset-password/reset-password.command';
 import { SignInCommand } from './sign-in/sign-in.command';
+import { SignOutCommand } from './sign-out/sign-out.command';
 
 @Module({
   providers: [
@@ -15,6 +16,7 @@ import { SignInCommand } from './sign-in/sign-in.command';
     ForgotPasswordCommand,
     ResetPasswordCommand,
     CheckResetPasswordQuery,
+    SignOutCommand,
   ],
   controllers: [AuthV1Controller],
 })

@@ -2,19 +2,22 @@ import 'reflect-metadata';
 
 const TASK_METADATA = Symbol('TASK_METADATA');
 
-type Parser = (obj: any) => object;
+type Validator = (obj: any) => void;
 export type TaskMetadata = {
   methodName: string;
-  parser?: Parser;
+  validator?: Validator;
 };
 
-export function QueueTask(taskName: string, parser?: Parser): MethodDecorator {
+export function QueueTask(
+  taskName: string,
+  validator?: Validator,
+): MethodDecorator {
   return (target, propertyKey) => {
     const handlers =
       Reflect.getMetadata(TASK_METADATA, target.constructor) || {};
     handlers[taskName] = {
       methodName: propertyKey as string,
-      parser,
+      validator: validator,
     } satisfies TaskMetadata;
 
     Reflect.defineMetadata(TASK_METADATA, handlers, target.constructor);

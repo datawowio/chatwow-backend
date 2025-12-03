@@ -55,6 +55,11 @@ export async function up(db: Kysely<any>): Promise<void> {
     .asEnum(['ACTIVE', 'INACTIVE'])
     .execute();
 
+  await db.schema
+    .createType('message_status')
+    .asEnum(['INVALID_PAYLOAD', 'FAIL', 'SUCCESS', 'DEAD'])
+    .execute();
+
   //
   // LINE_ACCOUNTS
   //
@@ -466,6 +471,25 @@ export async function up(db: Kysely<any>): Promise<void> {
     .on('password_reset_tokens')
     .column('token_hash')
     .execute();
+
+  await db.schema
+    .createTable('message_tasks')
+    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('queue_name', 'varchar', (col) => col.notNull())
+    .addColumn('exchange_name', 'varchar', (col) => col.notNull())
+    .addColumn('payload', 'jsonb', (col) => col.notNull())
+    .addColumn('message_status', sql`message_status`, (col) => col.notNull())
+    .addColumn('attempts', 'integer', (col) => col.notNull().defaultTo(0))
+    .addColumn('max_attempts', 'integer', (col) => col.notNull().defaultTo(5))
+    .addColumn('last_error', 'text')
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.notNull().defaultTo(sql`now()`),
+    )
+    .addColumn('updated_at', 'timestamptz', (col) =>
+      col.notNull().defaultTo(sql`now()`),
+    )
+    .addColumn('expire_at', 'timestamptz', (col) => col.notNull())
+    .execute();
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
@@ -478,6 +502,7 @@ export async function down(db: Kysely<any>): Promise<void> {
   await db.schema.dropIndex('user_verifications_code_idx').execute();
 
   // Drop tables (reverse order of creation)
+  await db.schema.dropTable('message_tasks').execute();
   await db.schema.dropTable('password_reset_tokens').execute();
   await db.schema.dropTable('sessions').execute();
   await db.schema.dropTable('audit_logs').execute();

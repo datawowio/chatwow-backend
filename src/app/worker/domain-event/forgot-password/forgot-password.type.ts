@@ -6,6 +6,8 @@ import {
 import type { User } from '@domain/base/user/user.domain';
 import type { UserJson, UserPg } from '@domain/base/user/user.type';
 
+import { TaskData } from '@app/worker/worker.type';
+
 import type { WithPgState } from '@shared/common/common.type';
 
 type Action = 'newUser' | 'resetPassword';
@@ -16,9 +18,9 @@ export type ForgotPasswordJobData = {
   action: Action;
 };
 
-export type ForgotPasswordJobInput = {
+export type ForgotPasswordJobInput = TaskData<{
   user: WithPgState<UserJson, UserPg>;
   passwordResetToken: WithPgState<PasswordResetTokenJson, PasswordResetTokenPg>;
   plainToken: string;
   action: Action;
-};
+}>;

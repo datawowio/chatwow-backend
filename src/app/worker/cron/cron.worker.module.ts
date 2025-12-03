@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 
-import { createBullmqHandler } from '@shared/common/common.worker';
+import { createMqHandler } from '@shared/common/common.worker';
 
-import { QUEUE } from '../worker.queue';
-import { CronBullmq } from './cron.bullmq';
+import { MQ_EXCHANGE } from '../worker.constant';
+import { CronAmqp } from './cron.amqp';
 
 @Module({
-  providers: [createBullmqHandler(QUEUE.CRONS, CronBullmq)],
+  providers: [createMqHandler(MQ_EXCHANGE.CRON.name, CronAmqp)],
 })
 export class CronWorkerModule {}

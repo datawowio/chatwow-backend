@@ -2,11 +2,12 @@ import { lineBotFromJsonWithState } from '@domain/base/line-bot/line-bot.mapper'
 import { lineSessionFromJsonWithState } from '@domain/base/line-session/line-session.mapper';
 import { Injectable } from '@nestjs/common';
 
-import { LINE_EVENT_JOBS } from '@app/worker/worker.job';
+import { BaseAmqpHandler } from '@infra/global/amqp/amqp.abstract';
 
-import { BaseTaskHandler } from '@shared/task/task.abstract';
 import { QueueTask } from '@shared/task/task.decorator';
 
+import { LINE_EVENT_QUEUES } from '../worker.constant';
+import { OmitTaskMeta } from '../worker.type';
 import { LineProcessAiChatCommand } from './line-process-ai-chat/line-process-ai-chat.command';
 import { LineProcessAiChatJobInput } from './line-process-ai-chat/line-process-ai-chat.type';
 import { LineProcessRawCommand } from './line-process-raw/line-process-raw.command';
@@ -19,7 +20,7 @@ import { LineShowSelectionMenuCommand } from './line-show-selection-menu/line-sh
 import { LineShowSelectionMenuJobInput } from './line-show-selection-menu/line-show-selection-menu.type';
 
 @Injectable()
-export class LineEventBullmq extends BaseTaskHandler {
+export class LineEventAmqp extends BaseAmqpHandler {
   constructor(
     private lineProcessRawCommand: LineProcessRawCommand,
     private lineProcessVerificationCommand: LineProcessVerificationCommand,
@@ -30,37 +31,41 @@ export class LineEventBullmq extends BaseTaskHandler {
     super();
   }
 
-  @QueueTask(LINE_EVENT_JOBS.PROCESS_RAW)
+  @QueueTask(LINE_EVENT_QUEUES.PROCESS_RAW)
   async processRaw(data: LineProcessRawJobData) {
     return this.lineProcessRawCommand.exec(data);
   }
 
-  @QueueTask(LINE_EVENT_JOBS.PROCESS_VERIFICATION)
-  async processVerification(input: LineProcessVerificationJobInput) {
+  @QueueTask(LINE_EVENT_QUEUES.PROCESS_VERIFICATION)
+  async processVerification(
+    input: OmitTaskMeta<LineProcessVerificationJobInput>,
+  ) {
     return this.lineProcessVerificationCommand.exec({
       ...input,
       lineBot: lineBotFromJsonWithState(input.lineBot),
     });
   }
 
-  @QueueTask(LINE_EVENT_JOBS.PROCESS_SELECTION_MENU)
-  async processSelectionMenu(input: LineProcessSelectionMenuJobInput) {
+  @QueueTask(LINE_EVENT_QUEUES.PROCESS_SELECTION_MENU)
+  async processSelectionMenu(
+    input: OmitTaskMeta<LineProcessSelectionMenuJobInput>,
+  ) {
     return this.lineProcessSelectionMenuCommand.exec({
       ...input,
       lineBot: lineBotFromJsonWithState(input.lineBot),
     });
   }
 
-  @QueueTask(LINE_EVENT_JOBS.SHOW_SELECTION_MENU)
-  async showSelectionMenu(input: LineShowSelectionMenuJobInput) {
+  @QueueTask(LINE_EVENT_QUEUES.SHOW_SELECTION_MENU)
+  async showSelectionMenu(input: OmitTaskMeta<LineShowSelectionMenuJobInput>) {
     return this.lineShowSelectionMenuCommand.exec({
       ...input,
       lineBot: lineBotFromJsonWithState(input.lineBot),
     });
   }
 
-  @QueueTask(LINE_EVENT_JOBS.PROCESS_AI_CHAT)
-  async processAiChat(input: LineProcessAiChatJobInput) {
+  @QueueTask(LINE_EVENT_QUEUES.PROCESS_AI_CHAT)
+  async processAiChat(input: OmitTaskMeta<LineProcessAiChatJobInput>) {
     return this.lineProcessAiChatCommand.exec({
       lineBot: lineBotFromJsonWithState(input.lineBot),
       lineSession: lineSessionFromJsonWithState(input.lineSession),
