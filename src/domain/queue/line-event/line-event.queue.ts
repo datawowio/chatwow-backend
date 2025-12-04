@@ -38,7 +38,7 @@ export class LineEventQueue extends BaseAmqpExchange {
       lineBotId: data.lineBotId,
     });
 
-    this.addJob(LINE_EVENT_QUEUES.PROCESS_RAW, input);
+    this.addJob(LINE_EVENT_QUEUES.PROCESS_RAW.name, input);
   }
 
   jobProcessVerification(domainData: LineProcessVerificationJobData) {
@@ -47,7 +47,7 @@ export class LineEventQueue extends BaseAmqpExchange {
       lineBot: lineBotToJsonWithState(domainData.lineBot),
     });
 
-    this.addJob(LINE_EVENT_QUEUES.PROCESS_VERIFICATION, input);
+    this.addJob(LINE_EVENT_QUEUES.PROCESS_VERIFICATION.name, input);
   }
 
   jobProcessSelectionMenu(domainData: LineProcessSelectionMenuJobData) {
@@ -56,7 +56,7 @@ export class LineEventQueue extends BaseAmqpExchange {
       lineBot: lineBotToJsonWithState(domainData.lineBot),
     });
 
-    this.addJob(LINE_EVENT_QUEUES.PROCESS_SELECTION_MENU, input);
+    this.addJob(LINE_EVENT_QUEUES.PROCESS_SELECTION_MENU.name, input);
   }
 
   jobShowSelectionMenu(domainData: LineShowSelectionMenuJobData) {
@@ -65,7 +65,7 @@ export class LineEventQueue extends BaseAmqpExchange {
       lineBot: lineBotToJsonWithState(domainData.lineBot),
     });
 
-    this.addJob(LINE_EVENT_QUEUES.SHOW_SELECTION_MENU, input);
+    this.addJob(LINE_EVENT_QUEUES.SHOW_SELECTION_MENU.name, input);
   }
 
   jobProcessAiChat(domainData: LineProcessAiChatJobData) {
@@ -76,6 +76,6 @@ export class LineEventQueue extends BaseAmqpExchange {
       message: domainData.message,
     });
 
-    this.addJob(LINE_EVENT_QUEUES.PROCESS_AI_CHAT, input);
+    this.addJob(LINE_EVENT_QUEUES.PROCESS_AI_CHAT.name, input);
   }
 }

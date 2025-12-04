@@ -52,13 +52,18 @@ export class AmqpService implements OnModuleInit, OnModuleDestroy {
       });
 
       for (const queue of config.queues) {
-        const mainQueueName = `${exchangeName}.${queue}.main`;
-        const retryQueueName = `${exchangeName}.${queue}.retry`;
+        const mainQueueName = `${exchangeName}.${queue.name}.main`;
+        const retryQueueName = `${exchangeName}.${queue.name}.retry`;
+
+        const enableRetry = queue.config?.retry?.enable ?? true;
+        const messageTtl =
+          queue.config?.retry?.backOffMilliSeconds ??
+          myDayjs.duration({ minutes: 1 }).asMilliseconds();
 
         await this.channel.assertQueue(mainQueueName, {
           durable: true,
           deadLetterExchange: exchangeName,
-          deadLetterRoutingKey: retryQueueName,
+          deadLetterRoutingKey: enableRetry ? retryQueueName : undefined,
         });
 
         await this.channel.bindQueue(
@@ -67,19 +72,20 @@ export class AmqpService implements OnModuleInit, OnModuleDestroy {
           mainQueueName,
         );
 
-        const messageTtl = myDayjs.duration({ minutes: 1 }).asMilliseconds();
-        await this.channel.assertQueue(retryQueueName, {
-          durable: true,
-          messageTtl,
-          deadLetterExchange: exchangeName,
-          deadLetterRoutingKey: mainQueueName,
-        });
+        if (enableRetry) {
+          await this.channel.assertQueue(retryQueueName, {
+            durable: true,
+            messageTtl,
+            deadLetterExchange: exchangeName,
+            deadLetterRoutingKey: mainQueueName,
+          });
 
-        await this.channel.bindQueue(
-          retryQueueName,
-          exchangeName,
-          retryQueueName,
-        );
+          await this.channel.bindQueue(
+            retryQueueName,
+            exchangeName,
+            retryQueueName,
+          );
+        }
       }
     }
   }

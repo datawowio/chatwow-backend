@@ -45,7 +45,7 @@ export function createMqWorker(
       const handler = app.get(addNamePrefix(config.name));
 
       for (const queue of config.queues) {
-        const queueName = `${config.name}.${queue}.main`;
+        const queueName = `${config.name}.${queue.name}.main`;
 
         mqService.channel.consume(queueName, async (msg) => {
           const message = msg!;
@@ -73,7 +73,7 @@ export function createMqWorker(
           });
 
           try {
-            await handler.dispatch(queue, payload.data);
+            await handler.dispatch(queue.name, payload.data);
             await mqService.handleSuccess(message);
             task.markAsSuccess();
           } catch (err: any) {

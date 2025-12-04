@@ -31,12 +31,12 @@ export class LineEventAmqp extends BaseAmqpHandler {
     super();
   }
 
-  @QueueTask(LINE_EVENT_QUEUES.PROCESS_RAW)
+  @QueueTask(LINE_EVENT_QUEUES.PROCESS_RAW.name)
   async processRaw(data: LineProcessRawJobData) {
     return this.lineProcessRawCommand.exec(data);
   }
 
-  @QueueTask(LINE_EVENT_QUEUES.PROCESS_VERIFICATION)
+  @QueueTask(LINE_EVENT_QUEUES.PROCESS_VERIFICATION.name)
   async processVerification(
     input: OmitTaskMeta<LineProcessVerificationJobInput>,
   ) {
@@ -46,7 +46,7 @@ export class LineEventAmqp extends BaseAmqpHandler {
     });
   }
 
-  @QueueTask(LINE_EVENT_QUEUES.PROCESS_SELECTION_MENU)
+  @QueueTask(LINE_EVENT_QUEUES.PROCESS_SELECTION_MENU.name)
   async processSelectionMenu(
     input: OmitTaskMeta<LineProcessSelectionMenuJobInput>,
   ) {
@@ -56,7 +56,7 @@ export class LineEventAmqp extends BaseAmqpHandler {
     });
   }
 
-  @QueueTask(LINE_EVENT_QUEUES.SHOW_SELECTION_MENU)
+  @QueueTask(LINE_EVENT_QUEUES.SHOW_SELECTION_MENU.name)
   async showSelectionMenu(input: OmitTaskMeta<LineShowSelectionMenuJobInput>) {
     return this.lineShowSelectionMenuCommand.exec({
       ...input,
@@ -64,7 +64,7 @@ export class LineEventAmqp extends BaseAmqpHandler {
     });
   }
 
-  @QueueTask(LINE_EVENT_QUEUES.PROCESS_AI_CHAT)
+  @QueueTask(LINE_EVENT_QUEUES.PROCESS_AI_CHAT.name)
   async processAiChat(input: OmitTaskMeta<LineProcessAiChatJobInput>) {
     return this.lineProcessAiChatCommand.exec({
       lineBot: lineBotFromJsonWithState(input.lineBot),

@@ -18,7 +18,7 @@ export class DomainEventQueue extends BaseAmqpExchange {
   jobSendVerification(user: User) {
     const input: SendVerificationJobInput = wrapJobMeta(userToJsonState(user));
 
-    this.addJob(DOMAIN_EVENT_QUEUES.SEND_VERIFICATION, input);
+    this.addJob(DOMAIN_EVENT_QUEUES.SEND_VERIFICATION.name, input);
   }
 
   jobResetPassword(data: ForgotPasswordJobData) {
@@ -31,6 +31,6 @@ export class DomainEventQueue extends BaseAmqpExchange {
       action: data.action,
     });
 
-    this.addJob(DOMAIN_EVENT_QUEUES.FORGOT_PASSWORD, jobData);
+    this.addJob(DOMAIN_EVENT_QUEUES.FORGOT_PASSWORD.name, jobData);
   }
 }

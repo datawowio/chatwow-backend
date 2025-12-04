@@ -24,6 +24,17 @@ export class LineProcessAiChatCommand {
   async exec(body: LineProcessAiChatJobData) {
     const lineService = new LineService(body.lineBot);
 
+    try {
+      await this.process(lineService, body);
+    } catch {
+      await lineService.reply(
+        body.replyToken,
+        'ระบบขัดข้องโปรดลองใหม่อีกครั้ง',
+      );
+    }
+  }
+
+  async process(lineService: LineService, body: LineProcessAiChatJobData) {
     const entity = await this.find(body.lineSession.projectId);
     await this.aiApiService.chat({
       request: {

@@ -23,12 +23,12 @@ export class DomainEventAmqp extends BaseAmqpHandler {
     super();
   }
 
-  @QueueTask(DOMAIN_EVENT_QUEUES.SEND_VERIFICATION)
+  @QueueTask(DOMAIN_EVENT_QUEUES.SEND_VERIFICATION.name)
   async processSendVerification(data: OmitTaskMeta<SendVerificationJobInput>) {
     return this.senVerificationQueueCommand.exec(userFromJsonState(data));
   }
 
-  @QueueTask(DOMAIN_EVENT_QUEUES.FORGOT_PASSWORD)
+  @QueueTask(DOMAIN_EVENT_QUEUES.FORGOT_PASSWORD.name)
   async processForgotPassword(data: OmitTaskMeta<ForgotPasswordJobInput>) {
     const dispatchData: ForgotPasswordJobData = {
       user: userFromJsonState(data.user),
