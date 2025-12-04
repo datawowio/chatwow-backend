@@ -172,6 +172,11 @@ export interface StoredFiles {
   updated_at: Generated<string>;
 }
 
+export interface UserGroupManagers {
+  user_group_id: string;
+  user_id: string;
+}
+
 export interface UserGroupProjects {
   project_id: string;
   user_group_id: string;
@@ -236,6 +241,7 @@ export interface DB {
   projects: Projects;
   sessions: Sessions;
   stored_files: StoredFiles;
+  user_group_managers: UserGroupManagers;
   user_group_projects: UserGroupProjects;
   user_group_users: UserGroupUsers;
   user_groups: UserGroups;

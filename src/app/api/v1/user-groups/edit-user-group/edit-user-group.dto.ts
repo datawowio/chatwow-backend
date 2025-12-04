@@ -18,6 +18,7 @@ const zod = z.object({
     })
     .optional(),
   userIds: z.array(z.string().uuid()).optional(),
+  manageUserIds: z.array(z.string().uuid()).optional(),
   projectIds: z.array(z.string().uuid()).optional(),
 });
 
@@ -26,6 +27,13 @@ export class EditUserGroupDto extends zodDto(zod) {}
 // ================ Response ================
 
 class EditUserGroupResponseDataUserGroupRelationsUsers implements IDomainData {
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
+
+class EditUserGroupResponseDataUserGroupRelationsManageUsers
+  implements IDomainData
+{
   @ApiProperty({ type: () => UserResponse })
   attributes: UserResponse;
 }
@@ -43,6 +51,12 @@ class EditUserGroupResponseDataUserGroupRelations {
     isArray: true,
   })
   users?: EditUserGroupResponseDataUserGroupRelationsUsers[];
+
+  @ApiProperty({
+    type: () => EditUserGroupResponseDataUserGroupRelationsManageUsers,
+    isArray: true,
+  })
+  manageUsers?: EditUserGroupResponseDataUserGroupRelationsManageUsers[];
 
   @ApiProperty({
     type: () => EditUserGroupResponseDataUserGroupRelationsProjects,

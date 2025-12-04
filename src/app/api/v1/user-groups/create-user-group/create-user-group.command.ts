@@ -4,6 +4,7 @@ import {
   projectToResponse,
 } from '@domain/base/project/project.mapper';
 import { projectsTableFilter } from '@domain/base/project/project.util';
+import { UserGroupManagerService } from '@domain/base/user-group-manager/user-group-manager.service';
 import { UserGroupProjectService } from '@domain/base/user-group-project/user-group-project.service';
 import { UserGroupUserService } from '@domain/base/user-group-user/user-group-user.service';
 import { UserGroup } from '@domain/base/user-group/user-group.domain';
@@ -34,6 +35,7 @@ import {
 type Entity = {
   userGroup: UserGroup;
   users: User[];
+  manageUsers: User[];
   projects: Project[];
 };
 
@@ -45,6 +47,7 @@ export class CreateUserGroupCommand implements CommandInterface {
     private userGroupsService: UserGroupService,
     private userGroupUsersService: UserGroupUserService,
     private userGroupProjectsService: UserGroupProjectService,
+    private userGroupManagerService: UserGroupManagerService,
     private transactionService: TransactionService,
   ) {}
 
@@ -56,12 +59,13 @@ export class CreateUserGroupCommand implements CommandInterface {
       actorId: claims.userId,
       data: body.userGroup,
     });
-    const [users, projects] = await Promise.all([
+    const [users, manageUsers, projects] = await Promise.all([
       this.findUsers(body.userIds),
+      this.findUsers(body.manageUserIds, true),
       this.findProjects(body.projectIds),
     ]);
 
-    await this.save({ userGroup, users, projects });
+    await this.save({ userGroup, users, manageUsers, projects });
 
     return toHttpSuccess({
       data: {
@@ -69,6 +73,9 @@ export class CreateUserGroupCommand implements CommandInterface {
           attributes: userGroupToResponse(userGroup),
           relations: {
             users: users.map((user) => ({
+              attributes: userToResponse(user),
+            })),
+            manageUsers: manageUsers.map((user) => ({
               attributes: userToResponse(user),
             })),
             projects: projects.map((project) => ({
@@ -87,6 +94,10 @@ export class CreateUserGroupCommand implements CommandInterface {
         entity.userGroup.id,
         entity.users.map((u) => u.id),
       );
+      await this.userGroupManagerService.saveUserGroupRelations(
+        entity.userGroup.id,
+        entity.manageUsers.map((u) => u.id),
+      );
       await this.userGroupProjectsService.saveUserGroupRelations(
         entity.userGroup.id,
         entity.projects.map((p) => p.id),
@@ -94,7 +105,7 @@ export class CreateUserGroupCommand implements CommandInterface {
     });
   }
 
-  async findUsers(userIds?: string[]) {
+  async findUsers(userIds?: string[], managerOnly?: boolean) {
     if (!userIds?.length) {
       return [];
     }
@@ -102,6 +113,7 @@ export class CreateUserGroupCommand implements CommandInterface {
     const users = await this.db.read
       .selectFrom('users')
       .where('users.id', 'in', userIds)
+      .$if(!!managerOnly, (eb) => eb.where('role', '=', 'MANAGER'))
       .where(usersTableFilter)
       .selectAll()
       .execute();

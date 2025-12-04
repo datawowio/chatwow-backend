@@ -4,6 +4,7 @@ import {
   projectToResponse,
 } from '@domain/base/project/project.mapper';
 import { projectsTableFilter } from '@domain/base/project/project.util';
+import { UserGroupManagerService } from '@domain/base/user-group-manager/user-group-manager.service';
 import { UserGroupProjectService } from '@domain/base/user-group-project/user-group-project.service';
 import { UserGroupUserService } from '@domain/base/user-group-user/user-group-user.service';
 import { UserGroup } from '@domain/base/user-group/user-group.domain';
@@ -29,6 +30,7 @@ import { EditUserGroupDto, EditUserGroupResponse } from './edit-user-group.dto';
 type Entity = {
   userGroup: UserGroup;
   users?: User[];
+  manageUsers?: User[];
   projects?: Project[];
 };
 
@@ -39,6 +41,7 @@ export class EditUserGroupCommand implements CommandInterface {
 
     private userGroupsService: UserGroupService,
     private userGroupUsersService: UserGroupUserService,
+    private userGroupManagerService: UserGroupManagerService,
     private userGroupProjectsService: UserGroupProjectService,
     private transactionService: TransactionService,
   ) {}
@@ -60,6 +63,9 @@ export class EditUserGroupCommand implements CommandInterface {
     const entity: Entity = {
       userGroup,
       users: body.userIds ? await this.findUsers(body.userIds) : undefined,
+      manageUsers: body.manageUserIds
+        ? await this.findUsers(body.manageUserIds, true)
+        : undefined,
       projects: body.projectIds
         ? await this.findProjects(body.projectIds)
         : undefined,
@@ -77,6 +83,11 @@ export class EditUserGroupCommand implements CommandInterface {
             users:
               entity.users &&
               entity.users.map((user) => ({
+                attributes: userToResponse(user),
+              })),
+            manageUsers:
+              entity.manageUsers &&
+              entity.manageUsers.map((user) => ({
                 attributes: userToResponse(user),
               })),
             projects:
@@ -101,6 +112,13 @@ export class EditUserGroupCommand implements CommandInterface {
         );
       }
 
+      if (entity.manageUsers) {
+        await this.userGroupManagerService.saveUserGroupRelations(
+          entity.userGroup.id,
+          entity.manageUsers.map((u) => u.id),
+        );
+      }
+
       if (entity.projects) {
         await this.userGroupProjectsService.saveUserGroupRelations(
           entity.userGroup.id,
@@ -119,7 +137,7 @@ export class EditUserGroupCommand implements CommandInterface {
     return userGroup;
   }
 
-  async findUsers(userIds?: string[]) {
+  async findUsers(userIds?: string[], managerOnly?: boolean) {
     if (!userIds?.length) {
       return [];
     }
@@ -127,6 +145,7 @@ export class EditUserGroupCommand implements CommandInterface {
     const users = await this.db.read
       .selectFrom('users')
       .where('users.id', 'in', userIds)
+      .$if(!!managerOnly, (eb) => eb.where('role', '=', 'MANAGER'))
       .where(usersTableFilter)
       .selectAll()
       .execute();

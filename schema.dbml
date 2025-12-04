@@ -107,6 +107,15 @@ Table "user_group_users" {
   }
 }
 
+Table "user_group_managers" {
+  "user_id" uuid [not null]
+  "user_group_id" uuid [not null]
+
+  Indexes {
+    (user_id, user_group_id) [type: btree, name: "pk_user_group_managers"]
+  }
+}
+
 Table "projects" {
   "id" uuid [pk, not null]
   "project_name" text [not null]
@@ -305,6 +314,10 @@ Ref "projects_created_by_id_fkey":"users"."id" < "projects"."created_by_id" [del
 Ref "projects_updated_by_id_fkey":"users"."id" < "projects"."updated_by_id" [delete: set null]
 
 Ref "sessions_user_id_fkey":"users"."id" < "sessions"."user_id" [delete: cascade]
+
+Ref "user_group_managers_user_group_id_fkey":"user_groups"."id" < "user_group_managers"."user_group_id" [delete: cascade]
+
+Ref "user_group_managers_user_id_fkey":"users"."id" < "user_group_managers"."user_id" [delete: cascade]
 
 Ref "user_group_projects_project_id_fkey":"projects"."id" < "user_group_projects"."project_id" [delete: cascade]
 

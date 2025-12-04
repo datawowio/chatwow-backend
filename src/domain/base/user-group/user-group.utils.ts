@@ -16,13 +16,13 @@ export function addUserGroupActorFilter<T extends SelectAnyQB<'user_groups'>>(
 
   return q
     .leftJoin(
-      'user_group_users',
-      'user_group_users.user_group_id',
+      'user_group_managers',
+      'user_group_managers.user_group_id',
       'user_groups.id',
     )
     .where((eb) =>
       eb.or([
-        eb('user_group_users.user_id', '=', actor.userId),
+        eb('user_group_managers.user_id', '=', actor.userId),
         eb('user_groups.created_by_id', '=', actor.userId),
       ]),
     ) as T;

@@ -10,6 +10,7 @@ import { ProjectDocumentModule } from './base/project-document/project-document.
 import { ProjectModule } from './base/project/project.module';
 import { SessionModule } from './base/session/session.module';
 import { StoredFileModule } from './base/stored-file/stored-file.module';
+import { UserGroupManagerModule } from './base/user-group-manager/user-group-manager.module';
 import { UserGroupProjectModule } from './base/user-group-project/user-group-project.module';
 import { UserGroupUserModule } from './base/user-group-user/user-group-user.module';
 import { UserGroupModule } from './base/user-group/user-group.module';
@@ -40,6 +41,7 @@ export const DOMAIN_PROVIDER = [
   PasswordResetTokenModule,
   LineBotModule,
   MessageTaskModule,
+  UserGroupManagerModule,
 
   QueueModule,
   PgModule,

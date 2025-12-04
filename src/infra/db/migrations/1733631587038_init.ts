@@ -162,6 +162,20 @@ export async function up(db: Kysely<any>): Promise<void> {
     ])
     .execute();
 
+  await db.schema
+    .createTable('user_group_managers')
+    .addColumn('user_id', 'uuid', (col) =>
+      col.notNull().references('users.id').onDelete('cascade'),
+    )
+    .addColumn('user_group_id', 'uuid', (col) =>
+      col.notNull().references('user_groups.id').onDelete('cascade'),
+    )
+    .addPrimaryKeyConstraint('pk_user_group_managers', [
+      'user_id',
+      'user_group_id',
+    ])
+    .execute();
+
   //
   // PROJECTS
   //
