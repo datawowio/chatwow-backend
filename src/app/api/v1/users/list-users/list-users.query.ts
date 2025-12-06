@@ -3,6 +3,7 @@ import { projectPgToResponse } from '@domain/base/project/project.mapper';
 import { userGroupPgToResponse } from '@domain/base/user-group/user-group.mapper';
 import { userPgToResponse } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
+import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
 import { filterQbIds } from '@infra/db/db.util';
@@ -14,6 +15,7 @@ import { toHttpSuccess } from '@shared/http/http.mapper';
 import { usersV1InclusionQb } from '../users.v1.util';
 import { ListUsersDto, ListUsersResponse } from './list-users.dto';
 
+@Injectable()
 export class ListUsersQuery implements QueryInterface {
   constructor(
     private db: MainDb,
