@@ -2,20 +2,26 @@ import { newProjectChat } from '@domain/base/project-chat/project-chat.factory';
 import { ProjectChatService } from '@domain/base/project-chat/project-chat.service';
 import { newProjectDocument } from '@domain/base/project-document/project-document.factory';
 import { ProjectDocumentService } from '@domain/base/project-document/project-document.service';
-import { newProject } from '@domain/base/project/project.factory';
+import { mockProjects, newProject } from '@domain/base/project/project.factory';
 import { ProjectService } from '@domain/base/project/project.service';
+import { UserGroupManagerService } from '@domain/base/user-group-manager/user-group-manager.service';
 import { UserGroupProjectService } from '@domain/base/user-group-project/user-group-project.service';
 import { UserGroupUserService } from '@domain/base/user-group-user/user-group-user.service';
-import { newUserGroup } from '@domain/base/user-group/user-group.factory';
+import {
+  mockUserGroups,
+  newUserGroup,
+} from '@domain/base/user-group/user-group.factory';
 import { UserGroupService } from '@domain/base/user-group/user-group.service';
 import { UserManageProjectService } from '@domain/base/user-manage-project/user-manage-project.service';
 import { newUserVerification } from '@domain/base/user-verification/user-verification.factory';
 import { UserVerificationService } from '@domain/base/user-verification/user-verification.service';
-import { newUser } from '@domain/base/user/user.factory';
+import { mockUsers, newUser } from '@domain/base/user/user.factory';
 import { UserService } from '@domain/base/user/user.service';
 import { Command, CommandRunner } from 'nest-commander';
 
 import { TransactionService } from '@infra/db/transaction/transaction.service';
+
+import { getRandomIds } from '@shared/common/common.func';
 
 @Command({
   name: 'initials:seed',
@@ -33,6 +39,7 @@ export class InitialsCliSeed extends CommandRunner {
     private userGroupProjectService: UserGroupProjectService,
     private userManageProjectService: UserManageProjectService,
     private userVerificationService: UserVerificationService,
+    private userGroupManagerService: UserGroupManagerService,
   ) {
     super();
   }
@@ -130,5 +137,60 @@ export class InitialsCliSeed extends CommandRunner {
       projectDocumentA,
       projectDocumentB,
     ]);
+
+    await this.mockRandom(superAdmin.id);
+  }
+
+  async mockRandom(superAdminId: string, amountEach = 20) {
+    // temp mock
+    const sampleUsers = mockUsers(amountEach, {
+      createdById: superAdminId,
+    });
+    const sampleProjects = mockProjects(amountEach, {
+      createdById: superAdminId,
+    });
+    const sampleUserGroups = mockUserGroups(amountEach, {
+      createdById: superAdminId,
+    });
+
+    await this.userService.saveBulk(sampleUsers);
+    await this.projectService.saveBulk(sampleProjects);
+    await this.userGroupService.saveBulk(sampleUserGroups);
+
+    const relationAmount = Math.floor(amountEach / 4);
+    const process: Promise<any>[] = [];
+    sampleProjects.forEach(async (project) => {
+      const prom = this.userManageProjectService.saveProjectRelations(
+        project.id,
+        getRandomIds(relationAmount, sampleUsers),
+      );
+
+      process.push(prom);
+
+      const prom2 = this.userGroupProjectService.saveProjectRelations(
+        project.id,
+        getRandomIds(relationAmount, sampleUserGroups),
+      );
+
+      process.push(prom2);
+    });
+
+    sampleUserGroups.forEach((group) => {
+      const prom = this.userGroupUserService.saveUserGroupRelations(
+        group.id,
+        getRandomIds(relationAmount, sampleUsers),
+      );
+
+      process.push(prom);
+
+      const prom2 = this.userGroupManagerService.saveUserGroupRelations(
+        group.id,
+        getRandomIds(Math.floor(relationAmount / 2), sampleUsers),
+      );
+
+      process.push(prom2);
+    });
+
+    await Promise.all(process);
   }
 }

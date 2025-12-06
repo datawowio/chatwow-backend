@@ -1,6 +1,8 @@
+import { faker } from '@faker-js/faker';
+
 import { uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
-import { isDefined } from '@shared/common/common.validator';
+import { firstValueOr, valueOr } from '@shared/common/common.func';
 
 import { userGroupFromPlain } from './user-group.mapper';
 import type { UserGroupNewData, UserGroupPlain } from './user-group.type';
@@ -23,13 +25,13 @@ export function newUserGroups(data: UserGroupNewData[]) {
 
 export function mockUserGroup(data: Partial<UserGroupPlain>) {
   return userGroupFromPlain({
-    id: isDefined(data.id) ? data.id : uuidV7(),
-    groupName: isDefined(data.groupName) ? data.groupName : 'Test Group',
-    description: isDefined(data.description) ? data.description : '',
-    createdAt: isDefined(data.createdAt) ? data.createdAt : myDayjs().toDate(),
-    updatedAt: isDefined(data.updatedAt) ? data.updatedAt : myDayjs().toDate(),
-    createdById: isDefined(data.createdById) ? data.createdById : null,
-    updatedById: isDefined(data.updatedById) ? data.updatedById : null,
+    id: valueOr(data.id, uuidV7()),
+    groupName: valueOr(data.groupName, faker.company.name()),
+    description: valueOr(data.description, ''),
+    createdAt: valueOr(data.createdAt, myDayjs().toDate()),
+    updatedAt: valueOr(data.updatedAt, myDayjs().toDate()),
+    createdById: valueOr(data.createdById, null),
+    updatedById: firstValueOr([data.updatedById, data.createdById], null),
   });
 }
 

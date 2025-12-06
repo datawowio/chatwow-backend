@@ -19,9 +19,27 @@ export function isLocal(env: string) {
   return env === 'local';
 }
 
-export function getRandomId(objs: { id: number }[]) {
+export function getRandomId(objs: { id: string }[]) {
   const randomNum = faker.number.int(objs.length - 1);
   return objs[randomNum].id;
+}
+
+export function getRandomIds(amount: number, objs: { id: string }[]) {
+  if (amount > objs.length) {
+    throw new Error('Amount exceeds available objects');
+  }
+
+  if (amount === objs.length) {
+    return objs.map((o) => o.id);
+  }
+
+  const idSet = new Set<string>();
+  while (idSet.size < amount) {
+    const randomNum = faker.number.int({ min: 0, max: objs.length - 1 });
+    idSet.add(objs[randomNum].id);
+  }
+
+  return Array.from(idSet.values());
 }
 
 export function clone<T>(obj: Read<T>): T {
@@ -135,6 +153,10 @@ export function valueOr<T>(val: T | undefined, defaultVal: T) {
   }
 
   return val;
+}
+export function firstValueOr<T>(vals: Array<T | undefined>, defaultVal: T): T {
+  for (const v of vals) if (v !== undefined) return v;
+  return defaultVal;
 }
 
 export function orUndefined<T, V>(

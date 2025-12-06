@@ -1,4 +1,7 @@
+import { faker } from '@faker-js/faker';
+
 import { uuidV7 } from '@shared/common/common.crypto';
+import { firstValueOr, valueOr } from '@shared/common/common.func';
 import { isDefined } from '@shared/common/common.validator';
 
 import { Project } from './project.domain';
@@ -26,24 +29,19 @@ export function newProjects(data: ProjectNewData[]): Project[] {
 
 export function mockProject(data: Partial<ProjectPlain>): Project {
   return projectFromPlain({
-    id: isDefined(data.id) ? data.id : uuidV7(),
-    createdAt: isDefined(data.createdAt) ? data.createdAt : new Date(),
-    updatedAt: isDefined(data.updatedAt) ? data.updatedAt : new Date(),
-    projectName: isDefined(data.projectName)
-      ? data.projectName
-      : 'Test Project',
-    projectDescription: isDefined(data.projectDescription)
-      ? data.projectDescription
-      : '',
-    projectGuidelineMd: isDefined(data.projectGuidelineMd)
-      ? data.projectGuidelineMd
-      : '',
-    projectStatus: isDefined(data.projectStatus)
-      ? data.projectStatus
-      : 'ACTIVE',
-    aiSummaryMd: isDefined(data.aiSummaryMd) ? data.aiSummaryMd : '',
-    createdById: isDefined(data.createdById) ? data.createdById : null,
-    updatedById: isDefined(data.updatedById) ? data.updatedById : null,
+    id: valueOr(data.id, uuidV7()),
+    createdAt: valueOr(data.createdAt, new Date()),
+    updatedAt: valueOr(data.updatedAt, new Date()),
+    projectName: valueOr(data.projectName, faker.commerce.productName()),
+    projectDescription: valueOr(
+      data.projectDescription,
+      faker.commerce.productDescription(),
+    ),
+    projectGuidelineMd: valueOr(data.projectGuidelineMd, ''),
+    projectStatus: valueOr(data.projectStatus, 'ACTIVE'),
+    aiSummaryMd: valueOr(data.aiSummaryMd, ''),
+    createdById: valueOr(data.createdById, null),
+    updatedById: firstValueOr([data.updatedById, data.createdById], null),
   });
 }
 
