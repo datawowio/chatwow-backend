@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import { render } from '@react-email/render';
 import * as path from 'path';
 import type React from 'react';
@@ -19,27 +18,29 @@ export function isLocal(env: string) {
   return env === 'local';
 }
 
+function randomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 export function getRandomId(objs: { id: string }[]) {
-  const randomNum = faker.number.int(objs.length - 1);
+  const randomNum = randomInt(0, objs.length - 1);
   return objs[randomNum].id;
 }
 
 export function getRandomIds(amount: number, objs: { id: string }[]) {
   if (amount > objs.length) {
-    throw new Error('Amount exceeds available objects');
+    throw new Error('amount cannot exceed number of available objects');
   }
 
-  if (amount === objs.length) {
-    return objs.map((o) => o.id);
+  const copy = [...objs];
+
+  // Fisher–Yates shuffle
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = randomInt(0, i);
+    [copy[i], copy[j]] = [copy[j], copy[i]];
   }
 
-  const idSet = new Set<string>();
-  while (idSet.size < amount) {
-    const randomNum = faker.number.int({ min: 0, max: objs.length - 1 });
-    idSet.add(objs[randomNum].id);
-  }
-
-  return Array.from(idSet.values());
+  return copy.slice(0, amount).map((o) => o.id);
 }
 
 export function clone<T>(obj: Read<T>): T {
