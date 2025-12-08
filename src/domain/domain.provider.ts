@@ -18,6 +18,7 @@ import { UserManageProjectModule } from './base/user-manage-project/user-manage-
 import { UserVerificationModule } from './base/user-verification/user-verification.module';
 import { UserModule } from './base/user/user.module';
 import { AiApiModule } from './logic/ai-api/api-api.module';
+import { AiFileModule } from './logic/ai-file/ai-file.module';
 import { PgModule } from './logic/pg/pg.module';
 import { QueueModule } from './queue/queue.module';
 
@@ -46,4 +47,5 @@ export const DOMAIN_PROVIDER = [
   QueueModule,
   PgModule,
   AiApiModule,
+  AiFileModule,
 ];

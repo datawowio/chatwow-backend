@@ -1,4 +1,5 @@
 import {
+  CopyObjectCommand,
   CreateBucketCommand,
   DeleteObjectCommand,
   GetObjectCommand,
@@ -243,6 +244,27 @@ export class StorageService implements OnModuleInit {
     } catch (e: any) {
       this.loggerService.error(e);
       return [];
+    }
+  }
+
+  async copy(fromKey: string, toKey: string, opts?: StorageOptions) {
+    if (!this.enable) {
+      throw new ApiException(500, 'storageDisable');
+    }
+
+    const bucket = opts?.bucket || this.defaultBucket;
+
+    try {
+      await this.s3.send(
+        new CopyObjectCommand({
+          Bucket: bucket,
+          CopySource: `${bucket}/${fromKey}`,
+          Key: toKey,
+        }),
+      );
+    } catch (e: any) {
+      this.loggerService.error(e);
+      throw new ApiException(502, 'copyFail');
     }
   }
 

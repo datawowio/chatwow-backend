@@ -40,6 +40,10 @@ export const MQ_EXCHANGE = {
     name: 'line-event',
     queues: values(LINE_EVENT_QUEUES),
   },
+  AI_EVENT: {
+    name: 'ai-event',
+    queues: values(AI_EVENT_QUEUES),
+  },
 } as const satisfies Record<string, ExchangeConfig>;
 
 export type MQ_EXCHANGE = (typeof MQ_EXCHANGE)[keyof typeof MQ_EXCHANGE];
