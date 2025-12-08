@@ -4,7 +4,6 @@ import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
 import { STORED_FILE_REF_NAME } from './stored-file.constant';
-import { storedFileFromPlain } from './stored-file.mapper';
 import type {
   StoredFilePg,
   StoredFilePlain,
@@ -65,7 +64,7 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
       isPublic: isDefined(data.isPublic) ? data.isPublic : this.isPublic,
     };
 
-    return storedFileFromPlain(plain);
+    Object.assign(this, plain);
   }
 
   isFileChanged() {

@@ -5,6 +5,8 @@ import { Injectable } from '@nestjs/common';
 
 import { StorageService } from '@infra/global/storage/storage.service';
 
+import { streamToBuffer } from '@shared/common/common.buffer';
+
 import {
   getProjectDocumentRawFileKeyPath,
   getProjectDocumentSummaryKeyPath,
@@ -30,6 +32,18 @@ export class AiFileService {
 
     await this.storageService.putBuffer(buffer, keyPath);
   }
+
+  async getProjectSummary(project: Project): Promise<string | null> {
+    const keyPath = getProjectSummaryKeyPath(project.id);
+    const stream = await this.storageService.get(keyPath);
+    if (!stream) {
+      return null;
+    }
+
+    const buffer = await streamToBuffer(stream);
+    return buffer.toString('utf-8');
+  }
+
   async writeProjectUserDescription(project: Project) {
     const buffer = Buffer.from(project.projectDescription, 'utf-8');
     const keyPath = getProjectUserDescriptionKeyPath(project.id);
@@ -53,6 +67,23 @@ export class AiFileService {
 
     await this.storageService.putBuffer(buffer, keyPath);
   }
+
+  async getProjectDocumentSummary(
+    projectDocument: ProjectDocument,
+  ): Promise<string | null> {
+    const keyPath = getProjectDocumentSummaryKeyPath(
+      projectDocument.projectId,
+      projectDocument.id,
+    );
+    const stream = await this.storageService.get(keyPath);
+    if (!stream) {
+      return null;
+    }
+
+    const buffer = await streamToBuffer(stream);
+    return buffer.toString('utf-8');
+  }
+
   async writeProjectDocumentUserDescription(projectDocument: ProjectDocument) {
     const buffer = Buffer.from(projectDocument.documentDetails, 'utf-8');
     const keyPath = getProjectDocumentUserDescriptionKeyPath(

@@ -1,4 +1,4 @@
-import type { Projects } from '@infra/db/db';
+import type { ProjectStatus, Projects } from '@infra/db/db';
 import type { DBModel } from '@infra/db/db.common';
 
 import type {
@@ -21,7 +21,7 @@ export type ProjectNewData = {
     projectName: string;
     projectDescription?: string;
     projectGuidelineMd?: string;
-    projectStatus: 'ACTIVE' | 'INACTIVE';
+    projectStatus?: ProjectStatus;
     aiSummaryMd?: string;
   };
 };
@@ -32,7 +32,7 @@ export type ProjectUpdateData = {
     projectName?: string;
     projectDescription?: string;
     projectGuidelineMd?: string;
-    projectStatus?: 'ACTIVE' | 'INACTIVE';
+    projectStatus?: ProjectStatus;
     aiSummaryMd?: string;
   };
 };

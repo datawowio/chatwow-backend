@@ -17,6 +17,7 @@ Enum "chat_sender" {
 Enum "document_status" {
   "ACTIVE"
   "INACTIVE"
+  "PROCESSING"
 }
 
 Enum "line_session_status" {
@@ -34,6 +35,7 @@ Enum "message_status" {
 Enum "project_status" {
   "ACTIVE"
   "INACTIVE"
+  "PROCESSING"
 }
 
 Enum "user_role" {

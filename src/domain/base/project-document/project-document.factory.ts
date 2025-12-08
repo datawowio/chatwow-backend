@@ -2,6 +2,7 @@ import type { SetRequired } from 'type-fest';
 
 import { uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
+import { valueOr } from '@shared/common/common.func';
 import { isDefined } from '@shared/common/common.validator';
 
 import { ProjectDocument } from './project-document.domain';
@@ -23,7 +24,7 @@ export function newProjectDocument({
     projectId: data.projectId,
     updatedAt: myDayjs().toDate(),
     documentDetails: data.documentDetails || '',
-    documentStatus: data.documentStatus || 'ACTIVE',
+    documentStatus: valueOr(data.documentStatus, 'PROCESSING'),
     aiSummaryMd: data.aiSummaryMd || '',
   });
 }

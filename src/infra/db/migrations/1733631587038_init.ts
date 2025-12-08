@@ -23,12 +23,12 @@ export async function up(db: Kysely<any>): Promise<void> {
 
   await db.schema
     .createType('project_status')
-    .asEnum(['ACTIVE', 'INACTIVE'])
+    .asEnum(['ACTIVE', 'INACTIVE', 'PROCESSING'])
     .execute();
 
   await db.schema
     .createType('document_status')
-    .asEnum(['ACTIVE', 'INACTIVE'])
+    .asEnum(['ACTIVE', 'INACTIVE', 'PROCESSING'])
     .execute();
 
   await db.schema

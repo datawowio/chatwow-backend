@@ -49,7 +49,7 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
       projectId: isDefined(data.projectId) ? data.projectId : this.projectId,
     };
 
-    return projectDocumentFromPlain(plain);
+    Object.assign(this, plain);
   }
 
   clone() {

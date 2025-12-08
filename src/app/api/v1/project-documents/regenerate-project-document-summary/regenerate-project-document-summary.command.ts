@@ -6,13 +6,16 @@ import { Injectable } from '@nestjs/common';
 
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
+import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
 import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { RegenerateProjectDocumentSummaryResponse } from './regenerate-project-document-summary.dto';
 
 @Injectable()
-export class RegenerateProjectDocumentSummaryCommand {
+export class RegenerateProjectDocumentSummaryCommand
+  implements CommandInterface
+{
   constructor(
     private projectDocumentService: ProjectDocumentService,
     private aiEventQueue: AiEventQueue,
@@ -23,7 +26,13 @@ export class RegenerateProjectDocumentSummaryCommand {
     id: string,
   ): Promise<RegenerateProjectDocumentSummaryResponse> {
     const projectDocument = await this.find(claims, id);
-    this.aiEventQueue.jobProjectDocumentMdGenerate(projectDocument);
+    projectDocument.edit({
+      data: {
+        documentStatus: 'PROCESSING',
+      },
+    });
+
+    await this.save(projectDocument);
 
     return toHttpSuccess({
       data: {
@@ -45,5 +54,10 @@ export class RegenerateProjectDocumentSummaryCommand {
     }
 
     return projectDocument;
+  }
+
+  async save(projectDocument: ProjectDocument) {
+    await this.projectDocumentService.save(projectDocument);
+    this.aiEventQueue.jobProjectDocumentMdGenerate(projectDocument);
   }
 }

@@ -5,4 +5,5 @@ import type { UnionArray } from '@shared/common/common.type';
 export const PROJECT_DOCUMENT_STATUS: UnionArray<DocumentStatus> = [
   'ACTIVE',
   'INACTIVE',
+  'PROCESSING',
 ];

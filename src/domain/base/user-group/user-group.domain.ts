@@ -2,7 +2,6 @@ import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { userGroupFromPlain } from './user-group.mapper';
 import type {
   UserGroupPg,
   UserGroupPlain,
@@ -36,6 +35,6 @@ export class UserGroup extends DomainEntity<UserGroupPg> {
         : this.description,
     };
 
-    return userGroupFromPlain(plain);
+    Object.assign(this, plain);
   }
 }

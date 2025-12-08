@@ -1,7 +1,6 @@
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { userVerificationFromPlain } from './user-verification.mapper';
 import type {
   UserVerificationPg,
   UserVerificationPlain,
@@ -33,6 +32,6 @@ export class UserVerification extends DomainEntity<UserVerificationPg> {
       expireAt: isDefined(data.expireAt) ? data.expireAt : this.expireAt,
     };
 
-    return userVerificationFromPlain(plain);
+    Object.assign(this, plain);
   }
 }

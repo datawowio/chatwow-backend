@@ -4,7 +4,6 @@ import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { lineSessionFromPlain } from './line-session.mapper';
 import type {
   LineSessionPg,
   LineSessionPlain,
@@ -43,6 +42,6 @@ export class LineSession extends DomainEntity<LineSessionPg> {
         : this.latestChatLogId,
     };
 
-    return lineSessionFromPlain(plain);
+    Object.assign(this, plain);
   }
 }

@@ -1,7 +1,6 @@
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { passwordResetTokenFromPlain } from './password-reset-token.mapper';
 import type {
   PasswordResetTokenPg,
   PasswordResetTokenPlain,
@@ -31,6 +30,6 @@ export class PasswordResetToken extends DomainEntity<PasswordResetTokenPg> {
       revokeAt: isDefined(data.revokeAt) ? data.revokeAt : this.revokeAt,
     };
 
-    return passwordResetTokenFromPlain(plain);
+    Object.assign(this, plain);
   }
 }

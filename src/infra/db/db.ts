@@ -11,7 +11,7 @@ export type ActorType = "SYSTEM" | "USER";
 
 export type ChatSender = "BOT" | "USER";
 
-export type DocumentStatus = "ACTIVE" | "INACTIVE";
+export type DocumentStatus = "ACTIVE" | "INACTIVE" | "PROCESSING";
 
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
@@ -33,7 +33,7 @@ export type LineSessionStatus = "ACTIVE" | "INACTIVE";
 
 export type MessageStatus = "DEAD" | "FAIL" | "INVALID_PAYLOAD" | "SUCCESS";
 
-export type ProjectStatus = "ACTIVE" | "INACTIVE";
+export type ProjectStatus = "ACTIVE" | "INACTIVE" | "PROCESSING";
 
 export type UserRole = "ADMIN" | "MANAGER" | "USER";
 

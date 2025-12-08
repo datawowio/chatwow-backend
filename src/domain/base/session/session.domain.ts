@@ -3,7 +3,6 @@ import { ReqInfo } from '@infra/global/req-storage/req-storage.common';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { sessionFromPlain } from './session.mapper';
 import type {
   SessionPg,
   SessionPlain,
@@ -37,6 +36,6 @@ export class Session extends DomainEntity<SessionPg> {
       info: isDefined(data.info) ? data.info : this.info,
     };
 
-    return sessionFromPlain(plain);
+    Object.assign(this, plain);
   }
 }

@@ -1,7 +1,6 @@
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { userGroupUserFromPlain } from './user-group-user.mapper';
 import type {
   UserGroupUserPg,
   UserGroupUserPlain,
@@ -25,6 +24,6 @@ export class UserGroupUser extends DomainEntity<UserGroupUserPg> {
         : this.userGroupId,
     };
 
-    return userGroupUserFromPlain(plain);
+    Object.assign(this, plain);
   }
 }

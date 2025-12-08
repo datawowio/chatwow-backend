@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { DocumentStatus } from '@infra/db/db';
+
 import { DATE_EXAMPLE } from '@shared/common/common.constant';
 
 export class ProjectDocumentResponse {
@@ -7,7 +9,7 @@ export class ProjectDocumentResponse {
   id: string;
 
   @ApiProperty({ example: 'ACTIVE' })
-  documentStatus: 'ACTIVE' | 'INACTIVE';
+  documentStatus: DocumentStatus;
 
   @ApiProperty({ example: DATE_EXAMPLE })
   createdAt: string;

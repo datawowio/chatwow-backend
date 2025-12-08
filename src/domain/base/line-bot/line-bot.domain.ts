@@ -2,7 +2,6 @@ import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { lineBotFromPlain } from './line-bot.mapper';
 import type {
   LineBotPg,
   LineBotPlain,
@@ -36,6 +35,6 @@ export class LineBot extends DomainEntity<LineBotPg> {
         : this.channelSecret,
     };
 
-    return lineBotFromPlain(plain);
+    Object.assign(this, plain);
   }
 }

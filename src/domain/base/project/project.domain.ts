@@ -53,7 +53,7 @@ export class Project extends DomainEntity<ProjectPg> {
         : this.projectStatus,
     };
 
-    return projectFromPlain(plain);
+    Object.assign(this, plain);
   }
 
   clone() {

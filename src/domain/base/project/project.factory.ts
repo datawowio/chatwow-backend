@@ -18,7 +18,7 @@ export function newProject({ actorId, data }: ProjectNewData): Project {
     projectName: data.projectName,
     projectDescription: data.projectDescription || '',
     projectGuidelineMd: data.projectGuidelineMd || '',
-    projectStatus: data.projectStatus,
+    projectStatus: valueOr(data.projectStatus, 'PROCESSING'),
     aiSummaryMd: isDefined(data.aiSummaryMd) ? data.aiSummaryMd : '',
   });
 }
