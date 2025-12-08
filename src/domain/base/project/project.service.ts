@@ -10,6 +10,7 @@ import { isDefined } from '@shared/common/common.validator';
 
 import { Project } from './project.domain';
 import { projectFromPgWithState, projectToPg } from './project.mapper';
+import { ProjectSaveOpts } from './project.type';
 import { addProjectActorFilter, projectsTableFilter } from './project.util';
 import { ProjectFilterOptions, ProjectQueryOptions } from './project.zod';
 
@@ -68,7 +69,7 @@ export class ProjectService {
     return project;
   }
 
-  async save(project: Project) {
+  async save(project: Project, opts?: ProjectSaveOpts) {
     this._validate(project);
 
     if (!project.isPersist) {
@@ -78,11 +79,15 @@ export class ProjectService {
     }
 
     project.setPgState(projectToPg);
-    this.domainEventQueue.jobSavedProject(project);
+
+    const disableEvent = opts?.disableEvent ?? false;
+    if (!disableEvent) {
+      this.domainEventQueue.jobSavedProject(project);
+    }
   }
 
-  async saveBulk(projects: Project[]) {
-    return Promise.all(projects.map((p) => this.save(p)));
+  async saveBulk(projects: Project[], opts?: ProjectSaveOpts) {
+    return Promise.all(projects.map((p) => this.save(p, opts)));
   }
 
   async delete(id: string) {

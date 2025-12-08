@@ -37,3 +37,7 @@ export type ProjectDocumentUpdateData = {
     documentDetails?: string;
   };
 };
+
+export type ProjectDocumentSaveOpts = {
+  disableEvent?: boolean;
+};

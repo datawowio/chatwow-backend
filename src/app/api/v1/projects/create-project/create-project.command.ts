@@ -133,7 +133,7 @@ export class CreateProjectCommand implements CommandInterface {
 
   async save(entity: Entity): Promise<void> {
     await this.transactionService.transaction(async () => {
-      await this.projectService.save(entity.project);
+      await this.projectService.save(entity.project, { disableEvent: true });
 
       if (entity.userGroups.length) {
         await this.userGroupProjectService.saveProjectRelations(
@@ -163,6 +163,9 @@ export class CreateProjectCommand implements CommandInterface {
             },
           ),
         );
+
+        // if there's file upload we save again to trigger event
+        await this.projectService.save(entity.project);
       }
     });
   }

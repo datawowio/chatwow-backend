@@ -36,3 +36,7 @@ export type ProjectUpdateData = {
     aiSummaryMd?: string;
   };
 };
+
+export type ProjectSaveOpts = {
+  disableEvent?: boolean;
+};

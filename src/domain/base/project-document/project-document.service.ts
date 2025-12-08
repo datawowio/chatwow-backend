@@ -13,6 +13,7 @@ import {
   projectDocumentFromPgWithState,
   projectDocumentToPg,
 } from './project-document.mapper';
+import { ProjectDocumentSaveOpts } from './project-document.type';
 import {
   addProjectDocumentActorFilter,
   projectDocumentsTableFilter,
@@ -79,7 +80,7 @@ export class ProjectDocumentService {
     return projectDocument;
   }
 
-  async save(projectDocument: ProjectDocument) {
+  async save(projectDocument: ProjectDocument, opts?: ProjectDocumentSaveOpts) {
     this._validate(projectDocument);
 
     if (!projectDocument.isPersist) {
@@ -89,11 +90,18 @@ export class ProjectDocumentService {
     }
 
     projectDocument.setPgState(projectDocumentToPg);
-    this.domainEventQueue.jobSavedProjectDocument(projectDocument);
+
+    const disableEvent = opts?.disableEvent ?? false;
+    if (!disableEvent) {
+      this.domainEventQueue.jobSavedProjectDocument(projectDocument);
+    }
   }
 
-  async saveBulk(projectDocuments: ProjectDocument[]) {
-    return Promise.all(projectDocuments.map((p) => this.save(p)));
+  async saveBulk(
+    projectDocuments: ProjectDocument[],
+    opts?: ProjectDocumentSaveOpts,
+  ) {
+    return Promise.all(projectDocuments.map((p) => this.save(p, opts)));
   }
 
   async delete(id: string) {

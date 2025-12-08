@@ -36,6 +36,8 @@ import {
   ListProjectsResponse,
 } from './list-projects/list-projects.dto';
 import { ListProjectsQuery } from './list-projects/list-projects.query';
+import { RegenerateProjectSummaryCommand } from './regenerate-project-summary/regenerate-project-summary.command';
+import { RegenerateProjectSummaryResponse } from './regenerate-project-summary/regenerate-project-summary.dto';
 
 @Controller({ path: 'projects', version: '1' })
 export class ProjectsV1Controller {
@@ -45,6 +47,7 @@ export class ProjectsV1Controller {
     private createProjectCommand: CreateProjectCommand,
     private storedFileService: StoredFileService,
     private editProjectCommand: EditProjectCommand,
+    private regenerateProjectSummaryCommand: RegenerateProjectSummaryCommand,
   ) {}
 
   @Post()
@@ -56,18 +59,6 @@ export class ProjectsV1Controller {
     @Body() body: CreateProjectDto,
   ) {
     return this.createProjectCommand.exec(claims, body);
-  }
-
-  @Patch(':id')
-  @ApiResponse({
-    type: () => EditProjectResponse,
-  })
-  async editProject(
-    @UserClaims() claims: UserClaims,
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() body: EditProjectDto,
-  ) {
-    return this.editProjectCommand.exec(claims, id, body);
   }
 
   @Get()
@@ -92,6 +83,18 @@ export class ProjectsV1Controller {
     });
   }
 
+  @Patch(':id')
+  @ApiResponse({
+    type: () => EditProjectResponse,
+  })
+  async editProject(
+    @UserClaims() claims: UserClaims,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: EditProjectDto,
+  ) {
+    return this.editProjectCommand.exec(claims, id, body);
+  }
+
   @Get(':id')
   @ApiResponse({
     type: () => GetProjectResponse,
@@ -102,5 +105,16 @@ export class ProjectsV1Controller {
     @Query() query: GetProjectDto,
   ) {
     return this.getProjectsQuery.exec(claims, id, query);
+  }
+
+  @Post(':id/regenerate')
+  @ApiResponse({
+    type: () => RegenerateProjectSummaryResponse,
+  })
+  async regenerateSummary(
+    @UserClaims() claims: UserClaims,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.regenerateProjectSummaryCommand.exec(claims, id);
   }
 }
