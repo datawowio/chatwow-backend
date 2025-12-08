@@ -19,6 +19,10 @@ import {
 } from '@domain/base/user-group/user-group.mapper';
 import { UserGroupService } from '@domain/base/user-group/user-group.service';
 import { userGroupsTableFilter } from '@domain/base/user-group/user-group.utils';
+import { UserManageProjectService } from '@domain/base/user-manage-project/user-manage-project.service';
+import { User } from '@domain/base/user/user.domain';
+import { userToResponse } from '@domain/base/user/user.mapper';
+import { UserService } from '@domain/base/user/user.service';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
@@ -34,6 +38,7 @@ import { CreateProjectDto, CreateProjectResponse } from './create-project.dto';
 type Entity = {
   project: Project;
   userGroups: UserGroup[];
+  manageUsers: User[];
   projectDocumentsFiles: {
     storedFile: StoredFile;
     projectDocument: ProjectDocument;
@@ -48,6 +53,8 @@ export class CreateProjectCommand implements CommandInterface {
     private projectService: ProjectService,
     private storedFileService: StoredFileService,
     private userGroupService: UserGroupService,
+    private userService: UserService,
+    private userManageProjectService: UserManageProjectService,
     private projectDocumentService: ProjectDocumentService,
     private userGroupProjectService: UserGroupProjectService,
     private transactionService: TransactionService,
@@ -65,6 +72,7 @@ export class CreateProjectCommand implements CommandInterface {
       },
     });
     const userGroups = await this.getUserGroups(body.userGroupIds);
+    const manageUsers = await this.getMangeUsers(body.manageUserIds);
 
     const projectDocumentsFiles: Entity['projectDocumentsFiles'] = [];
 
@@ -95,6 +103,7 @@ export class CreateProjectCommand implements CommandInterface {
       project,
       userGroups,
       projectDocumentsFiles,
+      manageUsers,
     });
 
     return toHttpSuccess({
@@ -102,6 +111,9 @@ export class CreateProjectCommand implements CommandInterface {
         project: {
           attributes: projectToResponse(project),
           relations: {
+            manageUsers: manageUsers.map((u) => ({
+              attributes: userToResponse(u),
+            })),
             userGroups: userGroups.map((g) => ({
               attributes: userGroupToResponse(g),
             })),
@@ -123,20 +135,28 @@ export class CreateProjectCommand implements CommandInterface {
     await this.transactionService.transaction(async () => {
       await this.projectService.save(entity.project);
 
-      if (entity.userGroups.length > 0) {
-        await this.userGroupService.saveBulk(entity.userGroups);
+      if (entity.userGroups.length) {
         await this.userGroupProjectService.saveProjectRelations(
           entity.project.id,
           entity.userGroups.map((g) => g.id),
         );
       }
 
-      await this.projectDocumentService.saveBulk(
-        entity.projectDocumentsFiles.map((pdf) => pdf.projectDocument),
-      );
-      await this.storedFileService.saveBulk(
-        entity.projectDocumentsFiles.map((pdf) => pdf.storedFile),
-      );
+      if (entity.manageUsers.length) {
+        await this.userManageProjectService.saveProjectRelations(
+          entity.project.id,
+          entity.manageUsers.map((u) => u.id),
+        );
+      }
+
+      if (entity.projectDocumentsFiles.length) {
+        await this.projectDocumentService.saveBulk(
+          entity.projectDocumentsFiles.map((pdf) => pdf.projectDocument),
+        );
+        await this.storedFileService.saveBulk(
+          entity.projectDocumentsFiles.map((pdf) => pdf.storedFile),
+        );
+      }
     });
   }
 
@@ -159,5 +179,18 @@ export class CreateProjectCommand implements CommandInterface {
     }
 
     return rawRes.map((r) => userGroupFromPgWithState(r));
+  }
+
+  async getMangeUsers(manageUserIds: string[] | undefined): Promise<User[]> {
+    if (!manageUserIds?.length) {
+      return [];
+    }
+
+    const manageUsers = await this.userService.findMany(manageUserIds);
+    if (manageUsers.length !== manageUserIds.length) {
+      throw new ApiException(400, 'usersNotFound');
+    }
+
+    return manageUsers;
   }
 }

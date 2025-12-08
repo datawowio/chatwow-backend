@@ -1,13 +1,22 @@
-import { DomainEventQueue } from '@domain/queue/domain-event/domain-event.queue';
+import { AiFileService } from '@domain/logic/ai-file/ai-file.service';
+import { AiEventQueue } from '@domain/queue/ai-event/ai-event.queue';
 import { Injectable } from '@nestjs/common';
 
 import { SavedProjectDocumentData } from './saved-project-document.type';
 
 @Injectable()
 export class SavedProjectDocumentQueueCommand {
-  constructor(private domainEventQueue: DomainEventQueue) {}
+  constructor(
+    private aiEventQueue: AiEventQueue,
+    private aiFileService: AiFileService,
+  ) {}
 
-  async exec(_data: SavedProjectDocumentData) {
-    //
+  async exec(data: SavedProjectDocumentData) {
+    await this.processAi(data);
+  }
+
+  async processAi(data: SavedProjectDocumentData) {
+    await this.aiFileService.writeProjectDocumentAiFile(data);
+    this.aiEventQueue.jobProjectDocumentMdGenerate(data);
   }
 }

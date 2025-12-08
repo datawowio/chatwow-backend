@@ -3,6 +3,7 @@ import { ProjectResponse } from '@domain/base/project/project.response';
 import { StoredFileResponse } from '@domain/base/stored-file/stored-file.response';
 import { storedFileZod } from '@domain/base/stored-file/stored-file.zod';
 import { UserGroupResponse } from '@domain/base/user-group/user-group.response';
+import { UserResponse } from '@domain/base/user/user.response';
 import { ApiProperty } from '@nestjs/swagger';
 import z from 'zod';
 
@@ -25,12 +26,18 @@ const zod = z.object({
       }),
     )
     .optional(),
+  manageUserIds: z.array(z.string().uuid()).optional(),
   userGroupIds: z.array(z.string()).optional(),
 });
 
 export class CreateProjectDto extends zodDto(zod) {}
 
 // ================ Response ================
+
+class CreateProjectProjectManageUser implements IDomainData {
+  @ApiProperty({ type: () => UserResponse })
+  attributes: UserResponse;
+}
 
 class CreateProjectProjectUserGroup implements IDomainData {
   @ApiProperty({ type: () => UserGroupResponse })
@@ -59,6 +66,9 @@ class CreateProjectProjectProjectDocument implements IDomainData {
 }
 
 class CreateProjectProjectRelations {
+  @ApiProperty({ type: () => CreateProjectProjectManageUser, isArray: true })
+  manageUsers?: CreateProjectProjectManageUser[];
+
   @ApiProperty({ type: () => CreateProjectProjectUserGroup, isArray: true })
   userGroups?: CreateProjectProjectUserGroup[];
 

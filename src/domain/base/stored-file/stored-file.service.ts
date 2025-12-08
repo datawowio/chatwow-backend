@@ -47,7 +47,11 @@ export class StoredFileService {
   }
 
   async saveBulk(storedFiles: StoredFile[]) {
-    await this._deleteRelated(unique(storedFiles.map((s) => s.id)));
+    if (!storedFiles.length) {
+      return;
+    }
+
+    await this._deleteRelated(unique(storedFiles.map((s) => s.ownerId)));
     return Promise.all(storedFiles.map((s) => this._create(s)));
   }
 

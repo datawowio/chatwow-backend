@@ -143,6 +143,28 @@ export class ProjectService {
           )
           .where('user_group_users.user_id', '=', filter!.userId!),
       )
+      .$if(!!filter?.userGroupIds?.length, (q) =>
+        q
+          .leftJoin(
+            'user_group_projects',
+            'user_group_projects.project_id',
+            'projects.id',
+          )
+          .where(
+            'user_group_projects.user_group_id',
+            'in',
+            filter!.userGroupIds!,
+          ),
+      )
+      .$if(!!filter?.manageUserIds?.length, (q) =>
+        q
+          .leftJoin(
+            'user_manage_projects',
+            'user_manage_projects.project_id',
+            'projects.id',
+          )
+          .where('user_manage_projects.user_id', 'in', filter!.manageUserIds!),
+      )
       .$if(isDefined(filter?.lineAccountId), (q) =>
         q
           .leftJoin(

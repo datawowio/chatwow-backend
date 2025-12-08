@@ -5,7 +5,6 @@ import { Injectable } from '@nestjs/common';
 
 import { StorageService } from '@infra/global/storage/storage.service';
 
-import { WriteProjectDocumentAiFileOpts } from './ai-file.type';
 import {
   getProjectDocumentRawFileKeyPath,
   getProjectDocumentSummaryKeyPath,
@@ -38,14 +37,10 @@ export class AiFileService {
     await this.storageService.putBuffer(buffer, keyPath);
   }
 
-  async writeProjectDocumentAiFile({
-    projectDocument,
-    storedFile,
-  }: WriteProjectDocumentAiFileOpts) {
+  async writeProjectDocumentAiFile(projectDocument: ProjectDocument) {
     await Promise.all([
       this.writeProjectDocumentSummary(projectDocument),
       this.writeProjectDocumentUserDescription(projectDocument),
-      this.writeProjectDocumentRawFile(projectDocument, storedFile),
     ]);
   }
 

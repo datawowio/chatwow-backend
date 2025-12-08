@@ -55,7 +55,7 @@ export class AmqpService implements OnModuleInit, OnModuleDestroy {
         const mainQueueName = `${exchangeName}.${queue.name}.main`;
         const retryQueueName = `${exchangeName}.${queue.name}.retry`;
 
-        const enableRetry = queue.config?.retry?.enable ?? true;
+        const disableRetry = queue.config?.retry?.disable ?? false;
         const messageTtl =
           queue.config?.retry?.backOffMilliSeconds ??
           myDayjs.duration({ minutes: 1 }).asMilliseconds();
@@ -63,7 +63,7 @@ export class AmqpService implements OnModuleInit, OnModuleDestroy {
         await this.channel.assertQueue(mainQueueName, {
           durable: true,
           deadLetterExchange: exchangeName,
-          deadLetterRoutingKey: enableRetry ? retryQueueName : undefined,
+          deadLetterRoutingKey: disableRetry ? undefined : retryQueueName,
         });
 
         await this.channel.bindQueue(
@@ -72,7 +72,7 @@ export class AmqpService implements OnModuleInit, OnModuleDestroy {
           mainQueueName,
         );
 
-        if (enableRetry) {
+        if (!disableRetry) {
           await this.channel.assertQueue(retryQueueName, {
             durable: true,
             messageTtl,

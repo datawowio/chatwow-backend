@@ -21,9 +21,15 @@ export const LINE_EVENT_QUEUES = {
 } as const;
 
 export const AI_EVENT_QUEUES = {
-  PROJECT_MD_GENERATE: { name: 'project-md-generate' },
+  PROJECT_MD_GENERATE: {
+    name: 'project-md-generate',
+    config: { disableConsumer: true },
+  },
   PROJECT_MD_SUCCESS: { name: 'project-md-success' },
-  PROJECT_DOCUMENT_MD_GENERATE: { name: 'project-document-md-generate' },
+  PROJECT_DOCUMENT_MD_GENERATE: {
+    name: 'project-document-md-generate',
+    config: { disableConsumer: true },
+  },
   PROJECT_DOCUMENT_MD_SUCCESS: { name: 'project-document-md-success' },
 } as const satisfies Record<string, QueueConfig>;
 
@@ -51,9 +57,10 @@ export type MQ_EXCHANGE = (typeof MQ_EXCHANGE)[keyof typeof MQ_EXCHANGE];
 export type QueueConfig = {
   name: string;
   config?: {
+    disableConsumer?: boolean;
     retry?: {
-      // default true
-      enable?: boolean;
+      // default false
+      disable?: boolean;
       backOffMilliSeconds?: number;
     };
   };

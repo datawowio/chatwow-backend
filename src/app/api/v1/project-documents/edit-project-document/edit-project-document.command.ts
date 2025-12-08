@@ -19,6 +19,7 @@ import { StoredFile } from '@domain/base/stored-file/stored-file.domain';
 import { newStoredFile } from '@domain/base/stored-file/stored-file.factory';
 import { storedFileToResponse } from '@domain/base/stored-file/stored-file.mapper';
 import { StoredFileService } from '@domain/base/stored-file/stored-file.service';
+import { AiFileService } from '@domain/logic/ai-file/ai-file.service';
 import { Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
@@ -49,6 +50,7 @@ export class EditProjectDocumentCommand implements CommandInterface {
     private projectDocumentService: ProjectDocumentService,
     private storedFileService: StoredFileService,
     private transactionService: TransactionService,
+    private aiFileService: AiFileService,
   ) {}
 
   async exec(
@@ -119,11 +121,15 @@ export class EditProjectDocumentCommand implements CommandInterface {
 
   async save(entity: Entity): Promise<void> {
     await this.transactionService.transaction(async () => {
-      await this.projectDocumentService.save(entity.projectDocument);
-
       if (entity.storedFile) {
         await this.storedFileService.save(entity.storedFile);
+        await this.aiFileService.writeProjectDocumentRawFile(
+          entity.projectDocument,
+          entity.storedFile,
+        );
       }
+
+      await this.projectDocumentService.save(entity.projectDocument);
     });
   }
 

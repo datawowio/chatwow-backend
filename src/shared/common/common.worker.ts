@@ -47,6 +47,11 @@ export function createMqWorker(
       for (const queue of config.queues) {
         const queueName = `${config.name}.${queue.name}.main`;
 
+        const isDisableConsumer = queue.config?.disableConsumer ?? false;
+        if (isDisableConsumer) {
+          continue;
+        }
+
         mqService.channel.consume(queueName, async (msg) => {
           const message = msg!;
 

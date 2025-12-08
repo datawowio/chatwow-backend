@@ -138,7 +138,7 @@ export class InitialsCliSeed extends CommandRunner {
       projectDocumentB,
     ]);
 
-    await this.mockRandom(superAdmin.id);
+    // await this.mockRandom(superAdmin.id);
   }
 
   async mockRandom(superAdminId: string, amountEach = 20) {
