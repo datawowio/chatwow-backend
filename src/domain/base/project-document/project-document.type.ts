@@ -33,6 +33,7 @@ export type ProjectDocumentUpdateData = {
   data: {
     documentStatus?: DocumentStatus;
     aiSummaryMd?: string;
+    isRequireRegenerate?: boolean;
     projectId?: string;
     documentDetails?: string;
   };

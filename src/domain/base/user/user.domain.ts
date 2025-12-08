@@ -39,7 +39,7 @@ export class User extends DomainEntity<UserPg> {
         ? data.lastSignedInAt
         : this.lastSignedInAt,
       password: isDefined(data.password)
-        ? data.password
+        ? !!data.password
           ? hashString(data.password)
           : null
         : this.password,

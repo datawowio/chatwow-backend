@@ -27,6 +27,7 @@ export class ProjectMdSuccessCommand implements CommandInterface {
       data: {
         aiSummaryMd,
         projectStatus: 'ACTIVE',
+        isRequireRegenerate: false,
       },
     });
 
