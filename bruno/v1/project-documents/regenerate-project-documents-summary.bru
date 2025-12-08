@@ -1,0 +1,25 @@
+meta {
+  name: regenerate-project-documents-summary
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{url}}/v1/project-documents/:id/regenerate
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 019afc98-89d7-75ee-a980-359086ce7805
+}
+
+body:json {
+  {
+    "projectDocument": {
+      "documentStatus": "ACTIVE",
+      "documentDetails": "string",
+      "aiSummaryMd": "string"
+    }
+  }
+}

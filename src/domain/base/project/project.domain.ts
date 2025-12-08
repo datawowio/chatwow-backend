@@ -3,7 +3,7 @@ import type { ProjectStatus } from '@infra/db/db';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { projectFromPlain } from './project.mapper';
+import { projectFromPlain, projectToPlain } from './project.mapper';
 import type {
   ProjectPg,
   ProjectPlain,
@@ -54,5 +54,9 @@ export class Project extends DomainEntity<ProjectPg> {
     };
 
     return projectFromPlain(plain);
+  }
+
+  clone() {
+    return projectFromPlain(projectToPlain(this));
   }
 }

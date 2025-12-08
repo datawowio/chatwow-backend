@@ -36,6 +36,8 @@ import {
   ListProjectDocumentsResponse,
 } from './list-project-documents/list-project-documents.dto';
 import { ListProjectDocumentsQuery } from './list-project-documents/list-project-documents.query';
+import { RegenerateProjectDocumentSummaryCommand } from './regenerate-project-document-summary/regenerate-project-document-summary.command';
+import { RegenerateProjectDocumentSummaryResponse } from './regenerate-project-document-summary/regenerate-project-document-summary.dto';
 
 @Controller({ path: 'project-documents', version: '1' })
 export class ProjectDocumentsV1Controller {
@@ -45,6 +47,7 @@ export class ProjectDocumentsV1Controller {
     private createProjectDocumentCommand: CreateProjectDocumentCommand,
     private storedFileService: StoredFileService,
     private editProjectDocumentCommand: EditProjectDocumentCommand,
+    private regenerateProjectDocumentCommand: RegenerateProjectDocumentSummaryCommand,
   ) {}
 
   @Post()
@@ -56,18 +59,6 @@ export class ProjectDocumentsV1Controller {
     @Body() body: CreateProjectDocumentDto,
   ) {
     return this.createProjectDocumentCommand.exec(claims, body);
-  }
-
-  @Patch(':id')
-  @ApiResponse({
-    type: () => EditProjectDocumentResponse,
-  })
-  async editProject(
-    @UserClaims() claims: UserClaims,
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() body: EditProjectDocumentDto,
-  ) {
-    return this.editProjectDocumentCommand.exec(claims, id, body);
   }
 
   @Get()
@@ -92,6 +83,18 @@ export class ProjectDocumentsV1Controller {
     });
   }
 
+  @Patch(':id')
+  @ApiResponse({
+    type: () => EditProjectDocumentResponse,
+  })
+  async editProject(
+    @UserClaims() claims: UserClaims,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: EditProjectDocumentDto,
+  ) {
+    return this.editProjectDocumentCommand.exec(claims, id, body);
+  }
+
   @Get(':id')
   @ApiResponse({
     type: () => GetProjectDocumentResponse,
@@ -102,5 +105,16 @@ export class ProjectDocumentsV1Controller {
     @Query() query: GetProjectDocumentDto,
   ) {
     return this.getProjectDocumentsQuery.exec(claims, id, query);
+  }
+
+  @Post(':id/regenerate')
+  @ApiResponse({
+    type: () => RegenerateProjectDocumentSummaryResponse,
+  })
+  async regenerateProjectDocument(
+    @UserClaims() claims: UserClaims,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.regenerateProjectDocumentCommand.exec(claims, id);
   }
 }

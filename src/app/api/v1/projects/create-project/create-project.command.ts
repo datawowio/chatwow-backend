@@ -23,6 +23,7 @@ import { User } from '@domain/base/user/user.domain';
 import { userToResponse } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { AiFileService } from '@domain/logic/ai-file/ai-file.service';
+import { AiEventQueue } from '@domain/queue/ai-event/ai-event.queue';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
@@ -58,6 +59,7 @@ export class CreateProjectCommand implements CommandInterface {
     private userGroupProjectService: UserGroupProjectService,
     private transactionService: TransactionService,
     private aiFileService: AiFileService,
+    private aiEventQueue: AiEventQueue,
   ) {}
 
   async exec(
@@ -133,7 +135,7 @@ export class CreateProjectCommand implements CommandInterface {
 
   async save(entity: Entity): Promise<void> {
     await this.transactionService.transaction(async () => {
-      await this.projectService.save(entity.project, { disableEvent: true });
+      await this.projectService.save(entity.project);
 
       if (entity.userGroups.length) {
         await this.userGroupProjectService.saveProjectRelations(
@@ -160,12 +162,13 @@ export class CreateProjectCommand implements CommandInterface {
               );
 
               await this.projectDocumentService.save(projectDocument);
+              this.aiEventQueue.jobProjectDocumentMdGenerate(projectDocument);
             },
           ),
         );
 
-        // if there's file upload we save again to trigger event
-        await this.projectService.save(entity.project);
+        // if have file generate summary also
+        this.aiEventQueue.jobProjectMdGenerate(entity.project);
       }
     });
   }

@@ -4,7 +4,10 @@ import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
-import { projectDocumentFromPlain } from './project-document.mapper';
+import {
+  projectDocumentFromPlain,
+  projectDocumentToPlain,
+} from './project-document.mapper';
 import type {
   ProjectDocumentPg,
   ProjectDocumentPlain,
@@ -47,5 +50,9 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
     };
 
     return projectDocumentFromPlain(plain);
+  }
+
+  clone() {
+    return projectDocumentFromPlain(projectDocumentToPlain(this));
   }
 }
