@@ -1,3 +1,4 @@
+import { DomainEventQueue } from '@domain/queue/domain-event/domain-event.queue';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
@@ -14,7 +15,10 @@ import { ProjectFilterOptions, ProjectQueryOptions } from './project.zod';
 
 @Injectable()
 export class ProjectService {
-  constructor(private db: MainDb) {}
+  constructor(
+    private db: MainDb,
+    private domainEventQueue: DomainEventQueue,
+  ) {}
 
   async getIds(opts?: ProjectQueryOptions) {
     const { sort, pagination, filter } = opts?.options || {};
@@ -74,6 +78,7 @@ export class ProjectService {
     }
 
     project.setPgState(projectToPg);
+    this.domainEventQueue.jobSavedProject(project);
   }
 
   async saveBulk(projects: Project[]) {

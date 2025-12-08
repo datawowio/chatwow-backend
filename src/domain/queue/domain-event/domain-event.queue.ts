@@ -1,8 +1,6 @@
 import { passwordResetTokenToJsonState } from '@domain/base/password-reset-token/password-reset-token.mapper';
-import {
-  projectDocumentToJson,
-  projectDocumentToJsonState,
-} from '@domain/base/project-document/project-document.mapper';
+import { projectDocumentToJsonState } from '@domain/base/project-document/project-document.mapper';
+import { projectToJsonState } from '@domain/base/project/project.mapper';
 import { User } from '@domain/base/user/user.domain';
 import { userToJsonState } from '@domain/base/user/user.mapper';
 import { Injectable } from '@nestjs/common';
@@ -16,6 +14,10 @@ import {
   SavedProjectDocumentData,
   SavedProjectDocumentJobInput,
 } from '@app/worker/domain-event/saved-project-document/saved-project-document.type';
+import {
+  SavedProjectData,
+  SavedProjectJobInput,
+} from '@app/worker/domain-event/saved-project/saved-project.type';
 import { SendVerificationJobInput } from '@app/worker/domain-event/send-verification/send-verification.type';
 import { DOMAIN_EVENT_QUEUES, MQ_EXCHANGE } from '@app/worker/worker.constant';
 
@@ -48,5 +50,11 @@ export class DomainEventQueue extends BaseAmqpExchange {
     );
 
     this.addJob(DOMAIN_EVENT_QUEUES.SAVED_PROJECT_DOCUMENT.name, input);
+  }
+
+  jobSavedProject(data: SavedProjectData) {
+    const input: SavedProjectJobInput = wrapJobMeta(projectToJsonState(data));
+
+    this.addJob(DOMAIN_EVENT_QUEUES.SAVED_PROJECT.name, input);
   }
 }

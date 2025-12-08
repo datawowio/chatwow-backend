@@ -4,6 +4,7 @@ export const DOMAIN_EVENT_QUEUES = {
   SEND_VERIFICATION: { name: 'send-verification' },
   FORGOT_PASSWORD: { name: 'forgot-password' },
   SAVED_PROJECT_DOCUMENT: { name: 'saved-project-document' },
+  SAVED_PROJECT: { name: 'saved-project' },
 } as const satisfies Record<string, QueueConfig>;
 
 export const CRON_QUEUES = {

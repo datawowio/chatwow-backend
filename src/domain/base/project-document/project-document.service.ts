@@ -1,3 +1,4 @@
+import { DomainEventQueue } from '@domain/queue/domain-event/domain-event.queue';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
@@ -23,7 +24,10 @@ import {
 
 @Injectable()
 export class ProjectDocumentService {
-  constructor(private db: MainDb) {}
+  constructor(
+    private db: MainDb,
+    private domainEventQueue: DomainEventQueue,
+  ) {}
 
   async getIds(opts?: ProjectDocumentQueryOptions) {
     const { sort, pagination, filter } = opts?.options || {};
@@ -85,6 +89,7 @@ export class ProjectDocumentService {
     }
 
     projectDocument.setPgState(projectDocumentToPg);
+    this.domainEventQueue.jobSavedProjectDocument(projectDocument);
   }
 
   async saveBulk(projectDocuments: ProjectDocument[]) {

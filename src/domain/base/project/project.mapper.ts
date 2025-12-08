@@ -3,7 +3,12 @@ import { toDate, toResponseDate } from '@shared/common/common.transformer';
 
 import { Project } from './project.domain';
 import type { ProjectResponse } from './project.response';
-import type { ProjectJson, ProjectPg, ProjectPlain } from './project.type';
+import type {
+  ProjectJson,
+  ProjectJsonWithState,
+  ProjectPg,
+  ProjectPlain,
+} from './project.type';
 
 export function projectFromPg(pg: ProjectPg): Project {
   const plain: ProjectPlain = {
@@ -60,6 +65,13 @@ export function projectFromJson(json: ProjectJson): Project {
   return new Project(plain);
 }
 
+export function projectFromJsonState(jsonState: ProjectJsonWithState): Project {
+  const domain = projectFromJson(jsonState.data);
+  domain.setPgState(jsonState.state);
+
+  return domain;
+}
+
 export function projectToPg(project: Project): ProjectPg {
   return {
     id: project.id,
@@ -102,6 +114,13 @@ export function projectToJson(project: Project): ProjectJson {
     projectGuidelineMd: project.projectGuidelineMd,
     projectStatus: project.projectStatus,
     aiSummaryMd: project.aiSummaryMd,
+  };
+}
+
+export function projectToJsonState(domain: Project): ProjectJsonWithState {
+  return {
+    state: domain.pgState,
+    data: projectToJson(domain),
   };
 }
 

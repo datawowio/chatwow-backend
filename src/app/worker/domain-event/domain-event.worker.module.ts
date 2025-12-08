@@ -6,6 +6,7 @@ import { MQ_EXCHANGE } from '../worker.constant';
 import { DomainEventAmqp } from './domain-event.amqp';
 import { ForgotPasswordQueueCommand } from './forgot-password/forgot-password.command';
 import { SavedProjectDocumentQueueCommand } from './saved-project-document/saved-project-document.command';
+import { SavedProjectQueueCommand } from './saved-project/saved-project.command';
 import { SendVerificationQueueCommand } from './send-verification/send-verification.command';
 
 @Module({
@@ -13,6 +14,7 @@ import { SendVerificationQueueCommand } from './send-verification/send-verificat
     SendVerificationQueueCommand,
     ForgotPasswordQueueCommand,
     SavedProjectDocumentQueueCommand,
+    SavedProjectQueueCommand,
 
     //
     createMqHandler(MQ_EXCHANGE.DOMAIN_EVENT.name, DomainEventAmqp),

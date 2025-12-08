@@ -1,5 +1,6 @@
 import { passwordResetTokenFromJsonState } from '@domain/base/password-reset-token/password-reset-token.mapper';
 import { projectDocumentFromJsonState } from '@domain/base/project-document/project-document.mapper';
+import { projectFromJsonState } from '@domain/base/project/project.mapper';
 import { userFromJsonState } from '@domain/base/user/user.mapper';
 import { Injectable } from '@nestjs/common';
 
@@ -17,6 +18,11 @@ import {
   SavedProjectDocumentData,
   SavedProjectDocumentJobInput,
 } from './saved-project-document/saved-project-document.type';
+import { SavedProjectQueueCommand } from './saved-project/saved-project.command';
+import {
+  SavedProjectData,
+  SavedProjectJobInput,
+} from './saved-project/saved-project.type';
 import { SendVerificationQueueCommand } from './send-verification/send-verification.command';
 import type { SendVerificationJobInput } from './send-verification/send-verification.type';
 
@@ -26,6 +32,7 @@ export class DomainEventAmqp extends BaseAmqpHandler {
     private sendVerificationQueueCommand: SendVerificationQueueCommand,
     private forgotPasswordQueueCommand: ForgotPasswordQueueCommand,
     private savedProjectDocumentQueueCommand: SavedProjectDocumentQueueCommand,
+    private savedProjectQueueCommand: SavedProjectQueueCommand,
   ) {
     super();
   }
@@ -54,5 +61,12 @@ export class DomainEventAmqp extends BaseAmqpHandler {
     const data: SavedProjectDocumentData = projectDocumentFromJsonState(input);
 
     return this.savedProjectDocumentQueueCommand.exec(data);
+  }
+
+  @QueueTask(DOMAIN_EVENT_QUEUES.SAVED_PROJECT.name)
+  async savedProject(input: OmitJobMeta<SavedProjectJobInput>) {
+    const data: SavedProjectData = projectFromJsonState(input);
+
+    return this.savedProjectQueueCommand.exec(data);
   }
 }
