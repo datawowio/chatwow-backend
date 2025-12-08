@@ -76,8 +76,8 @@ export function usersV1InclusionQb(
       q.select((eb) =>
         jsonObjectFrom(
           eb
-            .selectFrom('users')
-            .whereRef('users.id', '=', 'users.created_by_id')
+            .selectFrom('users as creator')
+            .whereRef('creator.id', '=', 'users.created_by_id')
             .where(usersTableFilter)
             .selectAll(),
         ).as('createdBy'),
@@ -87,8 +87,8 @@ export function usersV1InclusionQb(
       q.select((eb) =>
         jsonObjectFrom(
           eb
-            .selectFrom('users')
-            .whereRef('users.id', '=', 'users.updated_by_id')
+            .selectFrom('users as updator')
+            .whereRef('updator.id', '=', 'users.updated_by_id')
             .where(usersTableFilter)
             .selectAll(),
         ).as('updatedBy'),
