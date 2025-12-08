@@ -4,6 +4,7 @@ import { ProjectDocument } from './project-document.domain';
 import type { ProjectDocumentResponse } from './project-document.response';
 import type {
   ProjectDocumentJson,
+  ProjectDocumentJsonWithState,
   ProjectDocumentPg,
   ProjectDocumentPlain,
 } from './project-document.type';
@@ -65,6 +66,14 @@ export function projectDocumentFromJson(
 
   return new ProjectDocument(plain);
 }
+export function projectDocumentFromJsonState(
+  jsonState: ProjectDocumentJsonWithState,
+): ProjectDocument {
+  const domain = projectDocumentFromJson(jsonState.data);
+  domain.setPgState(jsonState.state);
+
+  return domain;
+}
 
 export function projectDocumentToPg(
   projectDocument: ProjectDocument,
@@ -111,6 +120,14 @@ export function projectDocumentToJson(
     documentStatus: projectDocument.documentStatus,
     aiSummaryMd: projectDocument.aiSummaryMd,
     documentDetails: projectDocument.documentDetails,
+  };
+}
+export function projectDocumentToJsonState(
+  domain: ProjectDocument,
+): ProjectDocumentJsonWithState {
+  return {
+    state: domain.pgState,
+    data: projectDocumentToJson(domain),
   };
 }
 

@@ -3,7 +3,7 @@ import { LineBotJsonState } from '@domain/base/line-bot/line-bot.type';
 import { LineSession } from '@domain/base/line-session/line-session.domain';
 import { LineSessionJsonState } from '@domain/base/line-session/line-session.type';
 
-import { TaskData } from '@app/worker/worker.type';
+import { JobInput } from '@app/worker/worker.type';
 
 export type LineProcessAiChatJobData = {
   lineBot: LineBot;
@@ -12,7 +12,7 @@ export type LineProcessAiChatJobData = {
   message: string;
 };
 
-export type LineProcessAiChatJobInput = TaskData<{
+export type LineProcessAiChatJobInput = JobInput<{
   lineBot: LineBotJsonState;
   lineSession: LineSessionJsonState;
   replyToken: string;

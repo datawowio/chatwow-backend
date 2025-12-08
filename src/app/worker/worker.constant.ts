@@ -3,7 +3,8 @@ import { values } from 'remeda';
 export const DOMAIN_EVENT_QUEUES = {
   SEND_VERIFICATION: { name: 'send-verification' },
   FORGOT_PASSWORD: { name: 'forgot-password' },
-} as const;
+  SAVED_PROJECT_DOCUMENT: { name: 'saved-project-document' },
+} as const satisfies Record<string, QueueConfig>;
 
 export const CRON_QUEUES = {
   SAMPLE: { name: 'sample' },

@@ -8,7 +8,7 @@ import {
 import { AmqpService } from '@infra/global/amqp/amqp.service';
 
 import { ExchangeConfig } from '@app/worker/worker.constant';
-import { TaskData } from '@app/worker/worker.type';
+import { JobInput } from '@app/worker/worker.type';
 
 function addNamePrefix(name: string) {
   return `worker-${name}`;
@@ -52,7 +52,7 @@ export function createMqWorker(
 
           const payload = JSON.parse(
             message.content.toString(),
-          ) as TaskData<any>;
+          ) as JobInput<any>;
 
           const parsedMeta = TaskMetaZod.safeParse(payload.meta);
           if (!parsedMeta.success) {

@@ -3,7 +3,7 @@ import {
   LineWebhookEvent,
 } from '@infra/global/line/line.type';
 
-import { TaskData } from '@app/worker/worker.type';
+import { JobInput } from '@app/worker/worker.type';
 
 import { LineBaseJobConfig } from '../line-event.type';
 
@@ -13,7 +13,7 @@ export type LineProcessRawJobData = {
   data: LineWebHookMessage;
 };
 
-export type LineProcessRawJobInput = TaskData<{
+export type LineProcessRawJobInput = JobInput<{
   lineBotId: string;
   config: LineBaseJobConfig;
   data: LineWebHookMessage;

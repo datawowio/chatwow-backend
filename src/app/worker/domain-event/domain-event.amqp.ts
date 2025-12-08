@@ -1,4 +1,5 @@
 import { passwordResetTokenFromJsonState } from '@domain/base/password-reset-token/password-reset-token.mapper';
+import { projectDocumentFromJsonState } from '@domain/base/project-document/project-document.mapper';
 import { userFromJsonState } from '@domain/base/user/user.mapper';
 import { Injectable } from '@nestjs/common';
 
@@ -7,29 +8,35 @@ import { BaseAmqpHandler } from '@infra/global/amqp/amqp.abstract';
 import { QueueTask } from '@shared/task/task.decorator';
 
 import { DOMAIN_EVENT_QUEUES } from '../worker.constant';
-import { OmitTaskMeta } from '../worker.type';
+import { OmitJobMeta } from '../worker.type';
 import { ForgotPasswordQueueCommand } from './forgot-password/forgot-password.command';
 import type { ForgotPasswordJobInput } from './forgot-password/forgot-password.type';
 import { ForgotPasswordJobData } from './forgot-password/forgot-password.type';
+import { SavedProjectDocumentQueueCommand } from './saved-project-document/saved-project-document.command';
+import {
+  SavedProjectDocumentData,
+  SavedProjectDocumentJobInput,
+} from './saved-project-document/saved-project-document.type';
 import { SendVerificationQueueCommand } from './send-verification/send-verification.command';
 import type { SendVerificationJobInput } from './send-verification/send-verification.type';
 
 @Injectable()
 export class DomainEventAmqp extends BaseAmqpHandler {
   constructor(
-    private senVerificationQueueCommand: SendVerificationQueueCommand,
+    private sendVerificationQueueCommand: SendVerificationQueueCommand,
     private forgotPasswordQueueCommand: ForgotPasswordQueueCommand,
+    private savedProjectDocumentQueueCommand: SavedProjectDocumentQueueCommand,
   ) {
     super();
   }
 
   @QueueTask(DOMAIN_EVENT_QUEUES.SEND_VERIFICATION.name)
-  async processSendVerification(data: OmitTaskMeta<SendVerificationJobInput>) {
-    return this.senVerificationQueueCommand.exec(userFromJsonState(data));
+  async processSendVerification(data: OmitJobMeta<SendVerificationJobInput>) {
+    return this.sendVerificationQueueCommand.exec(userFromJsonState(data));
   }
 
   @QueueTask(DOMAIN_EVENT_QUEUES.FORGOT_PASSWORD.name)
-  async processForgotPassword(data: OmitTaskMeta<ForgotPasswordJobInput>) {
+  async processForgotPassword(data: OmitJobMeta<ForgotPasswordJobInput>) {
     const dispatchData: ForgotPasswordJobData = {
       user: userFromJsonState(data.user),
       passwordResetToken: passwordResetTokenFromJsonState(
@@ -40,5 +47,12 @@ export class DomainEventAmqp extends BaseAmqpHandler {
     };
 
     return this.forgotPasswordQueueCommand.exec(dispatchData);
+  }
+
+  @QueueTask(DOMAIN_EVENT_QUEUES.SAVED_PROJECT_DOCUMENT.name)
+  async savedProjectDocument(input: OmitJobMeta<SavedProjectDocumentJobInput>) {
+    const data: SavedProjectDocumentData = projectDocumentFromJsonState(input);
+
+    return this.savedProjectDocumentQueueCommand.exec(data);
   }
 }

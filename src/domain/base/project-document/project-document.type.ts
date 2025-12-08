@@ -1,7 +1,11 @@
 import type { DocumentStatus, ProjectDocuments } from '@infra/db/db';
 import type { DBModel } from '@infra/db/db.common';
 
-import type { Plain, Serialized } from '@shared/common/common.type';
+import type {
+  Plain,
+  Serialized,
+  WithPgState,
+} from '@shared/common/common.type';
 
 import type { ProjectDocument } from './project-document.domain';
 
@@ -9,6 +13,10 @@ export type ProjectDocumentPg = DBModel<ProjectDocuments>;
 export type ProjectDocumentPlain = Plain<ProjectDocument>;
 
 export type ProjectDocumentJson = Serialized<ProjectDocumentPlain>;
+export type ProjectDocumentJsonWithState = WithPgState<
+  ProjectDocumentJson,
+  ProjectDocumentPg
+>;
 
 export type ProjectDocumentNewData = {
   actorId: string | null;

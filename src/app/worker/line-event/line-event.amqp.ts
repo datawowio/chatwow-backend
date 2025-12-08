@@ -7,7 +7,7 @@ import { BaseAmqpHandler } from '@infra/global/amqp/amqp.abstract';
 import { QueueTask } from '@shared/task/task.decorator';
 
 import { LINE_EVENT_QUEUES } from '../worker.constant';
-import { OmitTaskMeta } from '../worker.type';
+import { OmitJobMeta } from '../worker.type';
 import { LineProcessAiChatCommand } from './line-process-ai-chat/line-process-ai-chat.command';
 import { LineProcessAiChatJobInput } from './line-process-ai-chat/line-process-ai-chat.type';
 import { LineProcessRawCommand } from './line-process-raw/line-process-raw.command';
@@ -38,7 +38,7 @@ export class LineEventAmqp extends BaseAmqpHandler {
 
   @QueueTask(LINE_EVENT_QUEUES.PROCESS_VERIFICATION.name)
   async processVerification(
-    input: OmitTaskMeta<LineProcessVerificationJobInput>,
+    input: OmitJobMeta<LineProcessVerificationJobInput>,
   ) {
     return this.lineProcessVerificationCommand.exec({
       ...input,
@@ -48,7 +48,7 @@ export class LineEventAmqp extends BaseAmqpHandler {
 
   @QueueTask(LINE_EVENT_QUEUES.PROCESS_SELECTION_MENU.name)
   async processSelectionMenu(
-    input: OmitTaskMeta<LineProcessSelectionMenuJobInput>,
+    input: OmitJobMeta<LineProcessSelectionMenuJobInput>,
   ) {
     return this.lineProcessSelectionMenuCommand.exec({
       ...input,
@@ -57,7 +57,7 @@ export class LineEventAmqp extends BaseAmqpHandler {
   }
 
   @QueueTask(LINE_EVENT_QUEUES.SHOW_SELECTION_MENU.name)
-  async showSelectionMenu(input: OmitTaskMeta<LineShowSelectionMenuJobInput>) {
+  async showSelectionMenu(input: OmitJobMeta<LineShowSelectionMenuJobInput>) {
     return this.lineShowSelectionMenuCommand.exec({
       ...input,
       lineBot: lineBotFromJsonWithState(input.lineBot),
@@ -65,7 +65,7 @@ export class LineEventAmqp extends BaseAmqpHandler {
   }
 
   @QueueTask(LINE_EVENT_QUEUES.PROCESS_AI_CHAT.name)
-  async processAiChat(input: OmitTaskMeta<LineProcessAiChatJobInput>) {
+  async processAiChat(input: OmitJobMeta<LineProcessAiChatJobInput>) {
     return this.lineProcessAiChatCommand.exec({
       lineBot: lineBotFromJsonWithState(input.lineBot),
       lineSession: lineSessionFromJsonWithState(input.lineSession),

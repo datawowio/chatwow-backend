@@ -1,6 +1,6 @@
 import z from 'zod';
 
-import { TaskData } from '@app/worker/worker.type';
+import { JobInput } from '@app/worker/worker.type';
 
 import { uuidV7 } from '@shared/common/common.crypto';
 
@@ -14,7 +14,7 @@ export function newTaskMeta(): TaskMeta {
     id: uuidV7(),
   };
 }
-export function wrapJobMeta<T>(data: T): TaskData<T> {
+export function wrapJobMeta<T>(data: T): JobInput<T> {
   return {
     meta: newTaskMeta(),
     data,

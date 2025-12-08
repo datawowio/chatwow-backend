@@ -1,4 +1,8 @@
 import { passwordResetTokenToJsonState } from '@domain/base/password-reset-token/password-reset-token.mapper';
+import {
+  projectDocumentToJson,
+  projectDocumentToJsonState,
+} from '@domain/base/project-document/project-document.mapper';
 import { User } from '@domain/base/user/user.domain';
 import { userToJsonState } from '@domain/base/user/user.mapper';
 import { Injectable } from '@nestjs/common';
@@ -8,6 +12,10 @@ import { wrapJobMeta } from '@infra/global/amqp/amqp.common';
 
 import { ForgotPasswordJobData } from '@app/worker/domain-event/forgot-password/forgot-password.type';
 import { ForgotPasswordJobInput } from '@app/worker/domain-event/forgot-password/forgot-password.type';
+import {
+  SavedProjectDocumentData,
+  SavedProjectDocumentJobInput,
+} from '@app/worker/domain-event/saved-project-document/saved-project-document.type';
 import { SendVerificationJobInput } from '@app/worker/domain-event/send-verification/send-verification.type';
 import { DOMAIN_EVENT_QUEUES, MQ_EXCHANGE } from '@app/worker/worker.constant';
 
@@ -22,7 +30,7 @@ export class DomainEventQueue extends BaseAmqpExchange {
   }
 
   jobResetPassword(data: ForgotPasswordJobData) {
-    const jobData: ForgotPasswordJobInput = wrapJobMeta({
+    const input: ForgotPasswordJobInput = wrapJobMeta({
       user: userToJsonState(data.user),
       passwordResetToken: passwordResetTokenToJsonState(
         data.passwordResetToken,
@@ -31,6 +39,14 @@ export class DomainEventQueue extends BaseAmqpExchange {
       action: data.action,
     });
 
-    this.addJob(DOMAIN_EVENT_QUEUES.FORGOT_PASSWORD.name, jobData);
+    this.addJob(DOMAIN_EVENT_QUEUES.FORGOT_PASSWORD.name, input);
+  }
+
+  jobSavedProjectDocument(data: SavedProjectDocumentData) {
+    const input: SavedProjectDocumentJobInput = wrapJobMeta(
+      projectDocumentToJsonState(data),
+    );
+
+    this.addJob(DOMAIN_EVENT_QUEUES.SAVED_PROJECT_DOCUMENT.name, input);
   }
 }
