@@ -3,9 +3,10 @@ import z from 'zod';
 import { JobInput } from '@app/worker/worker.type';
 
 import { uuidV7 } from '@shared/common/common.crypto';
+import { isUuid } from '@shared/common/common.validator';
 
 export const TaskMetaZod = z.object({
-  id: z.string(),
+  id: z.string().refine(isUuid, { message: 'invalidUuid' }),
 });
 export type TaskMeta = z.infer<typeof TaskMetaZod>;
 

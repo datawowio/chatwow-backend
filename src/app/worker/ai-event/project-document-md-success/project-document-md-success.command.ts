@@ -45,6 +45,8 @@ export class ProjectDocumentMdSuccessCommand implements CommandInterface {
   }
 
   async save(projectDocument: ProjectDocument) {
-    await this.projectDocumentService.save(projectDocument);
+    await this.projectDocumentService.save(projectDocument, {
+      disableEvent: true,
+    });
   }
 }

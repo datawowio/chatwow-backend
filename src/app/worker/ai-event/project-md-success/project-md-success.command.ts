@@ -43,6 +43,6 @@ export class ProjectMdSuccessCommand implements CommandInterface {
   }
 
   async save(project: Project) {
-    await this.projectService.save(project);
+    await this.projectService.save(project, { disableEvent: true });
   }
 }
