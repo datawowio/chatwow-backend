@@ -17,12 +17,12 @@ import {
   userGroupFromPgWithState,
   userGroupToResponse,
 } from '@domain/base/user-group/user-group.mapper';
-import { UserGroupService } from '@domain/base/user-group/user-group.service';
 import { userGroupsTableFilter } from '@domain/base/user-group/user-group.utils';
 import { UserManageProjectService } from '@domain/base/user-manage-project/user-manage-project.service';
 import { User } from '@domain/base/user/user.domain';
 import { userToResponse } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
+import { AiFileService } from '@domain/logic/ai-file/ai-file.service';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
@@ -52,12 +52,12 @@ export class CreateProjectCommand implements CommandInterface {
 
     private projectService: ProjectService,
     private storedFileService: StoredFileService,
-    private userGroupService: UserGroupService,
     private userService: UserService,
     private userManageProjectService: UserManageProjectService,
     private projectDocumentService: ProjectDocumentService,
     private userGroupProjectService: UserGroupProjectService,
     private transactionService: TransactionService,
+    private aiFileService: AiFileService,
   ) {}
 
   async exec(
@@ -150,11 +150,18 @@ export class CreateProjectCommand implements CommandInterface {
       }
 
       if (entity.projectDocumentsFiles.length) {
-        await this.projectDocumentService.saveBulk(
-          entity.projectDocumentsFiles.map((pdf) => pdf.projectDocument),
-        );
-        await this.storedFileService.saveBulk(
-          entity.projectDocumentsFiles.map((pdf) => pdf.storedFile),
+        await Promise.all(
+          entity.projectDocumentsFiles.map(
+            async ({ projectDocument, storedFile }) => {
+              await this.storedFileService.save(storedFile);
+              await this.aiFileService.writeProjectDocumentRawFile(
+                projectDocument,
+                storedFile,
+              );
+
+              await this.projectDocumentService.save(projectDocument);
+            },
+          ),
         );
       }
     });

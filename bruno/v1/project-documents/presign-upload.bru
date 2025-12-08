@@ -5,7 +5,11 @@ meta {
 }
 
 get {
-  url: {{url}}/v1/project-documents/presign-upload
+  url: {{url}}/v1/project-documents/presign-upload?amount=1
   body: none
   auth: inherit
+}
+
+params:query {
+  amount: 1
 }
