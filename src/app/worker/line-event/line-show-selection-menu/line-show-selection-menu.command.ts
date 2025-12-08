@@ -1,6 +1,7 @@
 import { LineSessionService } from '@domain/base/line-session/line-session.service';
 import { projectFromPgWithState } from '@domain/base/project/project.mapper';
 import { ProjectService } from '@domain/base/project/project.service';
+import { LineEventQueue } from '@domain/queue/line-event/line-event.queue';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
@@ -15,6 +16,7 @@ export class LineShowSelectionMenuCommand {
 
     private lineSessionService: LineSessionService,
     private projectService: ProjectService,
+    private lineEventQueue: LineEventQueue,
   ) {}
 
   async exec({
@@ -22,6 +24,7 @@ export class LineShowSelectionMenuCommand {
     lineAccountId,
     replyToken,
     addMessages,
+    lineChatLogs,
   }: LineShowSelectionMenuJobData) {
     const lineService = new LineService(lineBot);
     const projects = await this.getUserProjects(lineAccountId);
@@ -30,6 +33,7 @@ export class LineShowSelectionMenuCommand {
     await this.lineSessionService.inactiveAll(lineAccountId, lineBot.id);
 
     await lineService.replyProjectSelection(replyToken, projects, addMessages);
+    this.lineEventQueue.jobProcessChatLog(lineChatLogs);
   }
 
   async getUserProjects(lineAccountId: string) {

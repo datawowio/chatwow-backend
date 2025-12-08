@@ -4,6 +4,7 @@ import { LineChatLog } from './line-chat-log.domain';
 import type { LineChatLogResponse } from './line-chat-log.response';
 import type {
   LineChatLogJson,
+  LineChatLogJsonWithState,
   LineChatLogPg,
   LineChatLogPlain,
 } from './line-chat-log.type';
@@ -13,6 +14,7 @@ export function lineChatLogFromPg(pg: LineChatLogPg): LineChatLog {
     id: pg.id,
     parentId: pg.parent_id,
     message: pg.message,
+    lineAccountId: pg.line_account_id,
     createdAt: toDate(pg.created_at),
     lineSessionId: pg.line_session_id,
     chatSender: pg.chat_sender,
@@ -31,6 +33,7 @@ export function lineChatLogFromPlain(plainData: LineChatLogPlain): LineChatLog {
     parentId: plainData.parentId,
     message: plainData.message,
     createdAt: toDate(plainData.createdAt),
+    lineAccountId: plainData.lineAccountId,
     lineSessionId: plainData.lineSessionId,
     chatSender: plainData.chatSender,
   };
@@ -43,6 +46,7 @@ export function lineChatLogFromJson(json: LineChatLogJson): LineChatLog {
     id: json.id,
     parentId: json.parentId,
     message: json.message,
+    lineAccountId: json.lineAccountId,
     createdAt: toDate(json.createdAt),
     lineSessionId: json.lineSessionId,
     chatSender: json.chatSender,
@@ -51,11 +55,21 @@ export function lineChatLogFromJson(json: LineChatLogJson): LineChatLog {
   return new LineChatLog(plain);
 }
 
+export function lineChatLogFromJsonWithState(
+  jsonState: LineChatLogJsonWithState,
+): LineChatLog {
+  const domain = lineChatLogFromJson(jsonState.data);
+  domain.setPgState(jsonState.state);
+
+  return domain;
+}
+
 export function lineChatLogToPg(domain: LineChatLog): LineChatLogPg {
   return {
     id: domain.id,
     parent_id: domain.parentId,
     chat_sender: domain.chatSender,
+    line_account_id: domain.lineAccountId,
     created_at: toISO(domain.createdAt),
     line_session_id: domain.lineSessionId,
     message: domain.message,
@@ -66,6 +80,7 @@ export function lineChatLogToPlain(domain: LineChatLog): LineChatLogPlain {
   return {
     id: domain.id,
     parentId: domain.parentId,
+    lineAccountId: domain.lineAccountId,
     message: domain.message,
     createdAt: domain.createdAt,
     lineSessionId: domain.lineSessionId,
@@ -79,8 +94,18 @@ export function lineChatLogToJson(domain: LineChatLog): LineChatLogJson {
     parentId: domain.parentId,
     message: domain.message,
     createdAt: toISO(domain.createdAt),
+    lineAccountId: domain.lineAccountId,
     lineSessionId: domain.lineSessionId,
     chatSender: domain.chatSender,
+  };
+}
+
+export function lineChatLogToJsonState(
+  domain: LineChatLog,
+): LineChatLogJsonWithState {
+  return {
+    state: domain.pgState,
+    data: lineChatLogToJson(domain),
   };
 }
 
@@ -91,7 +116,6 @@ export function lineChatLogToResponse(
     id: domain.id,
     message: domain.message,
     createdAt: toISO(domain.createdAt),
-    lineSessionId: domain.lineSessionId,
     chatSender: domain.chatSender,
   };
 }

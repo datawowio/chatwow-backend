@@ -1,4 +1,5 @@
 import { lineBotToJsonWithState } from '@domain/base/line-bot/line-bot.mapper';
+import { lineChatLogToJsonState } from '@domain/base/line-chat-log/line-chat-log.mapper';
 import { lineSessionToJsonWithState } from '@domain/base/line-session/line-session.mapper';
 import { Injectable } from '@nestjs/common';
 
@@ -9,6 +10,10 @@ import {
   LineProcessAiChatJobData,
   LineProcessAiChatJobInput,
 } from '@app/worker/line-event/line-process-ai-chat/line-process-ai-chat.type';
+import {
+  LineProcessChatLogJobData,
+  LineProcessChatLogJobInput,
+} from '@app/worker/line-event/line-process-chat-log/line-process-chat-log.type';
 import {
   LineProcessRawJobData,
   LineProcessRawJobInput,
@@ -45,6 +50,9 @@ export class LineEventQueue extends BaseAmqpExchange {
     const input: LineProcessVerificationJobInput = wrapJobMeta({
       ...domainData,
       lineBot: lineBotToJsonWithState(domainData.lineBot),
+      lineChatLogs: domainData.lineChatLogs.map((log) =>
+        lineChatLogToJsonState(log),
+      ),
     });
 
     this.addJob(LINE_EVENT_QUEUES.PROCESS_VERIFICATION.name, input);
@@ -54,6 +62,9 @@ export class LineEventQueue extends BaseAmqpExchange {
     const input: LineProcessSelectionMenuJobInput = wrapJobMeta({
       ...domainData,
       lineBot: lineBotToJsonWithState(domainData.lineBot),
+      lineChatLogs: domainData.lineChatLogs.map((log) =>
+        lineChatLogToJsonState(log),
+      ),
     });
 
     this.addJob(LINE_EVENT_QUEUES.PROCESS_SELECTION_MENU.name, input);
@@ -63,6 +74,9 @@ export class LineEventQueue extends BaseAmqpExchange {
     const input: LineShowSelectionMenuJobInput = wrapJobMeta({
       ...domainData,
       lineBot: lineBotToJsonWithState(domainData.lineBot),
+      lineChatLogs: domainData.lineChatLogs.map((log) =>
+        lineChatLogToJsonState(log),
+      ),
     });
 
     this.addJob(LINE_EVENT_QUEUES.SHOW_SELECTION_MENU.name, input);
@@ -74,8 +88,19 @@ export class LineEventQueue extends BaseAmqpExchange {
       lineSession: lineSessionToJsonWithState(domainData.lineSession),
       replyToken: domainData.replyToken,
       message: domainData.message,
+      lineChatLogs: domainData.lineChatLogs.map((log) =>
+        lineChatLogToJsonState(log),
+      ),
     });
 
     this.addJob(LINE_EVENT_QUEUES.PROCESS_AI_CHAT.name, input);
+  }
+
+  jobProcessChatLog(domainData: LineProcessChatLogJobData) {
+    const input: LineProcessChatLogJobInput = wrapJobMeta(
+      domainData.map((item) => lineChatLogToJsonState(item)),
+    );
+
+    this.addJob(LINE_EVENT_QUEUES.PROCESS_CHAT_LOG.name, input);
   }
 }

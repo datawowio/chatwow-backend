@@ -4,7 +4,7 @@ const AI_FILE_MAIN_FOLDER = 'ai_files';
 const AI_FILE_PROJECT_FOLDER = 'project_folder';
 const AI_FILE_CHAT_FOLDER = 'chat_folder';
 
-export function getChatSessionFolderPath(sessionId: string) {
+export function getChatFolderPath(sessionId: string) {
   return join(AI_FILE_MAIN_FOLDER, AI_FILE_CHAT_FOLDER, sessionId);
 }
 
@@ -56,4 +56,8 @@ export function getProjectDocumentRawFileKeyPath(
     getProjectDocumentFolderPath(projectId, projectDocumentId),
     `raw_file.${extension}`,
   );
+}
+
+export function getChatFileKeyPath(sessionId: string, index: number) {
+  return join(getChatFolderPath(sessionId), `chat_${index}.json`);
 }

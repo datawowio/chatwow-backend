@@ -394,9 +394,8 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('created_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
-    .addColumn('line_session_id', 'uuid', (col) =>
-      col.references('line_sessions.id').notNull().onDelete('cascade'),
-    )
+    .addColumn('line_account_id', 'text', (col) => col.notNull())
+    .addColumn('line_session_id', 'uuid', (col) => col)
     .addColumn('chat_sender', sql`chat_sender`, (col) => col.notNull())
     .addColumn('parent_id', 'uuid')
     .addColumn('message', 'text', (col) => col.notNull())

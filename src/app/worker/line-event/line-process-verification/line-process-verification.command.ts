@@ -1,6 +1,7 @@
 import { LineAccount } from '@domain/base/line-account/line-account.domain';
 import { newLineAccount } from '@domain/base/line-account/line-account.factory';
 import { LineAccountService } from '@domain/base/line-account/line-account.service';
+import { newLineChatLog } from '@domain/base/line-chat-log/line-chat-log.factory';
 import { UserVerification } from '@domain/base/user-verification/user-verification.domain';
 import { userVerificationFromPgWithState } from '@domain/base/user-verification/user-verification.mapper';
 import { UserVerificationService } from '@domain/base/user-verification/user-verification.service';
@@ -47,6 +48,7 @@ export class LineProcessVerificationCommand {
   async exec({
     lineBot,
     verificationCode,
+    lineChatLogs,
     lineAccountId,
     replyToken,
   }: LineProcessVerificationJobData) {
@@ -54,7 +56,17 @@ export class LineProcessVerificationCommand {
 
     const res = await this.findUserFromVerification(verificationCode);
     if (!res) {
-      await lineService.reply(replyToken, LINE_INVALID_VERIFICATION_REPLY);
+      const replyMessage = LINE_INVALID_VERIFICATION_REPLY;
+      lineChatLogs.push(
+        newLineChatLog({
+          chatSender: 'BOT',
+          lineAccountId,
+          message: replyMessage,
+        }),
+      );
+
+      await lineService.reply(replyToken, replyMessage);
+      this.lineEventQueue.jobProcessChatLog(lineChatLogs);
       return;
     }
 
@@ -77,11 +89,20 @@ export class LineProcessVerificationCommand {
       userVerification,
     });
 
+    lineChatLogs.push(
+      newLineChatLog({
+        chatSender: 'BOT',
+        lineAccountId,
+        message: LINE_SUCCESS_VERIFICATION_REPLY,
+      }),
+    );
+
     this.lineEventQueue.jobShowSelectionMenu({
       lineAccountId,
       lineBot,
       replyToken,
       addMessages: [LINE_SUCCESS_VERIFICATION_REPLY],
+      lineChatLogs,
     });
   }
 

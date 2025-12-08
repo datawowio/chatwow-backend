@@ -14,9 +14,6 @@ export class LineChatLogResponse {
   @ApiProperty({ example: DATE_EXAMPLE })
   createdAt: string;
 
-  @ApiProperty({ example: UUID_EXAMPLE })
-  lineSessionId: string;
-
   @ApiProperty({ example: 'USER' satisfies ChatSender })
   chatSender: ChatSender;
 }

@@ -11,7 +11,8 @@ export function newLineChatLog(data: LineChatLogNewData): LineChatLog {
     id: uuidV7(),
     createdAt: myDayjs().toDate(),
     chatSender: data.chatSender,
-    lineSessionId: data.lineSessionId,
+    lineSessionId: data.lineSessionId || null,
+    lineAccountId: data.lineAccountId,
     message: data.message,
     parentId: isDefined(data.parentId) ? data.parentId : null,
   });

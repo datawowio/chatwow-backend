@@ -18,6 +18,7 @@ export const LINE_EVENT_QUEUES = {
   SHOW_SELECTION_MENU: { name: 'show-selection-menu' },
   PROCESS_SELECTION_MENU: { name: 'process-selection-menu' },
   PROCESS_AI_CHAT: { name: 'process-ai-chat' },
+  PROCESS_CHAT_LOG: { name: 'process-chat-log' },
 } as const;
 
 export const AI_EVENT_QUEUES = {

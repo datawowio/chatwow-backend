@@ -68,7 +68,8 @@ export interface LineChatLogs {
   chat_sender: ChatSender;
   created_at: Generated<string>;
   id: string;
-  line_session_id: string;
+  line_account_id: string;
+  line_session_id: string | null;
   message: string;
   parent_id: string | null;
 }

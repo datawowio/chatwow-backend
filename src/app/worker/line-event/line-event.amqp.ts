@@ -1,4 +1,5 @@
 import { lineBotFromJsonWithState } from '@domain/base/line-bot/line-bot.mapper';
+import { lineChatLogFromJsonWithState } from '@domain/base/line-chat-log/line-chat-log.mapper';
 import { lineSessionFromJsonWithState } from '@domain/base/line-session/line-session.mapper';
 import { Injectable } from '@nestjs/common';
 
@@ -10,6 +11,8 @@ import { LINE_EVENT_QUEUES } from '../worker.constant';
 import { OmitJobMeta } from '../worker.type';
 import { LineProcessAiChatCommand } from './line-process-ai-chat/line-process-ai-chat.command';
 import { LineProcessAiChatJobInput } from './line-process-ai-chat/line-process-ai-chat.type';
+import { LineProcessChatLogCommand } from './line-process-chat-log/line-process-chat-log.command';
+import { LineProcessChatLogJobInput } from './line-process-chat-log/line-process-chat-log.type';
 import { LineProcessRawCommand } from './line-process-raw/line-process-raw.command';
 import { LineProcessRawJobData } from './line-process-raw/line-process-raw.type';
 import { LineProcessSelectionMenuCommand } from './line-process-selection-menu/line-process-selection-menu.command';
@@ -27,6 +30,7 @@ export class LineEventAmqp extends BaseAmqpHandler {
     private lineProcessSelectionMenuCommand: LineProcessSelectionMenuCommand,
     private lineShowSelectionMenuCommand: LineShowSelectionMenuCommand,
     private lineProcessAiChatCommand: LineProcessAiChatCommand,
+    private lineProcessChatLogCommand: LineProcessChatLogCommand,
   ) {
     super();
   }
@@ -43,6 +47,9 @@ export class LineEventAmqp extends BaseAmqpHandler {
     return this.lineProcessVerificationCommand.exec({
       ...input,
       lineBot: lineBotFromJsonWithState(input.lineBot),
+      lineChatLogs: input.lineChatLogs.map((log) =>
+        lineChatLogFromJsonWithState(log),
+      ),
     });
   }
 
@@ -53,6 +60,9 @@ export class LineEventAmqp extends BaseAmqpHandler {
     return this.lineProcessSelectionMenuCommand.exec({
       ...input,
       lineBot: lineBotFromJsonWithState(input.lineBot),
+      lineChatLogs: input.lineChatLogs.map((log) =>
+        lineChatLogFromJsonWithState(log),
+      ),
     });
   }
 
@@ -61,6 +71,9 @@ export class LineEventAmqp extends BaseAmqpHandler {
     return this.lineShowSelectionMenuCommand.exec({
       ...input,
       lineBot: lineBotFromJsonWithState(input.lineBot),
+      lineChatLogs: input.lineChatLogs.map((log) =>
+        lineChatLogFromJsonWithState(log),
+      ),
     });
   }
 
@@ -71,6 +84,16 @@ export class LineEventAmqp extends BaseAmqpHandler {
       lineSession: lineSessionFromJsonWithState(input.lineSession),
       replyToken: input.replyToken,
       message: input.message,
+      lineChatLogs: input.lineChatLogs.map((log) =>
+        lineChatLogFromJsonWithState(log),
+      ),
     });
+  }
+
+  @QueueTask(LINE_EVENT_QUEUES.PROCESS_CHAT_LOG.name)
+  async processChatLog(input: OmitJobMeta<LineProcessChatLogJobInput>) {
+    return this.lineProcessChatLogCommand.exec(
+      input.map((data) => lineChatLogFromJsonWithState(data)),
+    );
   }
 }

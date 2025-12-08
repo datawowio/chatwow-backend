@@ -2,6 +2,11 @@ import { LineAccount } from '@domain/base/line-account/line-account.domain';
 import { lineAccountFromPgWithState } from '@domain/base/line-account/line-account.mapper';
 import { LineBot } from '@domain/base/line-bot/line-bot.domain';
 import { LineBotService } from '@domain/base/line-bot/line-bot.service';
+import { LineChatLog } from '@domain/base/line-chat-log/line-chat-log.domain';
+import {
+  newLineChatLog,
+  newLineChatLogs,
+} from '@domain/base/line-chat-log/line-chat-log.factory';
 import { LineSession } from '@domain/base/line-session/line-session.domain';
 import { lineSessionFromPgWithState } from '@domain/base/line-session/line-session.mapper';
 import { lineSessionsTableFilter } from '@domain/base/line-session/line-session.util';
@@ -28,6 +33,7 @@ type Entity = {
     lineAccount: LineAccount;
     lineSession: LineSession | null;
   } | null;
+  lineChatLogs: LineChatLog[];
 };
 
 @Injectable()
@@ -54,10 +60,35 @@ export class LineProcessRawCommand {
 
     const entity = await this.find(body.lineBotId, lineId);
     if (!entity) {
+      const replyMessage = 'ไม่พบเจอบอทในระบบ';
+
       // shouldn't happen
-      await lineService.reply(event.replyToken, 'ไม่พบเจอบิทในระบบ');
+      this.lineEventQueue.jobProcessChatLog(
+        newLineChatLogs([
+          {
+            chatSender: 'USER',
+            lineAccountId: lineId,
+            message: event.message.text,
+          },
+          {
+            chatSender: 'BOT',
+            lineAccountId: lineId,
+            message: replyMessage,
+          },
+        ]),
+      );
+
+      await lineService.reply(event.replyToken, replyMessage);
       return;
     }
+
+    entity.lineChatLogs.push(
+      newLineChatLog({
+        chatSender: 'USER',
+        lineAccountId: lineId,
+        message: event.message.text,
+      }),
+    );
 
     this.processByMessageType(entity, { event, config: body.config });
   }
@@ -67,6 +98,7 @@ export class LineProcessRawCommand {
     const message = event.message.text;
 
     const lineBot = entity.lineBot;
+    const lineChatLogs = entity.lineChatLogs;
     const lineAccountId = event.source.userId;
     const replyToken = event.replyToken;
 
@@ -77,6 +109,7 @@ export class LineProcessRawCommand {
         lineAccountId,
         replyToken,
         verificationCode: message,
+        lineChatLogs,
       });
     }
 
@@ -85,23 +118,30 @@ export class LineProcessRawCommand {
         lineBot,
         lineAccountId,
         replyToken,
+        lineChatLogs,
       });
     }
 
-    if (!entity.lineData.lineSession) {
+    const lineSession = entity.lineData.lineSession;
+    if (!lineSession) {
       return this.lineEventQueue.jobProcessSelectionMenu({
         lineBot,
         lineAccountId,
         replyToken,
         message,
+        lineChatLogs,
       });
     }
 
+    lineChatLogs.forEach((chatLog) =>
+      chatLog.edit({ lineSessionId: lineSession.id }),
+    );
     return this.lineEventQueue.jobProcessAiChat({
       lineBot,
-      lineSession: entity.lineData.lineSession,
+      lineSession,
       replyToken,
       message,
+      lineChatLogs,
     });
   }
 
@@ -131,6 +171,7 @@ export class LineProcessRawCommand {
       return {
         lineBot,
         lineData: null,
+        lineChatLogs: [],
       };
     }
 
@@ -142,6 +183,7 @@ export class LineProcessRawCommand {
           ? lineSessionFromPgWithState(raw.activeSession)
           : null,
       },
+      lineChatLogs: [],
     };
   }
 

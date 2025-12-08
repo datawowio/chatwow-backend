@@ -268,6 +268,39 @@ export class StorageService implements OnModuleInit {
     }
   }
 
+  async ensureFile(
+    key: string,
+    opts?: StorageOptions & { initialContent?: Buffer | string },
+  ): Promise<void> {
+    if (!this.enable) {
+      throw new ApiException(500, 'storageDisable');
+    }
+
+    const bucket = opts?.bucket || this.defaultBucket;
+
+    const exists = await this.exists(key, { bucket });
+    if (exists) return;
+
+    const body =
+      opts?.initialContent instanceof Buffer
+        ? opts.initialContent
+        : Buffer.from(opts?.initialContent ?? '');
+
+    try {
+      await this.s3.send(
+        new PutObjectCommand({
+          Bucket: bucket,
+          Key: key,
+          Body: body,
+          ContentType: 'application/octet-stream',
+        }),
+      );
+    } catch (e: any) {
+      this.loggerService.error(e);
+      throw new ApiException(502, 'fileCreateFail');
+    }
+  }
+
   private async _ensureBucket(bucket: string): Promise<void> {
     if (!this.enable) {
       return;

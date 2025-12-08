@@ -1,9 +1,11 @@
+import { newLineChatLog } from '@domain/base/line-chat-log/line-chat-log.factory';
 import { LineSession } from '@domain/base/line-session/line-session.domain';
 import { newLineSession } from '@domain/base/line-session/line-session.factory';
 import { lineSessionFromPgWithState } from '@domain/base/line-session/line-session.mapper';
 import { LineSessionService } from '@domain/base/line-session/line-session.service';
 import { projectFromPgWithState } from '@domain/base/project/project.mapper';
 import { ProjectService } from '@domain/base/project/project.service';
+import { LineEventQueue } from '@domain/queue/line-event/line-event.queue';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
@@ -25,6 +27,7 @@ export class LineProcessSelectionMenuCommand {
 
     private lineSessionService: LineSessionService,
     private projectService: ProjectService,
+    private lineEventQueue: LineEventQueue,
   ) {}
 
   async exec({
@@ -32,6 +35,7 @@ export class LineProcessSelectionMenuCommand {
     lineAccountId,
     message,
     replyToken,
+    lineChatLogs,
   }: LineProcessSelectionMenuJobData) {
     const lineService = new LineService(lineBot);
     const projects = await this.getUserProjects(lineAccountId);
@@ -53,10 +57,20 @@ export class LineProcessSelectionMenuCommand {
 
     await this.save(lineSession);
 
-    await lineService.reply(
-      replyToken,
-      LINE_SUCCESS_PROJECT_SELECTION_REPLY(selectedProject.projectName),
+    const replyMessage = LINE_SUCCESS_PROJECT_SELECTION_REPLY(
+      selectedProject.projectName,
     );
+    lineChatLogs.push(
+      newLineChatLog({
+        chatSender: 'BOT',
+        lineSessionId: lineSession.id,
+        lineAccountId,
+        message: replyMessage,
+      }),
+    );
+
+    await lineService.reply(replyToken, replyMessage);
+    this.lineEventQueue.jobProcessChatLog(lineChatLogs);
   }
 
   async save(lineSession: LineSession) {

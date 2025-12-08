@@ -1,3 +1,4 @@
+import { newLineChatLog } from '@domain/base/line-chat-log/line-chat-log.factory';
 import { projectDocumentFromPgWithState } from '@domain/base/project-document/project-document.mapper';
 import { projectDocumentsTableFilter } from '@domain/base/project-document/project-document.util';
 import { projectFromPgWithState } from '@domain/base/project/project.mapper';
@@ -6,11 +7,13 @@ import { STORED_FILE_REF_NAME } from '@domain/base/stored-file/stored-file.const
 import { storedFileFromPgWithState } from '@domain/base/stored-file/stored-file.mapper';
 import { AiApiService } from '@domain/logic/ai-api/ai-api.service';
 import { AiApiEntity } from '@domain/logic/ai-api/ai-api.type';
+import { LineEventQueue } from '@domain/queue/line-event/line-event.queue';
 import { Injectable } from '@nestjs/common';
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 
 import { MainDb } from '@infra/db/db.main';
 import { LineService } from '@infra/global/line/line.service';
+import { LoggerService } from '@infra/global/logger/logger.service';
 
 import { LineProcessAiChatJobData } from './line-process-ai-chat.type';
 
@@ -19,6 +22,8 @@ export class LineProcessAiChatCommand {
   constructor(
     private db: MainDb,
     private aiApiService: AiApiService,
+    private lineEventQueue: LineEventQueue,
+    private loggerService: LoggerService,
   ) {}
 
   async exec(body: LineProcessAiChatJobData) {
@@ -26,12 +31,23 @@ export class LineProcessAiChatCommand {
 
     try {
       await this.process(lineService, body);
-    } catch {
-      await lineService.reply(
-        body.replyToken,
-        'ระบบขัดข้องโปรดลองใหม่อีกครั้ง',
+    } catch (err) {
+      this.loggerService.error(err as Error);
+
+      const message = 'ระบบขัดข้องโปรดลองใหม่อีกครั้ง';
+      body.lineChatLogs.push(
+        newLineChatLog({
+          chatSender: 'BOT',
+          lineSessionId: body.lineSession.id,
+          message,
+          lineAccountId: body.lineSession.lineAccountId,
+        }),
       );
+
+      await lineService.reply(body.replyToken, message);
     }
+
+    this.lineEventQueue.jobProcessChatLog(body.lineChatLogs);
   }
 
   async process(lineService: LineService, body: LineProcessAiChatJobData) {

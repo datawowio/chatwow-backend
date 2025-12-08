@@ -219,7 +219,8 @@ Table "line_sessions" {
 Table "line_chat_logs" {
   "id" uuid [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "line_session_id" uuid [not null]
+  "line_account_id" text [not null]
+  "line_session_id" uuid
   "chat_sender" chat_sender [not null]
   "parent_id" uuid
   "message" text [not null]
@@ -288,8 +289,6 @@ Table "message_tasks" {
 }
 
 Ref "audit_logs_created_by_id_fkey":"users"."id" < "audit_logs"."created_by_id"
-
-Ref "line_chat_logs_line_session_id_fkey":"line_sessions"."id" < "line_chat_logs"."line_session_id" [delete: cascade]
 
 Ref "line_sessions_latest_chat_log_id_fkey":"line_chat_logs"."id" < "line_sessions"."latest_chat_log_id" [delete: set null]
 
