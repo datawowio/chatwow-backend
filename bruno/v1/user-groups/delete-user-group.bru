@@ -1,0 +1,24 @@
+meta {
+  name: delete-user-group
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{url}}/v1/user-groups/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 019aa48a-db39-75ab-9292-e15531427ca2
+}
+
+body:json {
+  {
+    "userGroup": {
+      "groupName": "updated group",
+      "description": "updated"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -17,6 +18,8 @@ import {
   CreateUserGroupDto,
   CreateUserGroupResponse,
 } from './create-user-group/create-user-group.dto';
+import { DeleteUserGroupCommand } from './delete-user-group/delete-user-group.command';
+import { DeleteUserGroupResponse } from './delete-user-group/delete-user-group.dto';
 import { EditUserGroupCommand } from './edit-user-group/edit-user-group.command';
 import {
   EditUserGroupDto,
@@ -40,6 +43,7 @@ export class UserGroupsV1Controller {
     private getUserGroupQuery: GetUserGroupQuery,
     private editUserGroupCommand: EditUserGroupCommand,
     private listUserGroupsQuery: ListUserGroupsQuery,
+    private deleteUserGroupCommand: DeleteUserGroupCommand,
   ) {}
 
   @Get()
@@ -78,5 +82,14 @@ export class UserGroupsV1Controller {
     @Body() body: EditUserGroupDto,
   ) {
     return this.editUserGroupCommand.exec(claims, id, body);
+  }
+
+  @Delete(':id')
+  @ApiResponse({ type: () => DeleteUserGroupResponse })
+  async deleteUserGroup(
+    @UserClaims() claims: UserClaims,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<DeleteUserGroupResponse> {
+    return this.deleteUserGroupCommand.exec(claims, id);
   }
 }

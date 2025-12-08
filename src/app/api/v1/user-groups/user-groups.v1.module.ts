@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { CreateUserGroupCommand } from './create-user-group/create-user-group.command';
+import { DeleteUserGroupCommand } from './delete-user-group/delete-user-group.command';
 import { EditUserGroupCommand } from './edit-user-group/edit-user-group.command';
 import { GetUserGroupQuery } from './get-user-group/get-user-group.query';
 import { ListUserGroupsQuery } from './list-user-groups/list-user-groups.query';
@@ -12,6 +13,7 @@ import { UserGroupsV1Controller } from './user-groups.v1.controller';
     GetUserGroupQuery,
     EditUserGroupCommand,
     ListUserGroupsQuery,
+    DeleteUserGroupCommand,
   ],
   controllers: [UserGroupsV1Controller],
 })
