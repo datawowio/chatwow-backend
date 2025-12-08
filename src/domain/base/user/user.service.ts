@@ -163,6 +163,9 @@ export class UserService {
       .$if(isDefined(filter?.role), (q) =>
         q.where('users.role', '=', filter!.role!),
       )
+      .$if(!!filter?.roles?.length, (q) =>
+        q.where('users.role', 'in', filter!.roles!),
+      )
       .$if(isDefined(filter?.userStatus), (q) =>
         q.where('users.user_status', '=', filter!.userStatus!),
       )

@@ -123,6 +123,7 @@ Table "projects" {
   "project_name" text [not null]
   "project_description" text [not null, default: '']
   "project_guideline_md" text [not null, default: '']
+  "is_require_regenerate" bool [not null, default: false]
   "project_status" project_status [not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "created_by_id" uuid
@@ -164,6 +165,7 @@ Table "project_documents" {
   "id" uuid [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "is_require_regenerate" bool [not null, default: false]
   "project_id" uuid [not null]
   "created_by_id" uuid
   "updated_by_id" uuid

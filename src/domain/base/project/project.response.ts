@@ -20,6 +20,9 @@ export class ProjectResponse {
   @ApiProperty({ example: 'Project description' })
   projectDescription: string;
 
+  @ApiProperty({ example: false })
+  isRequireRegenerate: boolean;
+
   @ApiProperty({ example: '# Guidelines' })
   projectGuidelineMd: string;
 

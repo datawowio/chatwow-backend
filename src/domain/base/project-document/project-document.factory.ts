@@ -22,6 +22,7 @@ export function newProjectDocument({
     createdById: actorId,
     updatedById: actorId,
     projectId: data.projectId,
+    isRequireRegenerate: false,
     updatedAt: myDayjs().toDate(),
     documentDetails: data.documentDetails || '',
     documentStatus: valueOr(data.documentStatus, 'PROCESSING'),
@@ -40,6 +41,9 @@ export function mockProjectDocument(
 ): ProjectDocument {
   return projectDocumentFromPlain({
     id: isDefined(data.id) ? data.id : uuidV7(),
+    isRequireRegenerate: isDefined(data.isRequireRegenerate)
+      ? data.isRequireRegenerate
+      : false,
     documentStatus: isDefined(data.documentStatus)
       ? data.documentStatus
       : 'ACTIVE',

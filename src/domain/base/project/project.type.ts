@@ -29,6 +29,7 @@ export type ProjectNewData = {
 export type ProjectUpdateData = {
   actorId?: string;
   data: {
+    isRequireRegenerate?: boolean;
     projectName?: string;
     projectDescription?: string;
     projectGuidelineMd?: string;

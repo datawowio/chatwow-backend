@@ -14,6 +14,7 @@ export function newProject({ actorId, data }: ProjectNewData): Project {
     createdAt: new Date(),
     createdById: actorId,
     updatedById: actorId,
+    isRequireRegenerate: false,
     updatedAt: new Date(),
     projectName: data.projectName,
     projectDescription: data.projectDescription || '',
@@ -32,6 +33,7 @@ export function mockProject(data: Partial<ProjectPlain>): Project {
     id: valueOr(data.id, uuidV7()),
     createdAt: valueOr(data.createdAt, new Date()),
     updatedAt: valueOr(data.updatedAt, new Date()),
+    isRequireRegenerate: valueOr(data.isRequireRegenerate, false),
     projectName: valueOr(data.projectName, faker.commerce.productName()),
     projectDescription: valueOr(
       data.projectDescription,

@@ -124,6 +124,7 @@ export interface ProjectDocuments {
   document_details: Generated<string>;
   document_status: DocumentStatus;
   id: string;
+  is_require_regenerate: Generated<boolean>;
   project_id: string;
   updated_at: Generated<string>;
   updated_by_id: string | null;
@@ -134,6 +135,7 @@ export interface Projects {
   created_at: Generated<string>;
   created_by_id: string | null;
   id: string;
+  is_require_regenerate: Generated<boolean>;
   project_description: Generated<string>;
   project_guideline_md: Generated<string>;
   project_name: string;

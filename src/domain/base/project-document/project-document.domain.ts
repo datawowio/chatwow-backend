@@ -22,6 +22,7 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
   readonly projectId: string;
   readonly createdAt: Date;
   readonly updatedAt: Date;
+  readonly isRequireRegenerate: boolean;
   readonly createdById: string | null;
   readonly updatedById: string | null;
 
@@ -36,6 +37,9 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
       createdAt: this.createdAt,
       updatedAt: myDayjs().toDate(),
       createdById: this.createdById,
+      isRequireRegenerate: isDefined(data.documentDetails)
+        ? data.documentDetails !== this.documentDetails
+        : this.isRequireRegenerate,
       updatedById: isDefined(actorId) ? actorId : this.updatedById,
       documentDetails: isDefined(data.documentDetails)
         ? data.documentDetails

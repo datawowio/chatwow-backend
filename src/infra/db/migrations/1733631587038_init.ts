@@ -189,6 +189,9 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('project_guideline_md', 'text', (col) =>
       col.notNull().defaultTo(''),
     )
+    .addColumn('is_require_regenerate', 'boolean', (col) =>
+      col.notNull().defaultTo(false),
+    )
     .addColumn('project_status', sql`project_status`, (col) => col.notNull())
     .addColumn('created_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -275,6 +278,9 @@ export async function up(db: Kysely<any>): Promise<void> {
     )
     .addColumn('updated_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('is_require_regenerate', 'boolean', (col) =>
+      col.notNull().defaultTo(false),
     )
     .addColumn('project_id', 'uuid', (col) =>
       col.notNull().references('projects.id').onDelete('cascade'),

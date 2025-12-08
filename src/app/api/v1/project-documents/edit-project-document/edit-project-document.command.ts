@@ -13,6 +13,7 @@ import {
   projectFromPgWithState,
   projectToResponse,
 } from '@domain/base/project/project.mapper';
+import { ProjectService } from '@domain/base/project/project.service';
 import { projectsTableFilter } from '@domain/base/project/project.util';
 import { STORED_FILE_OWNER_TABLE } from '@domain/base/stored-file/stored-file.constant';
 import { StoredFile } from '@domain/base/stored-file/stored-file.domain';
@@ -20,6 +21,7 @@ import { newStoredFile } from '@domain/base/stored-file/stored-file.factory';
 import { storedFileToResponse } from '@domain/base/stored-file/stored-file.mapper';
 import { StoredFileService } from '@domain/base/stored-file/stored-file.service';
 import { AiFileService } from '@domain/logic/ai-file/ai-file.service';
+import { setProjectRequireRegenerate } from '@domain/logic/project-action/project-action.util';
 import { Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
@@ -48,6 +50,7 @@ export class EditProjectDocumentCommand implements CommandInterface {
     private db: MainDb,
 
     private projectDocumentService: ProjectDocumentService,
+    private projectService: ProjectService,
     private storedFileService: StoredFileService,
     private transactionService: TransactionService,
     private aiFileService: AiFileService,
@@ -67,6 +70,10 @@ export class EditProjectDocumentCommand implements CommandInterface {
       });
     }
     this.editStoredFile(entity, body);
+    setProjectRequireRegenerate({
+      project: entity.project,
+      projectDocuments: [entity.projectDocument],
+    });
 
     await this.save(entity);
 
@@ -130,6 +137,7 @@ export class EditProjectDocumentCommand implements CommandInterface {
       }
 
       await this.projectDocumentService.save(entity.projectDocument);
+      await this.projectService.save(entity.project, { disableEvent: true });
     });
   }
 

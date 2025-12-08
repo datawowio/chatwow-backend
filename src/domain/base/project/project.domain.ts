@@ -17,6 +17,7 @@ export class Project extends DomainEntity<ProjectPg> {
   readonly projectName: string;
   readonly projectDescription: string;
   readonly projectGuidelineMd: string;
+  readonly isRequireRegenerate: boolean;
   readonly projectStatus: ProjectStatus;
   readonly aiSummaryMd: string;
 
@@ -36,6 +37,9 @@ export class Project extends DomainEntity<ProjectPg> {
       createdById: this.createdById,
       updatedById: isDefined(actorId) ? actorId : this.updatedById,
 
+      isRequireRegenerate: isDefined(data.isRequireRegenerate)
+        ? data.isRequireRegenerate
+        : this.isRequireRegenerate,
       aiSummaryMd: isDefined(data.aiSummaryMd)
         ? data.aiSummaryMd
         : this.aiSummaryMd,

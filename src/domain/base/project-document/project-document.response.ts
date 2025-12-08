@@ -17,6 +17,9 @@ export class ProjectDocumentResponse {
   @ApiProperty({ example: DATE_EXAMPLE })
   updatedAt: string;
 
+  @ApiProperty({ example: true })
+  isRequireRegenerate: boolean;
+
   @ApiProperty({ example: 'Detailed description of the document.' })
   documentDetails: string;
 
