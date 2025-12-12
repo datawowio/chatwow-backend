@@ -2,7 +2,7 @@ import { type Kysely, sql } from 'kysely';
 
 import { config } from '@infra/config';
 
-import { DEFAULT_LINEBOT_ID } from '@shared/common/common.constant';
+import { DEFAULT_LINE_BOT_ID } from '@shared/common/common.constant';
 import myDayjs from '@shared/common/common.dayjs';
 
 const lineConfig = config().line;
@@ -351,7 +351,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db
     .insertInto('line_bots')
     .values({
-      id: DEFAULT_LINEBOT_ID,
+      id: DEFAULT_LINE_BOT_ID,
       created_at: myDayjs().toISOString(),
       updated_at: myDayjs().toISOString(),
       channel_access_token: lineConfig.defaultAccessToken,
@@ -413,6 +413,40 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('latest_chat_log_id', 'uuid', (col) =>
       col.references('line_chat_logs.id').onDelete('set null'),
     )
+    .execute();
+
+  //
+  // PROJECT CHAT SESSION
+  //
+  await db.schema
+    .createTable('project_chat_sessions')
+    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('user_id', 'uuid', (col) =>
+      col.references('users.id').notNull().onDelete('cascade'),
+    )
+    .addColumn('project_id', 'uuid', (col) =>
+      col.references('projects.id').notNull().onDelete('cascade'),
+    )
+    .execute();
+
+  //
+  // PROJECT CHAT LOGS
+  //
+  await db.schema
+    .createTable('project_chat_logs')
+    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('project_chat_session_id', 'uuid', (col) =>
+      col.references('project_chat_sessions.id').notNull().onDelete('cascade'),
+    )
+    .addColumn('chat_sender', sql`chat_sender`, (col) => col.notNull())
+    .addColumn('message', 'text', (col) => col.notNull())
+    .addColumn('parent_id', 'uuid')
     .execute();
 
   //

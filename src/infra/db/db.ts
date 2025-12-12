@@ -108,12 +108,28 @@ export interface PasswordResetTokens {
   user_id: string;
 }
 
+export interface ProjectChatLogs {
+  chat_sender: ChatSender;
+  created_at: Generated<string>;
+  id: string;
+  message: string;
+  parent_id: string | null;
+  project_chat_session_id: string;
+}
+
 export interface ProjectChats {
   chat_sender: ChatSender;
   created_at: Generated<string>;
   id: string;
   message: string;
   parent_id: string | null;
+  project_id: string;
+  user_id: string;
+}
+
+export interface ProjectChatSessions {
+  created_at: Generated<string>;
+  id: string;
   project_id: string;
   user_id: string;
 }
@@ -239,6 +255,8 @@ export interface DB {
   line_sessions: LineSessions;
   message_tasks: MessageTasks;
   password_reset_tokens: PasswordResetTokens;
+  project_chat_logs: ProjectChatLogs;
+  project_chat_sessions: ProjectChatSessions;
   project_chats: ProjectChats;
   project_documents: ProjectDocuments;
   projects: Projects;

@@ -6,7 +6,12 @@ import rx from 'rxjs';
 
 import { AppConfig } from '@infra/config';
 
-import { SendAiApiOpts } from './ai-api.type';
+import {
+  AiRawResponse,
+  AiRequest,
+  AiResponse,
+  SendAiApiOpts,
+} from './ai-api.type';
 
 @Injectable()
 export class AiApiService {
@@ -20,29 +25,42 @@ export class AiApiService {
     this.url = aiConfig.url;
   }
 
-  async chat(_opts: SendAiApiOpts) {
-    const url = this.url;
-    const data = {};
+  async chat(opts: SendAiApiOpts) {
+    const url = `${this.url}/chat`;
+    const data: AiRequest = {
+      text: opts.text,
+      project_id: opts.project.id,
+      session_id: opts.lineSession.id,
+    };
+
     const headers = {};
 
-    const obs = this.httpService.post(url, data, { headers }).pipe(
-      rx.retry({
-        count: 3,
-        delay: (error: AxiosError, retryCount: number) => {
-          console.log(`Retry attempt #${retryCount}`, error.message);
-          return rx.timer(1000);
-        },
-      }),
-      rx.catchError((e: AxiosError) =>
-        rx.of({
-          isSuccess: false,
-          data: e.response?.data ?? null,
-          err: e,
+    const obs = this.httpService
+      .post<AiRawResponse>(url, data, { headers })
+      .pipe(
+        rx.retry({
+          count: 3,
+          delay: (error: AxiosError, retryCount: number) => {
+            console.log(`Retry attempt #${retryCount}`, error.message);
+            return rx.timer(1000);
+          },
         }),
-      ),
-    );
+        rx.map((d): { isSuccess: true; data: AiResponse } => ({
+          isSuccess: true,
+          data: {
+            text: d.data.text,
+            tokenUsed: d.data.token_used,
+          },
+        })),
+        rx.catchError((e: AxiosError) =>
+          rx.of<{ isSuccess: false; data: unknown; err: AxiosError }>({
+            isSuccess: false,
+            data: e.response?.data ?? null,
+            err: e,
+          }),
+        ),
+      );
 
-    const _res = await rx.firstValueFrom(obs);
-    //
+    return rx.firstValueFrom(obs);
   }
 }

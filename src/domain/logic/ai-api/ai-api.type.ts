@@ -1,24 +1,23 @@
-import { ProjectDocument } from '@domain/base/project-document/project-document.domain';
+import { LineSession } from '@domain/base/line-session/line-session.domain';
 import { Project } from '@domain/base/project/project.domain';
-import { StoredFile } from '@domain/base/stored-file/stored-file.domain';
-
-type AiContentType = 'text' | 'markdown';
-type AiContentRole = 'message' | 'project' | 'project_document';
-type AiRequest = {
-  content: string;
-  contentType?: AiContentType;
-  contentRole?: AiContentRole;
-  attachments?: [];
-};
-export type AiApiEntity = {
-  project: Project;
-  relations: {
-    projectDocument: ProjectDocument;
-    storedFile: StoredFile;
-  }[];
-};
 
 export type SendAiApiOpts = {
-  request: AiRequest;
-  entity: AiApiEntity;
+  text: string;
+  project: Project;
+  lineSession: LineSession;
+};
+
+export type AiRequest = {
+  text: string;
+  project_id: string;
+  session_id: string;
+};
+
+export type AiRawResponse = {
+  text: string;
+  token_used: number;
+};
+export type AiResponse = {
+  text: string;
+  tokenUsed: number;
 };

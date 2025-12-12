@@ -230,6 +230,22 @@ Table "line_chat_logs" {
   }
 }
 
+Table "project_chat_sessions" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "user_id" uuid [not null]
+  "project_id" uuid [not null]
+}
+
+Table "project_chat_logs" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "project_chat_session_id" uuid [not null]
+  "chat_sender" chat_sender [not null]
+  "message" text [not null]
+  "parent_id" uuid
+}
+
 Table "audit_logs" {
   "id" uuid [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
@@ -299,6 +315,12 @@ Ref "line_sessions_line_bot_id_fkey":"line_bots"."id" < "line_sessions"."line_bo
 Ref "line_sessions_project_id_fkey":"projects"."id" < "line_sessions"."project_id" [delete: cascade]
 
 Ref "password_reset_tokens_user_id_fkey":"users"."id" < "password_reset_tokens"."user_id" [delete: cascade]
+
+Ref "project_chat_logs_project_chat_session_id_fkey":"project_chat_sessions"."id" < "project_chat_logs"."project_chat_session_id" [delete: cascade]
+
+Ref "project_chat_sessions_project_id_fkey":"projects"."id" < "project_chat_sessions"."project_id" [delete: cascade]
+
+Ref "project_chat_sessions_user_id_fkey":"users"."id" < "project_chat_sessions"."user_id" [delete: cascade]
 
 Ref "project_chats_parent_id_fkey":"project_chats"."id" < "project_chats"."parent_id" [delete: set null]
 
