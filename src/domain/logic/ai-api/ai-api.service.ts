@@ -7,6 +7,7 @@ import rx from 'rxjs';
 import { AppConfig } from '@infra/config';
 
 import {
+  AiChat,
   AiRawResponse,
   AiRequest,
   AiResponse,
@@ -25,12 +26,21 @@ export class AiApiService {
     this.url = aiConfig.url;
   }
 
-  async chat(opts: SendAiApiOpts) {
+  async chat(opts: SendAiApiOpts): Promise<AiChat> {
+    return {
+      isSuccess: true,
+      data: {
+        text: 'ตอบสำเร็จ',
+        tokenUsed: 0,
+      },
+    };
+
+    // TODO: Use this after DE Finish implement
     const url = `${this.url}/chat`;
     const data: AiRequest = {
       text: opts.text,
       project_id: opts.project.id,
-      session_id: opts.lineSession.id,
+      session_id: opts.sessionId,
     };
 
     const headers = {};

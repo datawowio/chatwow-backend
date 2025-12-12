@@ -1,0 +1,27 @@
+meta {
+  name: project-chat
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{url}}/v1/projects/:id/chat-session/:chatId/chat
+  body: json
+  auth: inherit
+}
+
+params:path {
+  chatId: 019b12e1-b043-724f-8f45-b4ac05a6dd2a
+  id: 019b12dc-78c3-72ab-881c-4845d46e11cf
+}
+
+headers {
+  idempotency-key: 019b12a9-72ca-7430-a5db-bfcc6051e82f
+}
+
+body:json {
+  {
+    "text": "สวัสดี",
+    "previousChatId": null
+  }
+}

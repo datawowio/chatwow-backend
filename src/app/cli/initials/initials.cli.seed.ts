@@ -1,5 +1,3 @@
-import { newProjectChat } from '@domain/base/project-chat/project-chat.factory';
-import { ProjectChatService } from '@domain/base/project-chat/project-chat.service';
 import { newProjectDocument } from '@domain/base/project-document/project-document.factory';
 import { ProjectDocumentService } from '@domain/base/project-document/project-document.service';
 import { mockProjects, newProject } from '@domain/base/project/project.factory';
@@ -33,7 +31,6 @@ export class InitialsCliSeed extends CommandRunner {
     private transactionService: TransactionService,
     private userGroupService: UserGroupService,
     private projectService: ProjectService,
-    private projectChatService: ProjectChatService,
     private projectDocumentService: ProjectDocumentService,
     private userGroupUserService: UserGroupUserService,
     private userGroupProjectService: UserGroupProjectService,
@@ -86,19 +83,7 @@ export class InitialsCliSeed extends CommandRunner {
         projectDescription: 'for local testing',
       },
     });
-    const projectChatA = newProjectChat({
-      chatSender: 'USER',
-      message: 'hello',
-      projectId: projectA.id,
-      userId: superAdmin.id,
-    });
-    const projectChatB = newProjectChat({
-      chatSender: 'BOT',
-      message: 'hello this is a project chat',
-      projectId: projectA.id,
-      userId: superAdmin.id,
-      parentId: projectChatA.id,
-    });
+
     const projectDocumentA = newProjectDocument({
       actorId: superAdmin.id,
       data: {
@@ -122,7 +107,7 @@ export class InitialsCliSeed extends CommandRunner {
     await this.userService.save(superAdmin);
     await this.userVerificationService.save(superAdminVerification);
     await this.userGroupService.save(groupA);
-    await this.projectService.save(projectA);
+    await this.projectService.save(projectA, { disableEvent: true });
     await this.userGroupUserService.saveUserRelations(superAdmin.id, [
       groupA.id,
     ]);
@@ -132,11 +117,10 @@ export class InitialsCliSeed extends CommandRunner {
     await this.userManageProjectService.saveUserRelations(superAdmin.id, [
       projectA.id,
     ]);
-    await this.projectChatService.saveBulk([projectChatA, projectChatB]);
-    await this.projectDocumentService.saveBulk([
-      projectDocumentA,
-      projectDocumentB,
-    ]);
+    await this.projectDocumentService.saveBulk(
+      [projectDocumentA, projectDocumentB],
+      { disableEvent: true },
+    );
 
     // await this.mockRandom(superAdmin.id);
   }

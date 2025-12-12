@@ -14,8 +14,12 @@ import {
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 
+import { IdempotentContext } from '@infra/middleware/idempotent/idempotent.common';
+import { UseIdempotent } from '@infra/middleware/idempotent/idempotent.interceptor';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
+import { CreateChatSessionCommand } from './create-chat-session/create-chat-session.command';
+import { CreateChatSessionResponse } from './create-chat-session/create-chat-session.dto';
 import { CreateProjectCommand } from './create-project/create-project.command';
 import {
   CreateProjectDto,
@@ -36,6 +40,11 @@ import {
   ListProjectsResponse,
 } from './list-projects/list-projects.dto';
 import { ListProjectsQuery } from './list-projects/list-projects.query';
+import { ProjectChatCommand } from './project-chat/project-chat.command';
+import {
+  ProjectChatDto,
+  ProjectChatResponse,
+} from './project-chat/project-chat.dto';
 import { RegenerateProjectSummaryCommand } from './regenerate-project-summary/regenerate-project-summary.command';
 import { RegenerateProjectSummaryResponse } from './regenerate-project-summary/regenerate-project-summary.dto';
 
@@ -48,6 +57,8 @@ export class ProjectsV1Controller {
     private storedFileService: StoredFileService,
     private editProjectCommand: EditProjectCommand,
     private regenerateProjectSummaryCommand: RegenerateProjectSummaryCommand,
+    private createChatSessionCommand: CreateChatSessionCommand,
+    private projectChatCommand: ProjectChatCommand,
   ) {}
 
   @Post()
@@ -116,5 +127,31 @@ export class ProjectsV1Controller {
     @Param('id', ParseUUIDPipe) id: string,
   ) {
     return this.regenerateProjectSummaryCommand.exec(claims, id);
+  }
+
+  @Post(':id/chat-session')
+  @ApiResponse({
+    type: () => CreateChatSessionResponse,
+  })
+  @UseIdempotent()
+  async createChatSession(
+    @IdempotentContext() idemCtx: IdempotentContext,
+    @UserClaims() claims: UserClaims,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.createChatSessionCommand.exec(idemCtx, claims, id);
+  }
+
+  @Post(':id/chat-session/:sessionId/chat')
+  @ApiResponse({
+    type: () => ProjectChatResponse,
+  })
+  async projectChat(
+    @UserClaims() claims: UserClaims,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('sessionId', ParseUUIDPipe) sessionId: string,
+    @Body() body: ProjectChatDto,
+  ) {
+    return this.projectChatCommand.exec(claims, id, sessionId, body);
   }
 }

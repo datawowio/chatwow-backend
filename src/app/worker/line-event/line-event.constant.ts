@@ -9,6 +9,7 @@ export const LINE_INVALID_PROJECT_SELECTION_REPLY =
   'ไม่พบหัวข้อที่คุณเลือก โปรดกดเลือกหัวข้ออีกครั้งครับ';
 export const LINE_NO_PROJECT_REPLY =
   'บัญชีของคุณยังไม่ได้ผูกกับหัวข้อใดๆ โปรดติดต่อแอดมินเพื่อให้ช่วยตรวจสอบ';
+export const LINE_AI_ERROR_REPLY = 'ระบบขัดข้องโปรดลองใหม่อีกครั้ง';
 
 // success reply
 export const LINE_SUCCESS_VERIFICATION_REPLY = 'ยืนยันตัวตนสำเร็จ';

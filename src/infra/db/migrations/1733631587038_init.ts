@@ -209,28 +209,6 @@ export async function up(db: Kysely<any>): Promise<void> {
     .execute();
 
   //
-  // PROJECTS CHAT
-  //
-  await db.schema
-    .createTable('project_chats')
-    .addColumn('id', 'uuid', (col) => col.primaryKey())
-    .addColumn('chat_sender', sql`chat_sender`, (col) => col.notNull())
-    .addColumn('message', 'text', (col) => col.notNull())
-    .addColumn('created_at', 'timestamptz', (col) =>
-      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
-    )
-    .addColumn('parent_id', 'uuid', (col) =>
-      col.references('project_chats.id').onDelete('set null'),
-    )
-    .addColumn('user_id', 'uuid', (col) =>
-      col.notNull().references('users.id').onDelete('cascade'),
-    )
-    .addColumn('project_id', 'uuid', (col) =>
-      col.notNull().references('projects.id').onDelete('cascade'),
-    )
-    .execute();
-
-  //
   // USER GROUP PROJECTS
   //
   await db.schema
@@ -430,6 +408,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('project_id', 'uuid', (col) =>
       col.references('projects.id').notNull().onDelete('cascade'),
     )
+    .addColumn('latest_chat_log_id', 'uuid')
     .execute();
 
   //
@@ -566,7 +545,6 @@ export async function down(db: Kysely<any>): Promise<void> {
   await db.schema.dropTable('project_documents').execute();
   await db.schema.dropTable('user_manage_projects').execute();
   await db.schema.dropTable('user_group_projects').execute();
-  await db.schema.dropTable('project_chats').execute();
   await db.schema.dropTable('projects').execute();
   await db.schema.dropTable('user_group_users').execute();
   await db.schema.dropTable('user_groups').execute();

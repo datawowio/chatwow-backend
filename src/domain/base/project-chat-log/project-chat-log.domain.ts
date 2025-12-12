@@ -2,18 +2,20 @@ import type { ChatSender } from '@infra/db/db';
 
 import { DomainEntity } from '@shared/common/common.domain';
 
-import type { ProjectChatPg, ProjectChatPlain } from './project-chat.type';
+import type {
+  ProjectChatLogPg,
+  ProjectChatLogPlain,
+} from './project-chat-log.type';
 
-export class ProjectChat extends DomainEntity<ProjectChatPg> {
+export class ProjectChatLog extends DomainEntity<ProjectChatLogPg> {
   readonly id: string;
   readonly createdAt: Date;
+  readonly projectChatSessionId: string;
   readonly chatSender: ChatSender;
-  readonly userId: string;
   readonly message: string;
-  readonly projectId: string;
   readonly parentId: string | null;
 
-  constructor(plain: ProjectChatPlain) {
+  constructor(plain: ProjectChatLogPlain) {
     super();
     Object.assign(this, plain);
   }

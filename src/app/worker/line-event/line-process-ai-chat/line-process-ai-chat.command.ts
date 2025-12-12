@@ -10,6 +10,7 @@ import { MainDb } from '@infra/db/db.main';
 import { LineService } from '@infra/global/line/line.service';
 import { LoggerService } from '@infra/global/logger/logger.service';
 
+import { LINE_AI_ERROR_REPLY } from '../line-event.constant';
 import { LineProcessAiChatJobData } from './line-process-ai-chat.type';
 
 @Injectable()
@@ -29,7 +30,7 @@ export class LineProcessAiChatCommand {
     } catch (err) {
       this.loggerService.error(err as Error);
 
-      const message = 'ระบบขัดข้องโปรดลองใหม่อีกครั้ง';
+      const message = LINE_AI_ERROR_REPLY;
       body.lineChatLogs.push(
         newLineChatLog({
           chatSender: 'BOT',
@@ -50,7 +51,7 @@ export class LineProcessAiChatCommand {
     const res = await this.aiApiService.chat({
       text: body.message,
       project,
-      lineSession: body.lineSession,
+      sessionId: body.lineSession.id,
     });
     if (!res.isSuccess) {
       throw new Error(`AI error: ${res.err.message}`);

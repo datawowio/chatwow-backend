@@ -1,10 +1,10 @@
-import { LineSession } from '@domain/base/line-session/line-session.domain';
 import { Project } from '@domain/base/project/project.domain';
+import { AxiosError } from 'axios';
 
 export type SendAiApiOpts = {
   text: string;
   project: Project;
-  lineSession: LineSession;
+  sessionId: string;
 };
 
 export type AiRequest = {
@@ -21,3 +21,7 @@ export type AiResponse = {
   text: string;
   tokenUsed: number;
 };
+
+export type AiChat =
+  | { isSuccess: true; data: AiResponse }
+  | { isSuccess: false; data: unknown; err: AxiosError };

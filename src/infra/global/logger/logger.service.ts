@@ -31,9 +31,9 @@ export class LoggerService {
     this._traceLogger.log(traceLog);
   }
 
-  error(exception: Error) {
+  error(exception: Error | unknown) {
     if (!this._enableJsonLog) {
-      prettyLogError(exception);
+      prettyLogError(exception as Error);
     }
   }
 }

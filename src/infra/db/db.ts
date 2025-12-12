@@ -117,19 +117,10 @@ export interface ProjectChatLogs {
   project_chat_session_id: string;
 }
 
-export interface ProjectChats {
-  chat_sender: ChatSender;
-  created_at: Generated<string>;
-  id: string;
-  message: string;
-  parent_id: string | null;
-  project_id: string;
-  user_id: string;
-}
-
 export interface ProjectChatSessions {
   created_at: Generated<string>;
   id: string;
+  latest_chat_log_id: string | null;
   project_id: string;
   user_id: string;
 }
@@ -257,7 +248,6 @@ export interface DB {
   password_reset_tokens: PasswordResetTokens;
   project_chat_logs: ProjectChatLogs;
   project_chat_sessions: ProjectChatSessions;
-  project_chats: ProjectChats;
   project_documents: ProjectDocuments;
   projects: Projects;
   sessions: Sessions;
