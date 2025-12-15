@@ -2,6 +2,7 @@ import {
   CopyObjectCommand,
   CreateBucketCommand,
   DeleteObjectCommand,
+  DeleteObjectsCommand,
   GetObjectCommand,
   HeadObjectCommand,
   ListObjectsV2Command,
@@ -225,6 +226,66 @@ export class StorageService implements OnModuleInit {
       return true;
     } catch {
       return false;
+    }
+  }
+
+  async deleteFile(key: string, opts?: StorageOptions): Promise<void> {
+    if (!this.enable) {
+      throw new ApiException(500, 'storageDisable');
+    }
+
+    try {
+      await this.s3.send(
+        new DeleteObjectCommand({
+          Bucket: opts?.bucket || this.defaultBucket,
+          Key: key,
+        }),
+      );
+    } catch (e: any) {
+      this.loggerService.error(e);
+      throw new ApiException(502, 'deleteFail');
+    }
+  }
+
+  async deleteFolder(prefix: string, opts?: StorageOptions): Promise<void> {
+    if (!this.enable) {
+      throw new ApiException(500, 'storageDisable');
+    }
+
+    const bucket = opts?.bucket || this.defaultBucket;
+    const normalizedPrefix = prefix.endsWith('/') ? prefix : `${prefix}/`;
+
+    try {
+      let continuationToken: string | undefined;
+
+      do {
+        const res = await this.s3.send(
+          new ListObjectsV2Command({
+            Bucket: bucket,
+            Prefix: normalizedPrefix,
+            ContinuationToken: continuationToken,
+          }),
+        );
+
+        const objects = res.Contents?.map((o) => ({ Key: o.Key! })) ?? [];
+
+        if (objects.length > 0) {
+          await this.s3.send(
+            new DeleteObjectsCommand({
+              Bucket: bucket,
+              Delete: {
+                Objects: objects,
+                Quiet: true,
+              },
+            }),
+          );
+        }
+
+        continuationToken = res.NextContinuationToken;
+      } while (continuationToken);
+    } catch (e: any) {
+      this.loggerService.error(e);
+      throw new ApiException(502, 'deleteFolderFail');
     }
   }
 

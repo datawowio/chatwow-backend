@@ -12,6 +12,10 @@ export class SavedProjectDocumentQueueCommand {
   }
 
   async processAi(data: SavedProjectDocumentData) {
+    if (!data.isAiFieldUpdate) {
+      return;
+    }
+
     await this.aiFileService.writeProjectDocumentAiFile(data);
   }
 }

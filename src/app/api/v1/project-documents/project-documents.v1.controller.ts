@@ -5,6 +5,7 @@ import { GetPresignUploadUrlDto } from '@domain/base/stored-file/stored-file.zod
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -21,6 +22,8 @@ import {
   CreateProjectDocumentDto,
   CreateProjectDocumentResponse,
 } from './create-project-document/create-project-document.dto';
+import { DeleteProjectDocumentCommand } from './delete-project-document/delete-project-document.command';
+import { DeleteProjectDocumentResponse } from './delete-project-document/delete-project-document.dto';
 import { EditProjectDocumentCommand } from './edit-project-document/edit-project-document.command';
 import {
   EditProjectDocumentDto,
@@ -47,6 +50,7 @@ export class ProjectDocumentsV1Controller {
     private createProjectDocumentCommand: CreateProjectDocumentCommand,
     private storedFileService: StoredFileService,
     private editProjectDocumentCommand: EditProjectDocumentCommand,
+    private deleteProjectDocumentCommand: DeleteProjectDocumentCommand,
     private regenerateProjectDocumentCommand: RegenerateProjectDocumentSummaryCommand,
   ) {}
 
@@ -105,6 +109,15 @@ export class ProjectDocumentsV1Controller {
     @Query() query: GetProjectDocumentDto,
   ) {
     return this.getProjectDocumentsQuery.exec(claims, id, query);
+  }
+
+  @Delete(':id')
+  @ApiResponse({ type: () => DeleteProjectDocumentResponse })
+  async deleteUser(
+    @UserClaims() claims: UserClaims,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<DeleteProjectDocumentResponse> {
+    return this.deleteProjectDocumentCommand.exec(claims, id);
   }
 
   @Post(':id/regenerate')

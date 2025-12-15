@@ -11,6 +11,7 @@ import { streamToBuffer } from '@shared/common/common.buffer';
 import { AppendChatLogOpts, ChatJsonContent } from './ai-file.type';
 import {
   getChatFileKeyPath,
+  getProjectDocumentFolderPath,
   getProjectDocumentRawFileKeyPath,
   getProjectDocumentSummaryKeyPath,
   getProjectDocumentUserDescriptionKeyPath,
@@ -62,6 +63,15 @@ export class AiFileService {
       this.writeProjectDocumentSummary(projectDocument),
       this.writeProjectDocumentUserDescription(projectDocument),
     ]);
+  }
+
+  async deleteProjectDocumentAiFile(projectDocument: ProjectDocument) {
+    const keyPath = getProjectDocumentFolderPath(
+      projectDocument.projectId,
+      projectDocument.id,
+    );
+
+    await this.storageService.deleteFolder(keyPath);
   }
 
   async writeProjectDocumentSummary(projectDocument: ProjectDocument) {

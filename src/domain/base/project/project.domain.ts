@@ -24,18 +24,30 @@ export class Project extends DomainEntity<ProjectPg> {
   readonly createdById: string | null;
   readonly updatedById: string | null;
 
+  readonly isAiFieldUpdate: boolean;
+
   constructor(plain: ProjectPlain) {
     super();
     Object.assign(this, plain);
   }
 
   edit({ actorId, data }: ProjectUpdateData) {
+    const aiSummaryUpdated =
+      data.aiSummaryMd && data.aiSummaryMd != this.aiSummaryMd;
+    const projectDescriptionUpdated =
+      data.projectDescription &&
+      data.projectDescription != this.projectDescription;
+
     const plain: ProjectPlain = {
       id: this.id,
       createdAt: this.createdAt,
       updatedAt: new Date(),
       createdById: this.createdById,
       updatedById: isDefined(actorId) ? actorId : this.updatedById,
+      isAiFieldUpdate:
+        aiSummaryUpdated && projectDescriptionUpdated
+          ? true
+          : this.isAiFieldUpdate,
 
       isRequireRegenerate: isDefined(data.isRequireRegenerate)
         ? data.isRequireRegenerate
