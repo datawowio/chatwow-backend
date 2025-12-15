@@ -12,7 +12,7 @@ export class SavedProjectQueueCommand {
   }
 
   async processAi(data: SavedProjectData) {
-    if (!data.isAiFieldUpdate) {
+    if (!data.isRequireRegenerate) {
       return;
     }
 

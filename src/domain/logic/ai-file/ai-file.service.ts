@@ -15,6 +15,7 @@ import {
   getProjectDocumentRawFileKeyPath,
   getProjectDocumentSummaryKeyPath,
   getProjectDocumentUserDescriptionKeyPath,
+  getProjectFolderPath,
   getProjectSummaryKeyPath,
   getProjectUserDescriptionKeyPath,
 } from './ai-file.util';
@@ -38,6 +39,12 @@ export class AiFileService {
     const keyPath = getProjectSummaryKeyPath(project.id);
 
     await this.storageService.putBuffer(buffer, keyPath);
+  }
+
+  async deleteProjectAiFile(project: Project) {
+    const keyPath = getProjectFolderPath(project.id);
+
+    await this.storageService.deleteFolder(keyPath);
   }
 
   async getProjectSummary(project: Project): Promise<string | null> {

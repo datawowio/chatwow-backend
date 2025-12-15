@@ -26,8 +26,6 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
   readonly createdById: string | null;
   readonly updatedById: string | null;
 
-  readonly isAiFieldUpdate: boolean;
-
   constructor(plain: ProjectDocumentPlain) {
     super();
     Object.assign(this, plain);
@@ -35,21 +33,19 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
 
   edit({ actorId, data }: ProjectDocumentUpdateData) {
     const aiSummaryUpdated =
-      data.aiSummaryMd && data.aiSummaryMd != this.aiSummaryMd;
+      !!data.aiSummaryMd && data.aiSummaryMd != this.aiSummaryMd;
     const descriptionUpdated =
-      data.documentDetails && data.documentDetails != this.documentDetails;
+      !!data.documentDetails && data.documentDetails != this.documentDetails;
 
     const plain: ProjectDocumentPlain = {
       id: this.id,
       createdAt: this.createdAt,
       updatedAt: myDayjs().toDate(),
       createdById: this.createdById,
-      isAiFieldUpdate:
-        aiSummaryUpdated && descriptionUpdated ? true : this.isAiFieldUpdate,
       isRequireRegenerate: isDefined(data.isRequireRegenerate)
         ? data.isRequireRegenerate
         : isDefined(data.documentDetails)
-          ? data.documentDetails !== this.documentDetails
+          ? aiSummaryUpdated || descriptionUpdated
           : this.isRequireRegenerate,
       updatedById: isDefined(actorId) ? actorId : this.updatedById,
       documentDetails: isDefined(data.documentDetails)

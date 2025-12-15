@@ -21,7 +21,6 @@ export function projectDocumentFromPg(pg: ProjectDocumentPg): ProjectDocument {
     documentStatus: pg.document_status,
     documentDetails: pg.document_details,
     aiSummaryMd: pg.ai_summary_md,
-    isAiFieldUpdate: false,
   };
 
   return new ProjectDocument(plain);
@@ -47,7 +46,6 @@ export function projectDocumentFromPlain(
     documentDetails: plainData.documentDetails,
     documentStatus: plainData.documentStatus,
     aiSummaryMd: plainData.aiSummaryMd,
-    isAiFieldUpdate: plainData.isAiFieldUpdate,
   };
 
   return new ProjectDocument(plain);
@@ -67,7 +65,6 @@ export function projectDocumentFromJson(
     documentStatus: json.documentStatus,
     documentDetails: json.documentDetails,
     aiSummaryMd: json.aiSummaryMd,
-    isAiFieldUpdate: json.isAiFieldUpdate,
   };
 
   return new ProjectDocument(plain);
@@ -112,7 +109,6 @@ export function projectDocumentToPlain(
     documentStatus: projectDocument.documentStatus,
     aiSummaryMd: projectDocument.aiSummaryMd,
     documentDetails: projectDocument.documentDetails,
-    isAiFieldUpdate: projectDocument.isAiFieldUpdate,
   };
 }
 
@@ -130,7 +126,6 @@ export function projectDocumentToJson(
     documentStatus: projectDocument.documentStatus,
     aiSummaryMd: projectDocument.aiSummaryMd,
     documentDetails: projectDocument.documentDetails,
-    isAiFieldUpdate: projectDocument.isAiFieldUpdate,
   };
 }
 export function projectDocumentToJsonState(
