@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 
 import { BaseAmqpHandler } from '@infra/global/amqp/amqp.abstract';
 
+import { decryptEventText } from '@shared/common/common.line';
 import { QueueTask } from '@shared/task/task.decorator';
 
 import { LINE_EVENT_QUEUES } from '../worker.constant';
@@ -37,6 +38,8 @@ export class LineEventAmqp extends BaseAmqpHandler {
 
   @QueueTask(LINE_EVENT_QUEUES.PROCESS_RAW.name)
   async processRaw(data: LineProcessRawJobData) {
+    decryptEventText(data.data.events);
+
     return this.lineProcessRawCommand.exec(data);
   }
 

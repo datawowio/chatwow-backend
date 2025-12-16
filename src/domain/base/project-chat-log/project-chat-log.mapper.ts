@@ -50,7 +50,7 @@ export function projectChatLogFromJson(
     createdAt: new Date(json.createdAt),
     projectChatSessionId: json.projectChatSessionId,
     chatSender: json.chatSender,
-    message: json.message,
+    message: decryptMessage(json.message),
     parentId: json.parentId,
   };
 
@@ -100,7 +100,7 @@ export function projectChatLogToJson(
     createdAt: toISO(projectChatLog.createdAt),
     projectChatSessionId: projectChatLog.projectChatSessionId,
     chatSender: projectChatLog.chatSender,
-    message: projectChatLog.message,
+    message: encryptMessage(projectChatLog.message),
     parentId: projectChatLog.parentId,
   };
 }

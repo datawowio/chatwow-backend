@@ -32,11 +32,15 @@ import {
 } from '@app/worker/line-event/line-show-selection-menu/line-show-selection-menu.type';
 import { LINE_EVENT_QUEUES, MQ_EXCHANGE } from '@app/worker/worker.constant';
 
+import { encryptEventText } from '@shared/common/common.line';
+
 @Injectable()
 export class LineEventQueue extends BaseAmqpExchange {
   config = MQ_EXCHANGE.LINE_EVENT;
 
   jobProcessRaw(data: LineProcessRawJobData) {
+    encryptEventText(data.data.events);
+
     const input: LineProcessRawJobInput = wrapJobMeta({
       config: data.config,
       data: data.data,

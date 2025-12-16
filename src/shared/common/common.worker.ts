@@ -74,7 +74,7 @@ export function createMqWorker(
           const task = await messageTaskService.process(payload.meta.id, {
             exchangeName: config.name,
             queueName,
-            payload,
+            payload: structuredClone(payload),
           });
 
           try {

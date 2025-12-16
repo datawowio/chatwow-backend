@@ -46,7 +46,7 @@ export function lineChatLogFromJson(json: LineChatLogJson): LineChatLog {
   const plain: LineChatLogPlain = {
     id: json.id,
     parentId: json.parentId,
-    message: json.message,
+    message: decryptMessage(json.message),
     lineAccountId: json.lineAccountId,
     createdAt: toDate(json.createdAt),
     lineSessionId: json.lineSessionId,
@@ -93,7 +93,7 @@ export function lineChatLogToJson(domain: LineChatLog): LineChatLogJson {
   return {
     id: domain.id,
     parentId: domain.parentId,
-    message: domain.message,
+    message: encryptMessage(domain.message),
     createdAt: toISO(domain.createdAt),
     lineAccountId: domain.lineAccountId,
     lineSessionId: domain.lineSessionId,
