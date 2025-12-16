@@ -14,6 +14,7 @@ import { getIncludesZod } from '@shared/zod/zod.util';
 
 export const userGroupsV1IncludesZod = getIncludesZod([
   'users',
+  'managers',
   'projects',
   'createdBy',
   'updatedBy',
@@ -55,6 +56,22 @@ export function userGroupsV1InclusionQb(
             .whereRef('user_group_users.user_group_id', '=', 'user_groups.id')
             .selectAll(),
         ).as('users'),
+      ),
+    )
+    .$if(includes.has('managers'), (q) =>
+      q.select((eb) =>
+        jsonArrayFrom(
+          eb
+            .selectFrom('user_group_managers')
+            .innerJoin('users', 'users.id', 'user_group_managers.user_id')
+            .where(usersTableFilter)
+            .whereRef(
+              'user_group_managers.user_group_id',
+              '=',
+              'user_groups.id',
+            )
+            .selectAll(),
+        ).as('managers'),
       ),
     )
     .$if(includes.has('createdBy'), (q) =>

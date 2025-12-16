@@ -45,6 +45,11 @@ export class ListUserGroupsQuery implements QueryInterface {
               userGroup.projects.map((project) => ({
                 attributes: projectPgToResponse(project),
               })),
+            managers:
+              userGroup.managers &&
+              userGroup.managers.map((user) => ({
+                attributes: userPgToResponse(user),
+              })),
             users:
               userGroup.users &&
               userGroup.users.map((user) => ({

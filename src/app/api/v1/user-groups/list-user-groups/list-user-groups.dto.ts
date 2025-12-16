@@ -65,6 +65,12 @@ export class ListUserGroupsResponseDataUserGroupsRelations {
   users?: ListUserGroupsResponseDataUserGroupsRelationsUsers[];
 
   @ApiProperty({
+    type: () => ListUserGroupsResponseDataUserGroupsRelationsUsers,
+    isArray: true,
+  })
+  managers?: ListUserGroupsResponseDataUserGroupsRelationsUsers[];
+
+  @ApiProperty({
     type: () => ListUserGroupsResponseDataUserGroupsRelationsCreatedBy,
   })
   createdBy?: ListUserGroupsResponseDataUserGroupsRelationsCreatedBy;

@@ -43,6 +43,11 @@ export class GetUserGroupQuery implements QueryInterface {
               userGroup.users.map((user) => ({
                 attributes: userPgToResponse(user),
               })),
+            managers:
+              userGroup.managers &&
+              userGroup.managers.map((user) => ({
+                attributes: userPgToResponse(user),
+              })),
             createdBy: userGroup.createdBy
               ? {
                   attributes: userPgToResponse(userGroup.createdBy),
