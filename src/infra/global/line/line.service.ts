@@ -2,7 +2,10 @@ import { Project } from '@domain/base/project/project.domain';
 import { messagingApi } from '@line/bot-sdk';
 import { createHmac } from 'crypto';
 
-import { LINE_NO_PROJECT_REPLY } from '@app/worker/line-event/line-event.constant';
+import {
+  LINE_NO_PROJECT_REPLY,
+  LINE_PROMPT_PROJECT_SELECTION_REPLY,
+} from '@app/worker/line-event/line-event.constant';
 
 import { isDefined } from '@shared/common/common.validator';
 import { ApiException } from '@shared/http/http.exception';
@@ -79,7 +82,7 @@ export class LineService {
 
     messages.push({
       type: 'flex',
-      altText: 'Select a project',
+      altText: LINE_PROMPT_PROJECT_SELECTION_REPLY,
       contents: {
         type: 'bubble',
         body: {
@@ -88,7 +91,7 @@ export class LineService {
           contents: [
             {
               type: 'text',
-              text: 'Select a project',
+              text: LINE_PROMPT_PROJECT_SELECTION_REPLY,
               weight: 'bold',
               size: 'lg',
             },

@@ -1,3 +1,4 @@
+import { newLineChatLog } from '@domain/base/line-chat-log/line-chat-log.factory';
 import { LineSessionService } from '@domain/base/line-session/line-session.service';
 import { projectFromPgWithState } from '@domain/base/project/project.mapper';
 import { ProjectService } from '@domain/base/project/project.service';
@@ -7,6 +8,7 @@ import { Injectable } from '@nestjs/common';
 import { MainDb } from '@infra/db/db.main';
 import { LineService } from '@infra/global/line/line.service';
 
+import { LINE_PROMPT_PROJECT_SELECTION_REPLY } from '../line-event.constant';
 import { LineShowSelectionMenuJobData } from './line-show-selection-menu.type';
 
 @Injectable()
@@ -33,6 +35,14 @@ export class LineShowSelectionMenuCommand {
     await this.lineSessionService.inactiveAll(lineAccountId, lineBot.id);
 
     await lineService.replyProjectSelection(replyToken, projects, addMessages);
+
+    lineChatLogs.push(
+      newLineChatLog({
+        chatSender: 'BOT',
+        lineAccountId,
+        message: LINE_PROMPT_PROJECT_SELECTION_REPLY,
+      }),
+    );
     this.lineEventQueue.jobProcessChatLog(lineChatLogs);
   }
 

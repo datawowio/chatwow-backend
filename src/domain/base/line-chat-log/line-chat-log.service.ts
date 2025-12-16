@@ -29,6 +29,19 @@ export class LineChatLogService {
     return lineChatLogFromPgWithState(lineChatLogPg);
   }
 
+  async findAll() {
+    const lineChatLogs = await this.db.read
+      .selectFrom('line_chat_logs')
+      .selectAll()
+      .execute();
+
+    if (!lineChatLogs) {
+      return null;
+    }
+
+    return lineChatLogs.map((log) => lineChatLogFromPgWithState(log));
+  }
+
   async save(lineChatLog: LineChatLog) {
     this._validate(lineChatLog);
 

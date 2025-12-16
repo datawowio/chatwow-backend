@@ -13,5 +13,7 @@ export const LINE_AI_ERROR_REPLY = 'ระบบขัดข้องโปร�
 
 // success reply
 export const LINE_SUCCESS_VERIFICATION_REPLY = 'ยืนยันตัวตนสำเร็จ';
+export const LINE_PROMPT_PROJECT_SELECTION_REPLY =
+  'เลือกโปรเจ็คที่คุณต้องการพูดคุย';
 export const LINE_SUCCESS_PROJECT_SELECTION_REPLY = (projectName: string) =>
   `เลือก หัวข้อ ${projectName} สำเร็จคุยได้เลย`;

@@ -7,6 +7,7 @@ import { CacheService } from '@infra/global/cache/cache.service';
 import { StorageService } from '@infra/global/storage/storage.service';
 
 import { streamToBuffer } from '@shared/common/common.buffer';
+import myDayjs from '@shared/common/common.dayjs';
 
 import { AppendChatLogOpts, ChatJsonContent } from './ai-file.type';
 import {
@@ -136,8 +137,9 @@ export class AiFileService {
 
     opts.lineChatLogs.forEach((chatLog) => {
       content.logs.push({
-        chatSender: chatLog.chatSender,
+        chat_sender: chatLog.chatSender,
         message: chatLog.message,
+        created_at: myDayjs().toISOString(),
       });
     });
 

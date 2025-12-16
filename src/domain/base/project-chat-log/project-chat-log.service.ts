@@ -29,6 +29,15 @@ export class ProjectChatLogService {
     return projectChatLogFromPgWithState(projectChatLogPg);
   }
 
+  async findAll() {
+    const projectChatLogs = await this.db.read
+      .selectFrom('project_chat_logs')
+      .selectAll()
+      .execute();
+
+    return projectChatLogs.map((log) => projectChatLogFromPgWithState(log));
+  }
+
   async save(projectChatLog: ProjectChatLog) {
     this._validate(projectChatLog);
 

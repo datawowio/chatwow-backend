@@ -1,3 +1,4 @@
+import { decryptMessage, encryptMessage } from '@shared/common/common.crypto';
 import { toDate, toISO } from '@shared/common/common.transformer';
 
 import { LineChatLog } from './line-chat-log.domain';
@@ -13,7 +14,7 @@ export function lineChatLogFromPg(pg: LineChatLogPg): LineChatLog {
   const plain: LineChatLogPlain = {
     id: pg.id,
     parentId: pg.parent_id,
-    message: pg.message,
+    message: decryptMessage(pg.message),
     lineAccountId: pg.line_account_id,
     createdAt: toDate(pg.created_at),
     lineSessionId: pg.line_session_id,
@@ -72,7 +73,7 @@ export function lineChatLogToPg(domain: LineChatLog): LineChatLogPg {
     line_account_id: domain.lineAccountId,
     created_at: toISO(domain.createdAt),
     line_session_id: domain.lineSessionId,
-    message: domain.message,
+    message: encryptMessage(domain.message),
   };
 }
 

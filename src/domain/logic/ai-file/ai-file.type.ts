@@ -14,5 +14,5 @@ export type AppendChatLogOpts = {
 };
 
 export type ChatJsonContent = {
-  logs: { chatSender: ChatSender; message: string }[];
+  logs: { chat_sender: ChatSender; message: string; created_at: string }[];
 };

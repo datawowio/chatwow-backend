@@ -24,6 +24,7 @@ async function bootstrap() {
       logger: coreLogger(appConfig),
       cors: {
         origin: appConfig.corsOrigin,
+        methods: ['PATCH', 'HEAD', 'POST', 'GET', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: [
           'x-device',
           'content-type',

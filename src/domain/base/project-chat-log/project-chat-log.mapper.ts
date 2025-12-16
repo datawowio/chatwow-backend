@@ -1,3 +1,4 @@
+import { decryptMessage, encryptMessage } from '@shared/common/common.crypto';
 import { toDate, toISO } from '@shared/common/common.transformer';
 
 import { ProjectChatLog } from './project-chat-log.domain';
@@ -15,7 +16,7 @@ export function projectChatLogFromPg(pg: ProjectChatLogPg): ProjectChatLog {
     createdAt: toDate(pg.created_at),
     projectChatSessionId: pg.project_chat_session_id,
     chatSender: pg.chat_sender,
-    message: pg.message,
+    message: decryptMessage(pg.message),
     parentId: pg.parent_id,
   };
 
@@ -73,7 +74,7 @@ export function projectChatLogToPg(
     created_at: toISO(projectChatLog.createdAt),
     project_chat_session_id: projectChatLog.projectChatSessionId,
     chat_sender: projectChatLog.chatSender,
-    message: projectChatLog.message,
+    message: encryptMessage(projectChatLog.message),
     parent_id: projectChatLog.parentId,
   };
 }

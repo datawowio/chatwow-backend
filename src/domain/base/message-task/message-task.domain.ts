@@ -73,7 +73,6 @@ export class MessageTask extends DomainEntity<MessageTaskPg> {
   markAsSuccess() {
     this._edit({
       messageStatus: 'SUCCESS',
-      lastError: null,
     });
   }
 
