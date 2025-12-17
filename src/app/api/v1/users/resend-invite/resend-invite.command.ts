@@ -1,11 +1,13 @@
 import { UserService } from '@domain/base/user/user.service';
 import { DomainEventQueue } from '@domain/queue/domain-event/domain-event.queue';
+import { Injectable } from '@nestjs/common';
 
 import { ApiException } from '@shared/http/http.exception';
 import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import { ResendInviteResponse } from './resend-invite.dto';
 
+@Injectable()
 export class ResendInviteCommand {
   constructor(
     private userService: UserService,

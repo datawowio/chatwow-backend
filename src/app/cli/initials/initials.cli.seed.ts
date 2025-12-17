@@ -122,7 +122,7 @@ export class InitialsCliSeed extends CommandRunner {
       { disableEvent: true },
     );
 
-    // await this.mockRandom(superAdmin.id);
+    await this.mockRandom(superAdmin.id);
   }
 
   async mockRandom(superAdminId: string, amountEach = 20) {

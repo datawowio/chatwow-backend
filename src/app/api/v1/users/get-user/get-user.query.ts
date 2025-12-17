@@ -3,6 +3,7 @@ import { projectPgToResponse } from '@domain/base/project/project.mapper';
 import { userGroupPgToResponse } from '@domain/base/user-group/user-group.mapper';
 import { userPgToResponse } from '@domain/base/user/user.mapper';
 import { usersTableFilter } from '@domain/base/user/user.util';
+import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
 
@@ -13,6 +14,7 @@ import { toHttpSuccess } from '@shared/http/http.mapper';
 import { usersV1InclusionQb } from '../users.v1.util';
 import { GetUserDto, GetUserResponse } from './get-user.dto';
 
+@Injectable()
 export class GetUserQuery implements QueryInterface {
   constructor(private db: MainDb) {}
 
