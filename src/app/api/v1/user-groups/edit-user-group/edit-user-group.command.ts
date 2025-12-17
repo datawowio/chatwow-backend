@@ -137,7 +137,7 @@ export class EditUserGroupCommand implements CommandInterface {
     return userGroup;
   }
 
-  async findUsers(userIds?: string[], managerOnly?: boolean) {
+  async findUsers(userIds?: string[], forManager?: boolean) {
     if (!userIds?.length) {
       return [];
     }
@@ -145,7 +145,7 @@ export class EditUserGroupCommand implements CommandInterface {
     const users = await this.db.read
       .selectFrom('users')
       .where('users.id', 'in', userIds)
-      .$if(!!managerOnly, (eb) => eb.where('role', '=', 'MANAGER'))
+      .$if(!!forManager, (eb) => eb.where('role', 'in', ['MANAGER', 'ADMIN']))
       .where(usersTableFilter)
       .selectAll()
       .execute();
