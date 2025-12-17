@@ -1,0 +1,7 @@
+node_modules
+bruno
+.vscode
+.github
+_docker_volumes
+dist
+test-report

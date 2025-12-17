@@ -30,10 +30,6 @@ export class AiEventAmqp extends BaseAmqpHandler {
   async processProjectDocumentMdSuccess(
     data: ProjectDocumentMdSuccessRawInput,
   ) {
-    console.log('==================================');
-    console.log('asdasdasd');
-    console.log('==================================');
-
     return this.projectDocumentMdSuccessCommand.exec({
       projectDocumentId: data.project_document_id,
     });
