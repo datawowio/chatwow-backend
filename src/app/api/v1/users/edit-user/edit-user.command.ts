@@ -95,9 +95,7 @@ export class EditUserCommand implements CommandInterface {
     }
 
     await this.save(entity);
-    if (roleAction === 'PROMOTED') {
-      this.sendResetPasswordEmail(entity, token);
-    }
+    this.sendResetPasswordEmail(entity, token);
 
     return toHttpSuccess({
       data: {
@@ -208,8 +206,7 @@ export class EditUserCommand implements CommandInterface {
 
   sendResetPasswordEmail(entity: Entity, token: string) {
     if (!entity.passwordResetToken) {
-      // shouldn't happen
-      throw new ApiException(500, 'internal');
+      return;
     }
 
     // send reset email
