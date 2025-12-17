@@ -5,6 +5,7 @@ import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
 import { isDefined } from '@shared/common/common.validator';
 
+import { userFromPlain, userToPlain } from './user.mapper';
 import type { UserPg, UserPlain, UserUpdateData } from './user.type';
 
 export class User extends DomainEntity<UserPg> {
@@ -58,11 +59,20 @@ export class User extends DomainEntity<UserPg> {
     Object.assign(this, plain);
   }
 
+  clone() {
+    return userFromPlain(userToPlain(this));
+  }
+
   isPasswordValid(rawPassword: string) {
     if (!this.password) {
       return false;
     }
 
     return isMatchedHash(rawPassword, this.password);
+  }
+
+  isAllowLoginAccess() {
+    const allowedRole: UserRole[] = ['ADMIN', 'MANAGER'];
+    return allowedRole.includes(this.role);
   }
 }

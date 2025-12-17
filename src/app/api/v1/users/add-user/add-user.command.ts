@@ -57,7 +57,7 @@ export class AddUserCommand implements CommandInterface {
     user.edit({
       actorId: claims.userId,
       data: {
-        userStatus: 'PENDING_REGISTRATION',
+        userStatus: 'ACTIVE',
       },
     });
 
@@ -70,7 +70,12 @@ export class AddUserCommand implements CommandInterface {
     };
 
     const token = shaHashstring();
-    if (user.role !== 'USER') {
+    if (user.isAllowLoginAccess()) {
+      entity.user.edit({
+        data: {
+          userStatus: 'PENDING_REGISTRATION',
+        },
+      });
       entity.passwordResetToken = newPasswordResetToken({
         userId: user.id,
         token,
@@ -81,7 +86,7 @@ export class AddUserCommand implements CommandInterface {
 
     this.domainEventQueue.jobSendVerification(user);
 
-    if (user.role !== 'USER') {
+    if (user.isAllowLoginAccess()) {
       if (!entity.passwordResetToken) {
         // shouldn't happen
         throw new ApiException(500, 'internal');
