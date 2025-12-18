@@ -2,6 +2,7 @@ import { ProjectDocument } from '@domain/base/project-document/project-document.
 import { newProjectDocument } from '@domain/base/project-document/project-document.factory';
 import { projectDocumentToResponse } from '@domain/base/project-document/project-document.mapper';
 import { ProjectDocumentService } from '@domain/base/project-document/project-document.service';
+import { Project } from '@domain/base/project/project.domain';
 import { projectToResponse } from '@domain/base/project/project.mapper';
 import { ProjectService } from '@domain/base/project/project.service';
 import { STORED_FILE_OWNER_TABLE } from '@domain/base/stored-file/stored-file.constant';
@@ -10,6 +11,7 @@ import { newStoredFile } from '@domain/base/stored-file/stored-file.factory';
 import { storedFileToResponse } from '@domain/base/stored-file/stored-file.mapper';
 import { StoredFileService } from '@domain/base/stored-file/stored-file.service';
 import { AiFileService } from '@domain/logic/ai-file/ai-file.service';
+import { setProjectRequireRegenerate } from '@domain/logic/project-action/project-action.util';
 import { AiEventQueue } from '@domain/queue/ai-event/ai-event.queue';
 import { Injectable } from '@nestjs/common';
 
@@ -28,6 +30,7 @@ import {
 type Entity = {
   projectDocument: ProjectDocument;
   storedFile: StoredFile;
+  project: Project;
 };
 
 @Injectable()
@@ -53,6 +56,10 @@ export class CreateProjectDocumentCommand implements CommandInterface {
       claims,
       body.projectDocument.projectId,
     );
+    setProjectRequireRegenerate({
+      project,
+      projectDocuments: [projectDocument],
+    });
 
     const storedFile = newStoredFile({
       ...body.storedFile,
@@ -63,6 +70,7 @@ export class CreateProjectDocumentCommand implements CommandInterface {
     await this.save({
       projectDocument,
       storedFile,
+      project,
     });
 
     return toHttpSuccess({
@@ -91,6 +99,7 @@ export class CreateProjectDocumentCommand implements CommandInterface {
       );
 
       await this.projectDocumentService.save(entity.projectDocument);
+      await this.projectService.save(entity.project);
     });
 
     this.aiEventQueue.jobProjectDocumentMdGenerate(entity.projectDocument);
