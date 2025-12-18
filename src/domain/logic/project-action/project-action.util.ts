@@ -10,7 +10,7 @@ export function setProjectRequireRegenerate({
   projectDocuments,
 }: SetProjectRequireRegenerateOpts) {
   projectDocuments.forEach((doc) => {
-    if (doc.isRequireRegenerate) {
+    if (doc.hasUpdatedAiMemory) {
       project.edit({
         data: { isRequireRegenerate: true },
       });

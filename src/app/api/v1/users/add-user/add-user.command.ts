@@ -83,23 +83,8 @@ export class AddUserCommand implements CommandInterface {
     }
 
     await this.save(entity);
-
     this.domainEventQueue.jobSendVerification(user);
-
-    if (user.isAllowLoginAccess()) {
-      if (!entity.passwordResetToken) {
-        // shouldn't happen
-        throw new ApiException(500, 'internal');
-      }
-
-      // send reset email
-      this.domainEventQueue.jobResetPassword({
-        user: entity.user,
-        plainToken: token,
-        passwordResetToken: entity.passwordResetToken,
-        action: 'newUser',
-      });
-    }
+    this.sendResetPasswordEmail(entity, token);
 
     return toHttpSuccess({
       data: {
@@ -180,5 +165,19 @@ export class AddUserCommand implements CommandInterface {
     }
 
     return rawProjects.map((p) => projectFromPgWithState(p));
+  }
+
+  sendResetPasswordEmail(entity: Entity, token: string) {
+    if (!entity.passwordResetToken) {
+      return;
+    }
+
+    // send reset email
+    this.domainEventQueue.jobResetPassword({
+      user: entity.user,
+      plainToken: token,
+      passwordResetToken: entity.passwordResetToken,
+      action: 'newUser',
+    });
   }
 }

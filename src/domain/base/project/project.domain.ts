@@ -24,17 +24,25 @@ export class Project extends DomainEntity<ProjectPg> {
   readonly createdById: string | null;
   readonly updatedById: string | null;
 
+  readonly hasUpdatedAiMemory: boolean;
+
   constructor(plain: ProjectPlain) {
     super();
     Object.assign(this, plain);
   }
 
   edit({ actorId, data }: ProjectUpdateData) {
-    const aiSummaryUpdated =
-      !!data.aiSummaryMd && data.aiSummaryMd != this.aiSummaryMd;
-    const projectDescriptionUpdated =
-      !!data.projectDescription &&
-      data.projectDescription != this.projectDescription;
+    const aiSummaryUpdated = isDefined(data.aiSummaryMd)
+      ? data.aiSummaryMd != this.aiSummaryMd
+      : false;
+
+    const projectDescriptionUpdated = isDefined(data.projectDescription)
+      ? data.projectDescription != this.projectDescription
+      : false;
+
+    const statusUpdated = isDefined(data.projectStatus)
+      ? data.projectStatus != this.projectStatus
+      : this.hasUpdatedAiMemory;
 
     const plain: ProjectPlain = {
       id: this.id,
@@ -42,10 +50,12 @@ export class Project extends DomainEntity<ProjectPg> {
       updatedAt: new Date(),
       createdById: this.createdById,
       updatedById: isDefined(actorId) ? actorId : this.updatedById,
+      hasUpdatedAiMemory:
+        aiSummaryUpdated || projectDescriptionUpdated || statusUpdated,
 
       isRequireRegenerate: isDefined(data.isRequireRegenerate)
         ? data.isRequireRegenerate
-        : aiSummaryUpdated || projectDescriptionUpdated,
+        : projectDescriptionUpdated,
       aiSummaryMd: isDefined(data.aiSummaryMd)
         ? data.aiSummaryMd
         : this.aiSummaryMd,

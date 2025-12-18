@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
+import { AppConfig } from '@infra/config';
 import { HttpExceptionFilter } from '@infra/middleware/filter/http-exception.filter';
 
 import myDayjs from '@shared/common/common.dayjs';
@@ -16,15 +17,19 @@ import { CoreZodValidationPipe } from './validation/zod-validation.pipe';
     ThrottlerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const nodeEnv = configService.get<string>('NODE_ENV');
+        const { enableThrottle } =
+          configService.getOrThrow<AppConfig['app']>('app');
 
+        const NODE_ENV = configService.get<string>('NODE_ENV');
         return {
-          throttlers: [
-            {
-              ttl: myDayjs.duration({ seconds: 60 }).asMilliseconds(),
-              limit: nodeEnv === 'local' ? 20000 : 20,
-            },
-          ],
+          throttlers: enableThrottle
+            ? [
+                {
+                  ttl: myDayjs.duration({ seconds: 60 }).asMilliseconds(),
+                  limit: NODE_ENV === 'local' ? 20000 : 20,
+                },
+              ]
+            : [],
         };
       },
     }),
