@@ -24,7 +24,7 @@ export class Project extends DomainEntity<ProjectPg> {
   readonly createdById: string | null;
   readonly updatedById: string | null;
 
-  readonly isStatusChanged: boolean;
+  readonly hasUpdatedAiMemory: boolean;
 
   constructor(plain: ProjectPlain) {
     super();
@@ -35,13 +35,14 @@ export class Project extends DomainEntity<ProjectPg> {
     const aiSummaryUpdated = isDefined(data.aiSummaryMd)
       ? data.aiSummaryMd != this.aiSummaryMd
       : false;
+
     const projectDescriptionUpdated = isDefined(data.projectDescription)
       ? data.projectDescription != this.projectDescription
       : false;
 
-    const isStatusChanged = isDefined(data.projectStatus)
+    const statusUpdated = isDefined(data.projectStatus)
       ? data.projectStatus != this.projectStatus
-      : this.isStatusChanged;
+      : this.hasUpdatedAiMemory;
 
     const plain: ProjectPlain = {
       id: this.id,
@@ -49,11 +50,12 @@ export class Project extends DomainEntity<ProjectPg> {
       updatedAt: new Date(),
       createdById: this.createdById,
       updatedById: isDefined(actorId) ? actorId : this.updatedById,
-      isStatusChanged,
+      hasUpdatedAiMemory:
+        aiSummaryUpdated || projectDescriptionUpdated || statusUpdated,
 
       isRequireRegenerate: isDefined(data.isRequireRegenerate)
         ? data.isRequireRegenerate
-        : aiSummaryUpdated || projectDescriptionUpdated,
+        : projectDescriptionUpdated,
       aiSummaryMd: isDefined(data.aiSummaryMd)
         ? data.aiSummaryMd
         : this.aiSummaryMd,

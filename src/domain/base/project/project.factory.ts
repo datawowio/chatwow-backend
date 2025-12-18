@@ -21,7 +21,7 @@ export function newProject({ actorId, data }: ProjectNewData): Project {
     projectGuidelineMd: data.projectGuidelineMd || '',
     projectStatus: valueOr(data.projectStatus, 'PROCESSING'),
     aiSummaryMd: isDefined(data.aiSummaryMd) ? data.aiSummaryMd : '',
-    isStatusChanged: true,
+    hasUpdatedAiMemory: true,
   });
 }
 
@@ -45,7 +45,7 @@ export function mockProject(data: Partial<ProjectPlain>): Project {
     aiSummaryMd: valueOr(data.aiSummaryMd, ''),
     createdById: valueOr(data.createdById, null),
     updatedById: firstValueOr([data.updatedById, data.createdById], null),
-    isStatusChanged: true,
+    hasUpdatedAiMemory: true,
   });
 }
 

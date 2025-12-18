@@ -26,7 +26,7 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
   readonly createdById: string | null;
   readonly updatedById: string | null;
 
-  readonly isStatusChanged: boolean;
+  readonly hasUpdatedAiMemory: boolean;
 
   constructor(plain: ProjectDocumentPlain) {
     super();
@@ -42,20 +42,21 @@ export class ProjectDocument extends DomainEntity<ProjectDocumentPg> {
       ? data.documentDetails != this.documentDetails
       : false;
 
-    const isStatusChanged = isDefined(data.documentStatus)
+    const statusUpdated = isDefined(data.documentStatus)
       ? data.documentStatus != this.documentStatus
-      : this.isStatusChanged;
+      : this.hasUpdatedAiMemory;
 
     const plain: ProjectDocumentPlain = {
       id: this.id,
       createdAt: this.createdAt,
       updatedAt: myDayjs().toDate(),
       createdById: this.createdById,
-      isStatusChanged,
+      hasUpdatedAiMemory:
+        aiSummaryUpdated || descriptionUpdated || statusUpdated,
 
       isRequireRegenerate: isDefined(data.isRequireRegenerate)
         ? data.isRequireRegenerate
-        : aiSummaryUpdated || descriptionUpdated,
+        : descriptionUpdated,
       updatedById: isDefined(actorId) ? actorId : this.updatedById,
       documentDetails: isDefined(data.documentDetails)
         ? data.documentDetails

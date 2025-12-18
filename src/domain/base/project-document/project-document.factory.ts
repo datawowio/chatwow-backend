@@ -27,7 +27,7 @@ export function newProjectDocument({
     documentDetails: data.documentDetails || '',
     documentStatus: valueOr(data.documentStatus, 'PROCESSING'),
     aiSummaryMd: data.aiSummaryMd || '',
-    isStatusChanged: true,
+    hasUpdatedAiMemory: true,
   });
 }
 
@@ -57,7 +57,7 @@ export function mockProjectDocument(
     createdById: isDefined(data.createdById) ? data.createdById : null,
     updatedById: isDefined(data.updatedById) ? data.updatedById : null,
     updatedAt: isDefined(data.updatedAt) ? data.updatedAt : myDayjs().toDate(),
-    isStatusChanged: true,
+    hasUpdatedAiMemory: true,
   });
 }
 
