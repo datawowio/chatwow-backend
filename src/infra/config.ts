@@ -15,6 +15,7 @@ export type AppConfig = {
     enableBullboard: boolean;
     enableJsonLog: boolean;
     enableCache: boolean;
+    enableThrottle: boolean;
     enableErrorDetails: boolean;
     corsOrigin: string[];
   };
@@ -74,6 +75,7 @@ export const config = (): AppConfig => ({
     enableSwagger: get('ENABLE_SWAGGER').default('true').asBool(),
     enableBullboard: get('ENABLE_BULLBOARD').default('true').asBool(),
     enableJsonLog: get('ENABLE_JSON_LOG').default('true').asBool(),
+    enableThrottle: get('ENABLE_THROTTLE').default('true').asBool(),
     enableErrorDetails: get('ENABLE_ERROR_DETAILS').default('true').asBool(),
     enableCache: get('ENABLE_CACHE').default('false').asBool(),
     memThreshold: get('MEM_THRESHOLD')

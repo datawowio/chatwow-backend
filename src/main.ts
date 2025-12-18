@@ -25,6 +25,7 @@ async function bootstrap() {
       cors: {
         origin: appConfig.corsOrigin,
         methods: ['PATCH', 'HEAD', 'POST', 'GET', 'PUT', 'DELETE', 'OPTIONS'],
+        credentials: true,
         allowedHeaders: [
           'x-device',
           'content-type',
