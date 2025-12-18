@@ -23,6 +23,7 @@ export function projectFromPg(pg: ProjectPg): Project {
     projectGuidelineMd: pg.project_guideline_md,
     projectStatus: pg.project_status,
     aiSummaryMd: pg.ai_summary_md,
+    isStatusChanged: false,
   };
 
   return new Project(plain);
@@ -45,6 +46,7 @@ export function projectFromPlain(plainData: ProjectPlain): Project {
     projectGuidelineMd: plainData.projectGuidelineMd,
     projectStatus: plainData.projectStatus,
     aiSummaryMd: plainData.aiSummaryMd,
+    isStatusChanged: plainData.isStatusChanged,
   };
 
   return new Project(plain);
@@ -63,6 +65,7 @@ export function projectFromJson(json: ProjectJson): Project {
     projectGuidelineMd: json.projectGuidelineMd,
     projectStatus: json.projectStatus,
     aiSummaryMd: json.aiSummaryMd,
+    isStatusChanged: json.isStatusChanged,
   };
 
   return new Project(plain);
@@ -104,6 +107,7 @@ export function projectToPlain(project: Project): ProjectPlain {
     projectGuidelineMd: project.projectGuidelineMd,
     projectStatus: project.projectStatus,
     aiSummaryMd: project.aiSummaryMd,
+    isStatusChanged: project.isStatusChanged,
   };
 }
 
@@ -120,6 +124,7 @@ export function projectToJson(project: Project): ProjectJson {
     projectGuidelineMd: project.projectGuidelineMd,
     projectStatus: project.projectStatus,
     aiSummaryMd: project.aiSummaryMd,
+    isStatusChanged: project.isStatusChanged,
   };
 }
 
