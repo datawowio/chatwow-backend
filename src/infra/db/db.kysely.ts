@@ -31,6 +31,7 @@ export default function getKysely(dbConfig: AppConfig['database']) {
     dialect: new PostgresDialect({
       pool: new pg.Pool({
         connectionString: dbConfig.url,
+        ssl: dbConfig.enableDbSsl,
       }),
     }),
     log(event) {

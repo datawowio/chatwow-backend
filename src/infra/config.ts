@@ -21,6 +21,7 @@ export type AppConfig = {
   };
   database: {
     url: string;
+    enableDbSsl: boolean;
     enableLog: boolean;
     enableAutoMigrate: boolean;
   };
@@ -85,6 +86,7 @@ export const config = (): AppConfig => ({
   },
   database: {
     url: get('DATABASE_URL').required().asString(),
+    enableDbSsl: get('ENABLE_DB_SSL').default('false').asBool(),
     enableLog: get('ENABLE_DB_LOG').default('false').asBool(),
     enableAutoMigrate: get('ENABLE_AUTO_MIGRATE').default('false').asBool(),
   },

@@ -12,7 +12,6 @@ export function coreLogger(appConfig: AppConfig['app']) {
   return WinstonModule.createLogger({
     transports: [
       new transports.Console({
-        level: 'warn',
         format: appConfig.enableJsonLog
           ? format.combine(
               format.timestamp(),
