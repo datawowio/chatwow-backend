@@ -26,6 +26,7 @@ export type AppConfig = {
   };
   storage: {
     enable: boolean;
+    enableAutoBucket: boolean;
     region: string;
     accessKey: string;
     secretKey: string;
@@ -89,6 +90,7 @@ export const config = (): AppConfig => ({
   },
   storage: {
     enable: get('ENABLE_STORAGE').default('false').asBool(),
+    enableAutoBucket: get('ENABLE_AUTO_BUCKET').default('false').asBool(),
     region: get('STORAGE_REGION').default('auto').asString(),
     accessKey: get('STORAGE_ACCESS_KEY').required().asString(),
     secretKey: get('STORAGE_SECRET_KEY').required().asString(),

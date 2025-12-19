@@ -45,7 +45,9 @@ export class StorageService implements OnModuleInit {
     this.defaultBucket = storageConfig.defaultBucket;
     this.enable = storageConfig.enable;
 
-    await this._ensureBucket(this.defaultBucket);
+    if (storageConfig.enableAutoBucket) {
+      await this._ensureBucket(this.defaultBucket);
+    }
   }
 
   async put(file: Express.Multer.File, key: string, opts?: StorageOptions) {
