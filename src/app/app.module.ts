@@ -64,6 +64,7 @@ export class AppCliModule {}
     ConfigModule.forRoot(getConfigOptions()),
 
     DBModule,
+    HealthModule,
     GlobalModule,
     DomainModule,
   ],
