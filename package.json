@@ -12,6 +12,7 @@
     "cmd": "./cmd.sh",
     "start": "node dist/main",
     "start:worker": "node dist/worker",
+    "start:cron": "node dist/cron",
     "start:repl": "node dist/repl",
     "start:cli": "NODE_ENV=cli node dist/cli",
     "build": "nest build",

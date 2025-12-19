@@ -1,0 +1,66 @@
+# Default values for chatwow-backend.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  repository: 240615393030.dkr.ecr.ap-southeast-1.amazonaws.com/skf/backend
+  # This sets the pull policy for images.
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+# Command and args for the container
+# By default, uses the Docker entrypoint (npm run) with "start" as the argument
+command: []
+args:
+  - "start"
+
+# Environment variables for the application
+env: []
+# - name: NODE_ENV
+#   value: "production"
+# - name: DATABASE_URL
+#   valueFrom:
+#     secretKeyRef:
+#       name: chatwow-backend-secrets
+#       key: database-url
+
+# This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  hosts:
+    - host: api-dev.chatwow.datawow.io
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: api-dev.chatwow.datawow.io-tls
+      hosts:
+        - api-dev.chatwow.datawow.io
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+
+secretName: "chatwow-dev-env"

@@ -14,7 +14,6 @@ WORKDIR /usr/src/app
 RUN adduser -S app
 
 COPY --chown=app package.json package-lock.json ./
-COPY --chown=app .env .env
 COPY --chown=app --from=builder /usr/src/app/dist ./dist
 COPY --chown=app --from=builder /usr/src/app/package.json ./package.json
 

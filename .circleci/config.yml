@@ -1,0 +1,33 @@
+version: 2.1
+
+orbs:
+  standard-cicd: datawowio/standard-cicd-orb@dev:ci-pipeline
+
+defaults: &defaults
+  context: CHATWOW_AWS
+  registry_type: "ecr"
+  ecr_repository_name: "240615393030.dkr.ecr.ap-southeast-1.amazonaws.com/chatwow/backend"
+
+workflows:
+  build-deploy:
+    jobs:
+      - standard-cicd/build-and-push-amd64:
+          <<: *defaults
+          dockerfile_path: dockerfile
+          filters:
+            branches:
+              only:
+                - main
+      - standard-cicd/deploy:
+          <<: *defaults 
+          eks_cluster_name: datawow-staging
+          namespace: chatwow
+          deploy_env: dev
+          release_name: "chatwow-backend"
+          helm_location: "helm/chatwow-backend"
+          requires:
+            -  standard-cicd/build-and-push-amd64
+          filters:
+            branches:
+              only:
+                - main
