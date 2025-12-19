@@ -18,6 +18,22 @@ workflows:
             branches:
               only:
                 - main
+      - standard-cicd/build-and-push-arm64:
+            <<: *defaults
+            dockerfile_path: dockerfile
+            filters:
+              branches:
+                only:
+                  - main
+      - standard-cicd/manifest-merge:
+          <<: *defaults
+          requires:
+            - standard-cicd/build-and-push-amd64
+            - standard-cicd/build-and-push-arm64
+          filters:
+            branches:
+              only:
+                - main
       - standard-cicd/deploy:
           <<: *defaults 
           eks_cluster_name: datawow-staging
@@ -27,7 +43,7 @@ workflows:
           release_name: "chatwow-backend"
           helm_location: "helm/chatwow-backend"
           requires:
-            -  standard-cicd/build-and-push-amd64
+            - standard-cicd/manifest-merge
           filters:
             branches:
               only:
