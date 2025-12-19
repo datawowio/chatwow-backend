@@ -94,8 +94,8 @@ export const config = (): AppConfig => ({
     enable: get('ENABLE_STORAGE').default('false').asBool(),
     enableAutoBucket: get('ENABLE_AUTO_BUCKET').default('false').asBool(),
     region: get('STORAGE_REGION').default('auto').asString(),
-    accessKey: get('STORAGE_ACCESS_KEY').required().asString(),
-    secretKey: get('STORAGE_SECRET_KEY').required().asString(),
+    accessKey: get('STORAGE_ACCESS_KEY').default('').asString(),
+    secretKey: get('STORAGE_SECRET_KEY').default('').asString(),
     endpoint: get('STORAGE_ENDPOINT').default('').asString(),
     defaultBucket: get('STORAGE_DEFAULT_BUCKET').default('app').asString(),
     enableforcePath: get('ENALBLE_STORAGE_FORCE_PATH')

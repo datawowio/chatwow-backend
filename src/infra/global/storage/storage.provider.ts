@@ -17,14 +17,19 @@ export const StorageProvider: Provider = {
       return null;
     }
 
+    const hasCredential =
+      !!storageConfig.accessKey && !!storageConfig.secretKey;
+
     const s3 = new S3Client({
       region: storageConfig.region,
       endpoint: storageConfig.endpoint ? 'http://localhost:9000' : undefined,
       forcePathStyle: storageConfig.enableforcePath,
-      credentials: {
-        accessKeyId: storageConfig.accessKey!,
-        secretAccessKey: storageConfig.secretKey!,
-      },
+      credentials: hasCredential
+        ? {
+            accessKeyId: storageConfig.accessKey!,
+            secretAccessKey: storageConfig.secretKey!,
+          }
+        : undefined,
     });
 
     return s3;

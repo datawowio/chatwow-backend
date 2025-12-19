@@ -3,7 +3,7 @@ import { FastifyAdapter } from '@nestjs/platform-fastify';
 import qs from 'qs';
 
 import { config } from '@infra/config';
-import { KYSELY, runMigrations } from '@infra/db/db.common';
+import { KYSELY, pingDatabase, runMigrations } from '@infra/db/db.common';
 
 import { coreLogger } from '@shared/common/common.logger';
 import { setupApp, setupSwagger } from '@shared/http/http.setup';
@@ -42,6 +42,9 @@ async function bootstrap() {
   if (appConfig.enableSwagger) {
     setupSwagger(app);
   }
+
+  // ping check
+  await pingDatabase(app.get(KYSELY));
 
   // Run migration
   if (dbConfig.enableAutoMigrate) {

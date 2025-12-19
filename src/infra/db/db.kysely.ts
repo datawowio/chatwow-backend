@@ -1,5 +1,7 @@
 import chalk from 'chalk';
+import { readFileSync } from 'fs';
 import { DeduplicateJoinsPlugin, Kysely, PostgresDialect } from 'kysely';
+import path from 'path';
 import * as pg from 'pg';
 
 import type { AppConfig } from '../config';
@@ -31,7 +33,11 @@ export default function getKysely(dbConfig: AppConfig['database']) {
     dialect: new PostgresDialect({
       pool: new pg.Pool({
         connectionString: dbConfig.url,
-        ssl: dbConfig.enableDbSsl,
+        ssl: dbConfig.enableDbSsl
+          ? {
+              ca: readFileSync(path.join(__dirname, 'ca.pem')),
+            }
+          : false,
       }),
     }),
     log(event) {

@@ -16,6 +16,7 @@ RUN adduser -S app
 COPY --chown=app package.json package-lock.json ./
 COPY --chown=app --from=builder /usr/src/app/dist ./dist
 COPY --chown=app --from=builder /usr/src/app/package.json ./package.json
+COPY --chown=app --from=builder /usr/src/app/ca.pem ./dist/infra/db/ca.pem
 
 RUN npm ci --omit=dev
 USER app

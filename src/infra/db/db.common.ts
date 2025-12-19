@@ -9,7 +9,7 @@ import type {
   SqlBool,
   Transaction,
 } from 'kysely';
-import { FileMigrationProvider, Migrator } from 'kysely';
+import { FileMigrationProvider, Migrator, sql } from 'kysely';
 import type { InsertObject } from 'kysely/dist/cjs/parser/insert-values-parser';
 import type { UpdateObject } from 'kysely/dist/cjs/parser/update-set-parser';
 import * as path from 'path';
@@ -69,5 +69,15 @@ export function getErrorKey(e: DatabaseError) {
       return 'invalidRef';
     default:
       return 'internal';
+  }
+}
+
+export async function pingDatabase(db: Kysely<any>) {
+  try {
+    // Execute 'SELECT 1' to verify connection
+    await sql`SELECT 1`.execute(db);
+    return true;
+  } catch (error) {
+    throw error;
   }
 }
