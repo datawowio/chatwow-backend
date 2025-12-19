@@ -34,7 +34,6 @@ ingress:
   enabled: true
   className: "nginx"
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   hosts:
     - host: api-dev.chatwow.datawow.io
@@ -42,7 +41,7 @@ ingress:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: api-dev.chatwow.datawow.io-tls
+    - secretName: datawow.io-tls
       hosts:
         - api-dev.chatwow.datawow.io
 
