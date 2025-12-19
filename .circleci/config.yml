@@ -6,7 +6,7 @@ orbs:
 defaults: &defaults
   context: CHATWOW_AWS
   registry_type: "ecr"
-  ecr_repository_name: "240615393030.dkr.ecr.ap-southeast-1.amazonaws.com/chatwow/backend"
+  ecr_repository_name: "chatwow/backend"
 
 workflows:
   build-deploy:
