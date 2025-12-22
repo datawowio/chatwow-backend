@@ -4,7 +4,7 @@ import { ExchangeConfig } from '@app/worker/worker.constant';
 
 import { TaskMetadata, getTaskHandlers } from '@shared/task/task.decorator';
 
-import { InvalidJobPayloadParseException } from './amqp.common';
+import { InvalidJobPayloadParseException, wrapJobMeta } from './amqp.common';
 import { AmqpService } from './amqp.service';
 
 @Injectable()
@@ -14,7 +14,11 @@ export abstract class BaseAmqpExchange {
   constructor(private amqpService: AmqpService) {}
 
   addJob(name: string, data?: any) {
-    this.amqpService.publishMessage(this.config.name, name, data ?? {});
+    this.amqpService.publishMessage(
+      this.config.name,
+      name,
+      data ?? wrapJobMeta({}),
+    );
   }
 }
 
