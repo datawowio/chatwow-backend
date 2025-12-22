@@ -11,7 +11,7 @@ export abstract class HttpBaseException extends HttpException {
   abstract httpStatus: number;
 
   constructor(info: Info<string>) {
-    super('Expected Http Exception', 0);
+    super(info.key || info.context || 'Expected Http Exception', 0);
     this.key = info.key;
     this.fields = info.fields;
     this.context = info.context;
