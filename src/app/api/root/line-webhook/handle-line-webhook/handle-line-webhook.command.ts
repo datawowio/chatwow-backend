@@ -1,19 +1,20 @@
+import { lineBotToPlain } from '@domain/base/line-bot/line-bot.mapper';
+import { LineBotService } from '@domain/base/line-bot/line-bot.service';
 import { LineEventQueue } from '@domain/queue/line-event/line-event.queue';
 import { Injectable, RawBodyRequest } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { FastifyRequest } from 'fastify';
 
-import { AppConfig } from '@infra/config';
 import { LineService } from '@infra/global/line/line.service';
 import { LineWebHookMessage } from '@infra/global/line/line.type';
 
 import { getLineInfoFromReq } from '@shared/common/common.line';
+import { ApiException } from '@shared/http/http.exception';
 
 @Injectable()
 export class HandleLineWebhookCommand {
   constructor(
-    private configService: ConfigService,
     private lineEventQueue: LineEventQueue,
+    private lineBotService: LineBotService,
   ) {}
 
   async exec(
@@ -21,10 +22,13 @@ export class HandleLineWebhookCommand {
     lineBotId: string,
     data: LineWebHookMessage,
   ) {
-    const lineConfig = this.configService.getOrThrow<AppConfig['line']>('line');
+    const linebot = await this.lineBotService.findOne(lineBotId);
+    if (!linebot) {
+      throw new ApiException(404, 'lineBotNotFound');
+    }
 
-    const channelAccessToken = lineConfig.defaultAccessToken;
-    const channelSecret = lineConfig.defaultSecret;
+    const { channelAccessToken, channelSecret } = lineBotToPlain(linebot);
+
     const lineService = new LineService({
       channelAccessToken,
       channelSecret,
