@@ -16,3 +16,7 @@ export type AppendChatLogOpts = {
 export type ChatJsonContent = {
   logs: { chat_sender: ChatSender; message: string; created_at: string }[];
 };
+
+export type MetadataContent = {
+  enable: boolean;
+};

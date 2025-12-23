@@ -9,14 +9,20 @@ import { StorageService } from '@infra/global/storage/storage.service';
 import { streamToBuffer } from '@shared/common/common.buffer';
 import myDayjs from '@shared/common/common.dayjs';
 
-import { AppendChatLogOpts, ChatJsonContent } from './ai-file.type';
+import {
+  AppendChatLogOpts,
+  ChatJsonContent,
+  MetadataContent,
+} from './ai-file.type';
 import {
   getChatFileKeyPath,
   getProjectDocumentFolderPath,
+  getProjectDocumentMetadataKeyPath,
   getProjectDocumentRawFileKeyPath,
   getProjectDocumentSummaryKeyPath,
   getProjectDocumentUserDescriptionKeyPath,
   getProjectFolderPath,
+  getProjectMetadataKeyPath,
   getProjectSummaryKeyPath,
   getProjectUserDescriptionKeyPath,
 } from './ai-file.util';
@@ -32,7 +38,19 @@ export class AiFileService {
     await Promise.all([
       this.writeProjectSummary(project),
       this.writeProjectUserDescription(project),
+      this.writeProjectMetadata(project),
     ]);
+  }
+
+  async writeProjectMetadata(project: Project) {
+    const content: MetadataContent = {
+      enable: project.projectStatus === 'ACTIVE',
+    };
+
+    await this._writeJsonContent(
+      getProjectMetadataKeyPath(project.id),
+      content,
+    );
   }
 
   async writeProjectSummary(project: Project) {
@@ -70,6 +88,7 @@ export class AiFileService {
     await Promise.all([
       this.writeProjectDocumentSummary(projectDocument),
       this.writeProjectDocumentUserDescription(projectDocument),
+      this.writeProjectDocumentMetadata(projectDocument),
     ]);
   }
 
@@ -90,6 +109,20 @@ export class AiFileService {
     );
 
     await this.storageService.putBuffer(buffer, keyPath);
+  }
+
+  async writeProjectDocumentMetadata(projectDocument: ProjectDocument) {
+    const content: MetadataContent = {
+      enable: projectDocument.documentStatus === 'ACTIVE',
+    };
+
+    await this._writeJsonContent(
+      getProjectDocumentMetadataKeyPath(
+        projectDocument.projectId,
+        projectDocument.id,
+      ),
+      content,
+    );
   }
 
   async getProjectDocumentSummary(
@@ -143,7 +176,7 @@ export class AiFileService {
       });
     });
 
-    await this._writeChatContent(keyPath, content);
+    await this._writeJsonContent(keyPath, content);
   }
 
   private async _getChatContent(keyPath: string): Promise<ChatJsonContent> {
@@ -171,7 +204,7 @@ export class AiFileService {
     return keyPath;
   }
 
-  private async _writeChatContent(keyPath: string, content: ChatJsonContent) {
+  private async _writeJsonContent(keyPath: string, content: any) {
     const buffer = Buffer.from(JSON.stringify(content), 'utf-8');
     await this.storageService.putBuffer(buffer, keyPath);
   }

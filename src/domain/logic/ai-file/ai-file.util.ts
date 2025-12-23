@@ -27,6 +27,10 @@ export function getProjectUserDescriptionKeyPath(projectId: string) {
   return join(getProjectFolderPath(projectId), 'user_description.txt');
 }
 
+export function getProjectMetadataKeyPath(projectId: string) {
+  return join(getProjectFolderPath(projectId), 'metadata.json');
+}
+
 export function getProjectDocumentSummaryKeyPath(
   projectId: string,
   projectDocumentId: string,
@@ -44,6 +48,16 @@ export function getProjectDocumentUserDescriptionKeyPath(
   return join(
     getProjectDocumentFolderPath(projectId, projectDocumentId),
     'user_description.txt',
+  );
+}
+
+export function getProjectDocumentMetadataKeyPath(
+  projectId: string,
+  projectDocumentId: string,
+) {
+  return join(
+    getProjectDocumentFolderPath(projectId, projectDocumentId),
+    'metadata.json',
   );
 }
 
