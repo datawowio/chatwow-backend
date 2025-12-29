@@ -27,15 +27,6 @@ export class AiApiService {
   }
 
   async chat(opts: SendAiApiOpts): Promise<AiChat> {
-    return {
-      isSuccess: true,
-      data: {
-        text: 'ตอบสำเร็จ',
-        tokenUsed: 0,
-      },
-    };
-
-    // TODO: Use this after DE Finish implement
     const url = `${this.url}/chat`;
     const data: AiRequest = {
       text: opts.text,
