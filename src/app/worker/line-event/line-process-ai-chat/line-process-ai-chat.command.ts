@@ -57,6 +57,14 @@ export class LineProcessAiChatCommand {
       throw new Error(`AI error: ${res.err.message}`);
     }
 
+    body.lineChatLogs.push(
+      newLineChatLog({
+        chatSender: 'BOT',
+        lineSessionId: body.lineSession.id,
+        message: res.data.text,
+        lineAccountId: body.lineSession.lineAccountId,
+      }),
+    );
     await lineService.reply(body.replyToken, res.data.text);
   }
 
