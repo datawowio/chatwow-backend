@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AxiosError } from 'axios';
-import rx from 'rxjs';
+import * as rx from 'rxjs';
 
 import { AppConfig } from '@infra/config';
 
