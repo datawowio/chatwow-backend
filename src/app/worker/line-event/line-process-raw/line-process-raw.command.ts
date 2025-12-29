@@ -162,6 +162,7 @@ export class LineProcessRawCommand {
             .selectAll()
             .where(lineSessionsTableFilter)
             .where('line_sessions.line_session_status', '!=', 'INACTIVE')
+            .where('line_sessions.line_bot_id', '=', lineBot.id)
             .whereRef('line_accounts.id', '=', 'line_sessions.line_account_id'),
         ).as('activeSession'),
       ])
