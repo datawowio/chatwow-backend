@@ -66,7 +66,7 @@ export class LineProcessAiChatCommand {
       .selectAll('projects')
       .where(projectsTableFilter)
       .where('projects.id', '=', projectId)
-      .where('projects.project_status', '=', 'INACTIVE')
+      .where('projects.project_status', '!=', 'INACTIVE')
       .executeTakeFirst();
 
     if (!raw) {
