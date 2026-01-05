@@ -52,14 +52,14 @@ export class UsersV1Controller {
   ) {}
 
   @Get()
-  @UseRoleGuard(['ADMIN'])
+  @UseRoleGuard(['ADMIN', 'MANAGER'])
   @ApiResponse({ type: () => ListUsersResponse })
   async getUsers(@Query() query: ListUsersDto) {
     return this.listUsersQuery.exec(query);
   }
 
   @Post()
-  @UseRoleGuard(['ADMIN'])
+  @UseRoleGuard(['ADMIN', 'MANAGER'])
   @ApiResponse({ type: () => AddUserResponse })
   async addUser(
     @UserClaims() claims: UserClaims,
@@ -69,7 +69,7 @@ export class UsersV1Controller {
   }
 
   @Get('summary')
-  @UseRoleGuard(['ADMIN'])
+  @UseRoleGuard(['ADMIN', 'MANAGER'])
   @ApiResponse({ type: () => UserSummaryResponse })
   async getUserSummary(
     @Query() query: UserSummaryDto,
@@ -105,7 +105,7 @@ export class UsersV1Controller {
   }
 
   @Get(':id')
-  @UseRoleGuard(['ADMIN'])
+  @UseRoleGuard(['ADMIN', 'MANAGER'])
   @ApiResponse({ type: () => GetUserResponse })
   async getUser(
     @Param('id', ParseUUIDPipe) id: string,
@@ -115,7 +115,7 @@ export class UsersV1Controller {
   }
 
   @Patch(':id')
-  @UseRoleGuard(['ADMIN'])
+  @UseRoleGuard(['ADMIN', 'MANAGER'])
   @ApiResponse({ type: () => EditUserResponse })
   async editUser(
     @UserClaims() claims: UserClaims,
@@ -126,7 +126,7 @@ export class UsersV1Controller {
   }
 
   @Delete(':id')
-  @UseRoleGuard(['ADMIN'])
+  @UseRoleGuard(['ADMIN', 'MANAGER'])
   @ApiResponse({ type: () => DeleteUserResponse })
   async deleteUser(
     @Param('id', ParseUUIDPipe) id: string,
@@ -135,7 +135,7 @@ export class UsersV1Controller {
   }
 
   @Post(':id/resend-invite')
-  @UseRoleGuard(['ADMIN'])
+  @UseRoleGuard(['ADMIN', 'MANAGER'])
   @ApiResponse({ type: () => ResendInviteResponse })
   async resendInvite(
     @Param('id', ParseUUIDPipe) id: string,
