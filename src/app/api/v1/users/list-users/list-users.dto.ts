@@ -20,8 +20,8 @@ import { usersV1IncludesZod } from '../users.v1.util';
 const zod = z.object({
   includes: usersV1IncludesZod,
   sort: userSortZod,
-  filter: userFilterZod,
-  countFilter: userFilterZod,
+  filter: userFilterZod.optional(),
+  countFilter: userFilterZod.optional(),
   pagination: paginationZod,
 });
 

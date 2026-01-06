@@ -18,6 +18,8 @@ import { AddUserCommand } from './add-user/add-user.command';
 import { AddUserDto, AddUserResponse } from './add-user/add-user.dto';
 import { CheckMeDto, CheckMeResponse } from './check-me/check-me.dto';
 import { CheckMeQuery } from './check-me/check-me.query';
+import { CheckUserDto, CheckUserResponse } from './check-user/check-user.dto';
+import { CheckUserQuery } from './check-user/check-user.query';
 import { DeleteUserCommand } from './delete-user/delete-user.command';
 import { DeleteUserResponse } from './delete-user/delete-user.dto';
 import { EditUserCommand } from './edit-user/edit-user.command';
@@ -48,6 +50,7 @@ export class UsersV1Controller {
     private userSummaryQuery: UserSummaryQuery,
     private deleteUserCommand: DeleteUserCommand,
     private checkMeQuery: CheckMeQuery,
+    private checkUserQuery: CheckUserQuery,
     private updateMeCommand: UpdateMeCommand,
   ) {}
 
@@ -75,6 +78,13 @@ export class UsersV1Controller {
     @Query() query: UserSummaryDto,
   ): Promise<UserSummaryResponse> {
     return this.userSummaryQuery.exec(query);
+  }
+
+  @Get('check')
+  @UseRoleGuard(['ADMIN', 'MANAGER'])
+  @ApiResponse({ type: () => CheckUserResponse })
+  async checkUser(@Query() query: CheckUserDto): Promise<CheckUserResponse> {
+    return this.checkUserQuery.exec(query);
   }
 
   @Get('me')
