@@ -9,6 +9,8 @@ export type ActionType = "CREATE" | "DELETE" | "UPDATE";
 
 export type ActorType = "SYSTEM" | "USER";
 
+export type AiUsageAction = "CHAT_LINE" | "CHAT_PROJECT" | "GENERATE_PROJECT_DOCUMENT_SUMMARY" | "GENERATE_PROJECT_SUMMARY";
+
 export type ChatSender = "BOT" | "USER";
 
 export type DocumentStatus = "ACTIVE" | "INACTIVE" | "PROCESSING";
@@ -38,6 +40,21 @@ export type ProjectStatus = "ACTIVE" | "INACTIVE" | "PROCESSING";
 export type UserRole = "ADMIN" | "MANAGER" | "USER";
 
 export type UserStatus = "ACTIVE" | "INACTIVE" | "PENDING_REGISTRATION";
+
+export interface AiUsages {
+  ai_reply_at: string;
+  ai_request_at: string;
+  ai_usage_action: AiUsageAction;
+  confidence: number;
+  created_at: Generated<string>;
+  id: string;
+  project_id: string;
+  ref_id: string;
+  ref_table: string;
+  reply_time_ms: number;
+  token_used: number;
+  user_id: string;
+}
 
 export interface AuditLogs {
   action_detail: Generated<string>;
@@ -239,6 +256,7 @@ export interface UserVerifications {
 }
 
 export interface DB {
+  ai_usages: AiUsages;
   audit_logs: AuditLogs;
   line_accounts: LineAccounts;
   line_bots: LineBots;

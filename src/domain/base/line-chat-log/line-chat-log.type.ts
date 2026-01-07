@@ -28,4 +28,5 @@ export type LineChatLogNewData = {
 
 export type LineChatLogUpdateData = {
   lineSessionId?: string;
+  message?: string;
 };

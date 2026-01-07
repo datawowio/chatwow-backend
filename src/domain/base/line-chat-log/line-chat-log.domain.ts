@@ -28,7 +28,7 @@ export class LineChatLog extends DomainEntity<LineChatLogPg> {
       id: this.id,
       createdAt: this.createdAt,
       chatSender: this.chatSender,
-      message: this.message,
+      message: valueOr(data.message, this.message),
       lineAccountId: this.lineAccountId,
       parentId: this.parentId,
 

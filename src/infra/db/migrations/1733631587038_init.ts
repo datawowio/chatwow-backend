@@ -60,6 +60,16 @@ export async function up(db: Kysely<any>): Promise<void> {
     .asEnum(['INVALID_PAYLOAD', 'FAIL', 'SUCCESS', 'DEAD'])
     .execute();
 
+  await db.schema
+    .createType('ai_usage_action')
+    .asEnum([
+      'CHAT_LINE',
+      'CHAT_PROJECT',
+      'GENERATE_PROJECT_SUMMARY',
+      'GENERATE_PROJECT_DOCUMENT_SUMMARY',
+    ])
+    .execute();
+
   //
   // LINE_ACCOUNTS
   //
@@ -457,6 +467,27 @@ export async function up(db: Kysely<any>): Promise<void> {
     .execute();
 
   //
+  // AI USAGES
+  //
+  await db.schema
+    .createTable('ai_usages')
+    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('user_id', 'uuid', (col) => col.notNull())
+    .addColumn('ai_usage_action', sql`ai_usage_action`, (col) => col.notNull())
+    .addColumn('project_id', 'uuid', (col) => col.notNull())
+    .addColumn('created_at', 'timestamptz', (col) =>
+      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
+    )
+    .addColumn('ai_request_at', 'timestamptz', (col) => col.notNull())
+    .addColumn('ai_reply_at', 'timestamptz', (col) => col.notNull())
+    .addColumn('reply_time_ms', 'int4', (col) => col.notNull())
+    .addColumn('token_used', 'int4', (col) => col.notNull())
+    .addColumn('confidence', 'int2', (col) => col.notNull())
+    .addColumn('ref_table', 'text', (col) => col.notNull())
+    .addColumn('ref_id', 'uuid', (col) => col.notNull())
+    .execute();
+
+  //
   // Sessions
   //
   await db.schema
@@ -504,6 +535,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .column('token_hash')
     .execute();
 
+  // message tasks
   await db.schema
     .createTable('message_tasks')
     .addColumn('id', 'uuid', (col) => col.primaryKey())

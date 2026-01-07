@@ -1,3 +1,7 @@
+import { AI_USAGE_REF_TABLE } from '@domain/base/ai-usage/ai-usage.constant';
+import { AiUsage } from '@domain/base/ai-usage/ai-usage.domain';
+import { newAiUsage } from '@domain/base/ai-usage/ai-usage.factory';
+import { AiUsageService } from '@domain/base/ai-usage/ai-usage.service';
 import { ProjectChatLog } from '@domain/base/project-chat-log/project-chat-log.domain';
 import { newProjectChatLog } from '@domain/base/project-chat-log/project-chat-log.factory';
 import { projectChatLogToResponse } from '@domain/base/project-chat-log/project-chat-log.mapper';
@@ -29,6 +33,8 @@ type Entity = {
   projectChatSession: ProjectChatSession;
   project: Project;
   userChatLog: ProjectChatLog;
+  botChatLog?: ProjectChatLog;
+  aiUsage?: AiUsage;
 };
 
 @Injectable()
@@ -38,6 +44,7 @@ export class ProjectChatCommand implements CommandInterface {
     private projectChatLogService: ProjectChatLogService,
     private projectChatSessionService: ProjectChatSessionService,
     private aiApiService: AiApiService,
+    private aiUsageService: AiUsageService,
     private loggerService: LoggerService,
     private transactionService: TransactionService,
     private aiFileService: AiFileService,
@@ -50,13 +57,16 @@ export class ProjectChatCommand implements CommandInterface {
     body: ProjectChatDto,
   ): Promise<ProjectChatResponse> {
     const entity = await this.find(claims, projectId, sessionId, body);
-    const botChatLog = await this.processAiChat(body.text, entity);
+    const { botChatLog, aiUsage } = await this.processAiChat(body.text, entity);
+
+    entity.botChatLog = botChatLog;
+    entity.aiUsage = aiUsage;
 
     entity.projectChatSession.edit({
       latestChatLogId: botChatLog.id,
     });
 
-    await this.save(entity, botChatLog);
+    await this.save(entity);
 
     return toHttpSuccess({
       data: {
@@ -68,7 +78,17 @@ export class ProjectChatCommand implements CommandInterface {
     });
   }
 
-  async save(entity: Entity, botChatLog: ProjectChatLog): Promise<void> {
+  async save(entity: Entity): Promise<void> {
+    if (!entity.botChatLog) {
+      throw new ApiException(500, 'unexpectNoBotChatLog');
+    }
+    if (!entity.aiUsage) {
+      throw new ApiException(500, 'unexpectNoAiUsage');
+    }
+
+    const botChatLog = entity.botChatLog;
+    const aiUsage = entity.aiUsage;
+
     await this.transactionService.transaction(async () => {
       await this.projectChatLogService.saveBulk([
         entity.userChatLog,
@@ -80,6 +100,8 @@ export class ProjectChatCommand implements CommandInterface {
         sessionId: entity.projectChatSession.id,
         lineChatLogs: [entity.userChatLog, botChatLog],
       });
+
+      await this.aiUsageService.save(aiUsage);
     });
   }
 
@@ -133,13 +155,21 @@ export class ProjectChatCommand implements CommandInterface {
   async processAiChat(
     text: string,
     { project, projectChatSession, userChatLog }: Entity,
-  ): Promise<ProjectChatLog> {
-    const errorReplyChat = newProjectChatLog({
+  ) {
+    const botChatLog = newProjectChatLog({
       chatSender: 'BOT',
       message: LINE_AI_ERROR_REPLY,
       parentId: userChatLog.id,
       projectChatSessionId: projectChatSession.id,
     });
+
+    const aiUsage = newAiUsage({
+      userId: projectChatSession.userId,
+      projectId: project.id,
+      aiUsageAction: 'CHAT_PROJECT',
+      refId: botChatLog.id,
+      refTable: AI_USAGE_REF_TABLE.PROJECT_CHAT_LOG,
+    }).record();
 
     try {
       const res = await this.aiApiService.chat({
@@ -148,19 +178,20 @@ export class ProjectChatCommand implements CommandInterface {
         sessionId: projectChatSession.id,
       });
 
-      if (!res.isSuccess) {
-        return errorReplyChat;
+      if (res.isSuccess) {
+        botChatLog.edit({
+          message: res.data.text,
+        });
+        aiUsage.stopRecord({
+          tokenUsed: res.data.tokenUsed,
+          confidence: 100,
+        });
       }
-
-      return newProjectChatLog({
-        chatSender: 'BOT',
-        message: res.data.text,
-        parentId: userChatLog.id,
-        projectChatSessionId: projectChatSession.id,
-      });
     } catch (error) {
       this.loggerService.error(error);
-      return errorReplyChat;
+      aiUsage.stopRecordError();
     }
+
+    return { botChatLog, aiUsage };
   }
 }

@@ -9,6 +9,13 @@ Enum "actor_type" {
   "SYSTEM"
 }
 
+Enum "ai_usage_action" {
+  "CHAT_LINE"
+  "CHAT_PROJECT"
+  "GENERATE_PROJECT_SUMMARY"
+  "GENERATE_PROJECT_DOCUMENT_SUMMARY"
+}
+
 Enum "chat_sender" {
   "USER"
   "BOT"
@@ -251,6 +258,21 @@ Table "audit_logs" {
   Indexes {
     owner_id [type: btree, name: "audit_logs_owner_id_idx"]
   }
+}
+
+Table "ai_usages" {
+  "id" uuid [pk, not null]
+  "user_id" uuid [not null]
+  "ai_usage_action" ai_usage_action [not null]
+  "project_id" uuid [not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "ai_request_at" timestamptz [not null]
+  "ai_reply_at" timestamptz [not null]
+  "reply_time_ms" int4 [not null]
+  "token_used" int4 [not null]
+  "confidence" int2 [not null]
+  "ref_table" text [not null]
+  "ref_id" uuid [not null]
 }
 
 Table "sessions" {
