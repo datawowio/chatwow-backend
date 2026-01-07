@@ -169,6 +169,9 @@ export class UserService {
       .$if(isDefined(filter?.userStatus), (q) =>
         q.where('users.user_status', '=', filter!.userStatus!),
       )
+      .$if(!!filter?.userStatuses?.length, (q) =>
+        q.where('users.user_status', 'in', filter!.userStatuses!),
+      )
       .$if(isDefined(filter?.email), (q) =>
         q.where('users.email', '=', filter!.email!),
       )

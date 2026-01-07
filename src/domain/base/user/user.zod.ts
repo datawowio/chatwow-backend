@@ -14,6 +14,9 @@ export const userFilterZod = z.object({
   role: z.enum(USER_ROLE).optional(),
   roles: z.preprocess(toSplitCommaArray, z.array(z.enum(USER_ROLE))).optional(),
   userStatus: z.enum(USER_STATUS).optional(),
+  userStatuses: z
+    .preprocess(toSplitCommaArray, z.array(z.enum(USER_STATUS)))
+    .optional(),
   userGroupIds: parmUuidsZod.optional(),
   search: z.string().optional(),
 });
