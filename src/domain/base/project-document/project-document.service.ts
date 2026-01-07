@@ -165,6 +165,13 @@ export class ProjectDocumentService {
           .innerJoin('projects', 'projects.id', 'project_documents.project_id')
           .where('projects.id', 'in', filter!.projectIds!),
       )
+      .$if(!!filter?.documentStatuses?.length, (qb) =>
+        qb.where(
+          'project_documents.document_status',
+          'in',
+          filter!.documentStatuses!,
+        ),
+      )
       .$if(!!filter?.storedFileExtensions?.length, (qb) =>
         qb
           .innerJoin(

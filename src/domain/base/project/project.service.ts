@@ -148,6 +148,9 @@ export class ProjectService {
           )
           .where('user_group_users.user_id', '=', filter!.userId!),
       )
+      .$if(!!filter?.projectStatuses?.length, (q) =>
+        q.where('projects.project_status', 'in', filter!.projectStatuses!),
+      )
       .$if(!!filter?.userGroupIds?.length, (q) =>
         q
           .leftJoin(

@@ -14,6 +14,9 @@ export type ProjectDocumentSortKey = 'id';
 export const projectDocumentFilterZod = z
   .object({
     documentStatus: z.enum(PROJECT_DOCUMENT_STATUS).optional(),
+    documentStatuses: z
+      .preprocess(toSplitCommaArray, z.array(z.enum(PROJECT_DOCUMENT_STATUS)))
+      .optional(),
     projectName: z.string().optional(),
     search: z.string().optional(),
     projectIds: parmUuidsZod.optional(),
