@@ -8,6 +8,7 @@ import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 import { diff, getUniqueIds } from '@shared/common/common.func';
 import { isDefined } from '@shared/common/common.validator';
 
+import { STORED_FILE_REF_NAME } from '../stored-file/stored-file.constant';
 import { ProjectDocument } from './project-document.domain';
 import {
   projectDocumentFromPgWithState,
@@ -163,6 +164,16 @@ export class ProjectDocumentService {
         qb
           .innerJoin('projects', 'projects.id', 'project_documents.project_id')
           .where('projects.id', 'in', filter!.projectIds!),
+      )
+      .$if(!!filter?.storedFileExtensions?.length, (qb) =>
+        qb
+          .innerJoin(
+            'stored_files',
+            'stored_files.owner_id',
+            'project_documents.id',
+          )
+          .where('stored_files.ref_name', '=', STORED_FILE_REF_NAME.DEFAULT)
+          .where('stored_files.extension', 'in', filter!.storedFileExtensions!),
       )
       .$if(isDefined(filter?.search), (qb) => {
         const search = `%${filter!.search!}%`;
