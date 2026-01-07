@@ -42,7 +42,7 @@ export type UserRole = "ADMIN" | "MANAGER" | "USER";
 export type UserStatus = "ACTIVE" | "INACTIVE" | "PENDING_REGISTRATION";
 
 export interface AiUsages {
-  ai_reply_at: string;
+  ai_reply_at: string | null;
   ai_request_at: string;
   ai_usage_action: AiUsageAction;
   confidence: number;
@@ -51,9 +51,9 @@ export interface AiUsages {
   project_id: string;
   ref_id: string;
   ref_table: string;
-  reply_time_ms: number;
+  reply_time_ms: number | null;
   token_used: number;
-  user_id: string;
+  user_id: string | null;
 }
 
 export interface AuditLogs {

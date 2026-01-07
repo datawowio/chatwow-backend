@@ -7,9 +7,6 @@ export class AiUsageResponse {
   id: string;
 
   @ApiProperty({ example: UUID_EXAMPLE })
-  userId: string;
-
-  @ApiProperty({ example: UUID_EXAMPLE })
   projectId: string;
 
   @ApiProperty({ example: DATE_EXAMPLE })
@@ -22,7 +19,7 @@ export class AiUsageResponse {
   aiReplyAt: string | null;
 
   @ApiProperty({ example: 0 })
-  replyTimeMs: number;
+  replyTimeMs: number | null;
 
   @ApiProperty({ example: 100 })
   tokenUsed: number;

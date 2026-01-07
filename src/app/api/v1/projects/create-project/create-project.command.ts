@@ -23,7 +23,7 @@ import { User } from '@domain/base/user/user.domain';
 import { userToResponse } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
 import { AiFileService } from '@domain/logic/ai-file/ai-file.service';
-import { AiEventQueue } from '@domain/queue/ai-event/ai-event.queue';
+import { QueueDispatchService } from '@domain/logic/queue-dispatch/queue-dispatch.service';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
@@ -59,7 +59,7 @@ export class CreateProjectCommand implements CommandInterface {
     private userGroupProjectService: UserGroupProjectService,
     private transactionService: TransactionService,
     private aiFileService: AiFileService,
-    private aiEventQueue: AiEventQueue,
+    private queueDispatchService: QueueDispatchService,
   ) {}
 
   async exec(
@@ -162,13 +162,15 @@ export class CreateProjectCommand implements CommandInterface {
               );
 
               await this.projectDocumentService.save(projectDocument);
-              this.aiEventQueue.jobProjectDocumentMdGenerate(projectDocument);
+              await this.queueDispatchService.projectDocumentMdGenerate(
+                projectDocument,
+              );
             },
           ),
         );
 
         // if have file generate summary also
-        this.aiEventQueue.jobProjectMdGenerate(entity.project);
+        await this.queueDispatchService.projectMdGenerate(entity.project);
       }
     });
   }

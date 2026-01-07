@@ -84,9 +84,13 @@ export class LineProcessAiChatCommand {
     botChatLog.edit({
       message: botMessage,
     });
+
     entity.lineChatLogs.push(botChatLog);
+    entity.aiUsage = aiUsage;
 
     await lineService.reply(body.replyToken, botMessage);
+
+    await this.save(entity);
   }
 
   async save(entity: Entity) {

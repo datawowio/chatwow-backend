@@ -1,7 +1,7 @@
 import { Project } from '@domain/base/project/project.domain';
 import { projectToResponse } from '@domain/base/project/project.mapper';
 import { ProjectService } from '@domain/base/project/project.service';
-import { AiEventQueue } from '@domain/queue/ai-event/ai-event.queue';
+import { QueueDispatchService } from '@domain/logic/queue-dispatch/queue-dispatch.service';
 import { Injectable } from '@nestjs/common';
 
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
@@ -16,7 +16,7 @@ import { RegenerateProjectSummaryResponse } from './regenerate-project-summary.d
 export class RegenerateProjectSummaryCommand implements CommandInterface {
   constructor(
     private projectService: ProjectService,
-    private aiEventQueue: AiEventQueue,
+    private queueDispatchService: QueueDispatchService,
   ) {}
 
   async exec(
@@ -25,6 +25,7 @@ export class RegenerateProjectSummaryCommand implements CommandInterface {
   ): Promise<RegenerateProjectSummaryResponse> {
     const project = await this.find(claims, id);
     project.edit({
+      actorId: claims.userId,
       data: {
         projectStatus: 'PROCESSING',
       },
@@ -53,6 +54,6 @@ export class RegenerateProjectSummaryCommand implements CommandInterface {
 
   async save(project: Project) {
     await this.projectService.save(project);
-    this.aiEventQueue.jobProjectMdGenerate(project);
+    await this.queueDispatchService.projectMdGenerate(project);
   }
 }

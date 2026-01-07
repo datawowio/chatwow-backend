@@ -5,9 +5,11 @@ import { addPagination, queryCount, sortQb } from '@infra/db/db.util';
 
 import { diff, getUniqueIds } from '@shared/common/common.func';
 import { isDefined } from '@shared/common/common.validator';
+import { ApiException } from '@shared/http/http.exception';
 
 import { AiUsage } from './ai-usage.domain';
 import { aiUsageFromPgWithState, aiUsageToPg } from './ai-usage.mapper';
+import { AiUsageStopRecordData } from './ai-usage.type';
 import { aiUsagesTableFilter } from './ai-usage.util';
 import { AiUsageFilterOptions, AiUsageQueryOptions } from './ai-usage.zod';
 
@@ -90,6 +92,16 @@ export class AiUsageService {
 
   async deleteBulk(ids: string[]) {
     await Promise.all(ids.map((id) => this.delete(id)));
+  }
+
+  async stopRecord(id: string, data: AiUsageStopRecordData) {
+    const aiUsage = await this.findOne(id);
+    if (!aiUsage) {
+      throw new ApiException(404, 'aiUsageNotfound');
+    }
+
+    aiUsage.stopRecord(data);
+    await this.save(aiUsage);
   }
 
   private async _create(aiUsage: AiUsage): Promise<void> {

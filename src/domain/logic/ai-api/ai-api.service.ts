@@ -6,6 +6,8 @@ import * as rx from 'rxjs';
 
 import { AppConfig } from '@infra/config';
 
+import { isLocal } from '@shared/common/common.func';
+
 import {
   AiChat,
   AiRawResponse,
@@ -27,6 +29,18 @@ export class AiApiService {
   }
 
   async chat(opts: SendAiApiOpts): Promise<AiChat> {
+    const appConfig = this.configService.getOrThrow<AppConfig['app']>('app');
+
+    if (isLocal(appConfig.nodeEnv)) {
+      return {
+        isSuccess: true,
+        data: {
+          text: 'ตอบสำเร็จ',
+          tokenUsed: 10,
+        },
+      };
+    }
+
     const url = `${this.url}/chat`;
     const data: AiRequest = {
       text: opts.text,

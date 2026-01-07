@@ -1,7 +1,7 @@
 import { TaskMeta } from '@infra/global/amqp/amqp.common';
 
-export type JobInput<T> = {
-  meta: TaskMeta;
+export type JobInput<T, M = object> = {
+  meta: TaskMeta & M;
   data: T;
 };
 

@@ -84,10 +84,6 @@ export function aiUsageToPg(domain: AiUsage): AiUsagePg {
     throw new Error('no ai_request_at data');
   }
 
-  if (!domain.aiReplyAt) {
-    throw new Error('no ai_reply_at data');
-  }
-
   return {
     id: domain.id,
     user_id: domain.userId,
@@ -149,7 +145,6 @@ export function aiUsageToJsonState(
 export function aiUsageToResponse(domain: AiUsage): AiUsageResponse {
   return {
     id: domain.id,
-    userId: domain.userId,
     projectId: domain.projectId,
     createdAt: toResponseDate(domain.createdAt),
     aiRequestAt: toResponseDate(domain.aiRequestAt),
@@ -165,7 +160,6 @@ export function aiUsageToResponse(domain: AiUsage): AiUsageResponse {
 export function aiUsagePgToResponse(pg: AiUsagePg): AiUsageResponse {
   return {
     id: pg.id,
-    userId: pg.user_id,
     projectId: pg.project_id,
     createdAt: toResponseDate(pg.created_at),
     aiRequestAt: toResponseDate(pg.ai_request_at),

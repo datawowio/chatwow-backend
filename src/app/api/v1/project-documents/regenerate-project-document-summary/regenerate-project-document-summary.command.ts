@@ -1,7 +1,7 @@
 import { ProjectDocument } from '@domain/base/project-document/project-document.domain';
 import { projectDocumentToResponse } from '@domain/base/project-document/project-document.mapper';
 import { ProjectDocumentService } from '@domain/base/project-document/project-document.service';
-import { AiEventQueue } from '@domain/queue/ai-event/ai-event.queue';
+import { QueueDispatchService } from '@domain/logic/queue-dispatch/queue-dispatch.service';
 import { Injectable } from '@nestjs/common';
 
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
@@ -18,7 +18,7 @@ export class RegenerateProjectDocumentSummaryCommand
 {
   constructor(
     private projectDocumentService: ProjectDocumentService,
-    private aiEventQueue: AiEventQueue,
+    private queueDispatchService: QueueDispatchService,
   ) {}
 
   async exec(
@@ -27,6 +27,7 @@ export class RegenerateProjectDocumentSummaryCommand
   ): Promise<RegenerateProjectDocumentSummaryResponse> {
     const projectDocument = await this.find(claims, id);
     projectDocument.edit({
+      actorId: claims.userId,
       data: {
         documentStatus: 'PROCESSING',
       },
@@ -58,6 +59,6 @@ export class RegenerateProjectDocumentSummaryCommand
 
   async save(projectDocument: ProjectDocument) {
     await this.projectDocumentService.save(projectDocument);
-    this.aiEventQueue.jobProjectDocumentMdGenerate(projectDocument);
+    await this.queueDispatchService.projectDocumentMdGenerate(projectDocument);
   }
 }

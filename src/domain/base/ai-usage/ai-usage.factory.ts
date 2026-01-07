@@ -14,15 +14,15 @@ export function newAiUsage(data: AiUsageNewData): AiUsage {
   return aiUsageFromPlain({
     id: uuidV7(),
     createdAt: myDayjs().toDate(),
-    userId: data.userId,
+    userId: data.userId || null,
     projectId: data.projectId,
-    aiRequestAt: null,
+    aiRequestAt: myDayjs().toDate(),
     aiReplyAt: null,
     tokenUsed: 0,
     confidence: 0,
     refTable: data.refTable,
     refId: data.refId,
-    replyTimeMs: 0,
+    replyTimeMs: null,
     aiUsageAction: data.aiUsageAction,
   });
 }

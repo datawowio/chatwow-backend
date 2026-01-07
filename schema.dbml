@@ -262,13 +262,13 @@ Table "audit_logs" {
 
 Table "ai_usages" {
   "id" uuid [pk, not null]
-  "user_id" uuid [not null]
+  "user_id" uuid
   "ai_usage_action" ai_usage_action [not null]
   "project_id" uuid [not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "ai_request_at" timestamptz [not null]
-  "ai_reply_at" timestamptz [not null]
-  "reply_time_ms" int4 [not null]
+  "ai_reply_at" timestamptz
+  "reply_time_ms" int4
   "token_used" int4 [not null]
   "confidence" int2 [not null]
   "ref_table" text [not null]

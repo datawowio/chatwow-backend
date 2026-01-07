@@ -8,8 +8,10 @@ import { Injectable } from '@nestjs/common';
 import { BaseAmqpExchange } from '@infra/global/amqp/amqp.abstract';
 import { wrapJobMeta } from '@infra/global/amqp/amqp.common';
 
-import { ForgotPasswordJobData } from '@app/worker/domain-event/forgot-password/forgot-password.type';
-import { ForgotPasswordJobInput } from '@app/worker/domain-event/forgot-password/forgot-password.type';
+import {
+  ForgotPasswordJobData,
+  ForgotPasswordJobInput,
+} from '@app/worker/domain-event/forgot-password/forgot-password.type';
 import {
   SavedProjectDocumentData,
   SavedProjectDocumentJobInput,

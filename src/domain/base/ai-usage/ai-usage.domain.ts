@@ -14,17 +14,17 @@ import type {
 
 export class AiUsage extends DomainEntity<AiUsagePg> {
   readonly id: string;
-  readonly userId: string;
+  readonly userId: string | null;
   readonly projectId: string;
   readonly createdAt: Date;
-  readonly aiRequestAt: Date | null;
+  readonly aiRequestAt: Date;
   readonly aiReplyAt: Date | null;
   readonly tokenUsed: number;
   readonly confidence: number;
   readonly refTable: AiUsageRefTable;
   readonly aiUsageAction: AiUsageAction;
   readonly refId: string;
-  readonly replyTimeMs: number;
+  readonly replyTimeMs: number | null;
 
   constructor(plain: AiUsagePlain) {
     super();
@@ -57,10 +57,6 @@ export class AiUsage extends DomainEntity<AiUsagePg> {
   }
 
   stopRecordError() {
-    if (!this.aiRequestAt) {
-      throw new Error('unexpected no request at to stop record');
-    }
-
     const writable = this as Writable<typeof this>;
     writable.aiReplyAt = myDayjs().toDate();
     writable.tokenUsed = -1;
