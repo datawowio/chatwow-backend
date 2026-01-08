@@ -73,17 +73,19 @@ export function isEmail(value: string | null): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+// Match: YYYY-MM-DDTHH:mm:ss[.sss]Z
+const ISO_REGEX =
+  /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d{3})?Z$/;
 export function isISOString(value: string | null): boolean {
   if (isNil(value)) {
     return false;
   }
 
-  try {
-    new Date(value);
-    return true;
-  } catch {
-    return false;
-  }
+  if (!ISO_REGEX.test(value)) return false;
+
+  // 2. Check calendar logic with Date
+  const d = new Date(value);
+  return !isNaN(d.getTime()) && d.toISOString() === value;
 }
 
 // helper

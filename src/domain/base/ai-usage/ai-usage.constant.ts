@@ -6,3 +6,5 @@ export const AI_USAGE_REF_TABLE = {
 } as const;
 export type AiUsageRefTable =
   (typeof AI_USAGE_REF_TABLE)[keyof typeof AI_USAGE_REF_TABLE];
+
+export const AI_USAGE_CHAT_ACTION = ['CHAT_LINE', 'CHAT_PROJECT'] as const;
