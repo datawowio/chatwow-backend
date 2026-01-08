@@ -9,6 +9,8 @@ export type ActionType = "CREATE" | "DELETE" | "UPDATE";
 
 export type ActorType = "SYSTEM" | "USER";
 
+export type AiModel = "GPT_DW";
+
 export type AiUsageAction = "CHAT_LINE" | "CHAT_PROJECT" | "GENERATE_PROJECT_DOCUMENT_SUMMARY" | "GENERATE_PROJECT_SUMMARY";
 
 export type ChatSender = "BOT" | "USER";
@@ -43,6 +45,13 @@ export type UserRole = "ADMIN" | "MANAGER" | "USER";
 
 export type UserStatus = "ACTIVE" | "INACTIVE" | "PENDING_REGISTRATION";
 
+export interface AiModels {
+  ai_model: AiModel;
+  created_at: Generated<string>;
+  price_per_token: Numeric;
+  updated_at: Generated<string>;
+}
+
 export interface AiUsages {
   ai_reply_at: string | null;
   ai_request_at: string;
@@ -65,6 +74,14 @@ export interface AiUsageUserGroups {
   id: string;
   token_used: Numeric;
   user_group_id: string | null;
+}
+
+export interface AppConfigurations {
+  config_data: Json;
+  config_key: string;
+  created_at: Generated<string>;
+  id: string;
+  updated_at: Generated<string>;
 }
 
 export interface AuditLogs {
@@ -267,8 +284,10 @@ export interface UserVerifications {
 }
 
 export interface DB {
+  ai_models: AiModels;
   ai_usage_user_groups: AiUsageUserGroups;
   ai_usages: AiUsages;
+  app_configurations: AppConfigurations;
   audit_logs: AuditLogs;
   line_accounts: LineAccounts;
   line_bots: LineBots;

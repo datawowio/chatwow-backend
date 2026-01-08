@@ -60,16 +60,6 @@ export async function up(db: Kysely<any>): Promise<void> {
     .asEnum(['INVALID_PAYLOAD', 'FAIL', 'SUCCESS', 'DEAD'])
     .execute();
 
-  await db.schema
-    .createType('ai_usage_action')
-    .asEnum([
-      'CHAT_LINE',
-      'CHAT_PROJECT',
-      'GENERATE_PROJECT_SUMMARY',
-      'GENERATE_PROJECT_DOCUMENT_SUMMARY',
-    ])
-    .execute();
-
   //
   // LINE_ACCOUNTS
   //
@@ -464,62 +454,6 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createIndex('audit_logs_owner_id_idx')
     .on('audit_logs')
     .column('owner_id')
-    .execute();
-
-  //
-  // AI USAGES
-  //
-  await db.schema
-    .createTable('ai_usages')
-    .addColumn('id', 'uuid', (col) => col.primaryKey())
-    .addColumn('created_at', 'timestamptz', (col) =>
-      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
-    )
-    .addColumn('created_by_id', 'uuid', (col) => col)
-    .addColumn('ai_usage_action', sql`ai_usage_action`, (col) => col.notNull())
-    .addColumn('project_id', 'uuid', (col) => col.notNull())
-    .addColumn('ai_request_at', 'timestamptz', (col) => col.notNull())
-    .addColumn('ai_reply_at', 'timestamptz')
-    .addColumn('reply_time_ms', 'int4')
-    .addColumn('token_used', 'decimal(10, 2)', (col) => col.notNull())
-    .addColumn('confidence', 'int2', (col) => col.notNull())
-    .addColumn('ref_table', 'text', (col) => col.notNull())
-    .addColumn('ref_id', 'uuid', (col) => col.notNull())
-    .execute();
-
-  await db.schema
-    .createIndex('ai_usages_project_id_idx')
-    .on('ai_usages')
-    .column('project_id')
-    .execute();
-
-  //
-  // AI USAGE USER GROUPS
-  //
-  await db.schema
-    .createTable('ai_usage_user_groups')
-    .addColumn('id', 'uuid', (col) => col.primaryKey())
-    .addColumn('created_at', 'timestamptz', (col) =>
-      col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
-    )
-    .addColumn('user_group_id', 'uuid', (col) => col)
-    .addColumn('token_used', 'decimal(10, 2)', (col) => col.notNull())
-    .addColumn('chat_count', 'decimal(10, 2)', (col) => col.notNull())
-    .addColumn('ai_usage_id', 'uuid', (col) =>
-      col.references('ai_usages.id').onDelete('cascade').notNull(),
-    )
-    .execute();
-
-  await db.schema
-    .createIndex('ai_usage_user_groups_ai_usage_id_idx')
-    .on('ai_usage_user_groups')
-    .column('ai_usage_id')
-    .execute();
-
-  await db.schema
-    .createIndex('ai_usage_user_groups_user_group_id_idx')
-    .on('ai_usage_user_groups')
-    .column('user_group_id')
     .execute();
 
   //

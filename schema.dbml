@@ -9,6 +9,10 @@ Enum "actor_type" {
   "SYSTEM"
 }
 
+Enum "ai_model" {
+  "GPT_DW"
+}
+
 Enum "ai_usage_action" {
   "CHAT_LINE"
   "CHAT_PROJECT"
@@ -273,6 +277,10 @@ Table "ai_usages" {
   "confidence" int2 [not null]
   "ref_table" text [not null]
   "ref_id" uuid [not null]
+
+  Indexes {
+    project_id [type: btree, name: "ai_usages_project_id_idx"]
+  }
 }
 
 Table "ai_usage_user_groups" {
@@ -285,7 +293,23 @@ Table "ai_usage_user_groups" {
 
   Indexes {
     ai_usage_id [type: btree, name: "ai_usage_user_groups_ai_usage_id_idx"]
+    user_group_id [type: btree, name: "ai_usage_user_groups_user_group_id_idx"]
   }
+}
+
+Table "ai_models" {
+  "ai_model" ai_model [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "price_per_token" numeric(10,2) [not null]
+}
+
+Table "app_configurations" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "config_key" text [unique, not null]
+  "config_data" jsonb [not null]
 }
 
 Table "sessions" {

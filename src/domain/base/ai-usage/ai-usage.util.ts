@@ -1,6 +1,5 @@
 import type { EB } from '@infra/db/db.common';
 
 export function aiUsagesTableFilter(eb: EB<'ai_usages'>) {
-  // no base filter
-  return eb.and([]);
+  return eb.and([eb('ai_usages.ai_reply_at', 'is not', null)]);
 }
