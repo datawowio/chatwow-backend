@@ -2,7 +2,9 @@ import { JsonValue } from '@infra/db/db';
 
 import { newBig } from '@shared/common/common.func';
 import {
+  fromDbCurrency,
   toDate,
+  toDbCurrency,
   toISO,
   toResponseDate,
 } from '@shared/common/common.transformer';
@@ -21,14 +23,14 @@ export function aiUsageFromPg(pg: AiUsagePg): AiUsage {
     createdAt: toDate(pg.created_at),
     aiRequestAt: toDate(pg.ai_request_at),
     aiReplyAt: toDate(pg.ai_reply_at),
-    tokenUsed: newBig(pg.token_used),
+    tokenUsed: pg.token_used,
     confidence: pg.confidence,
     refTable: pg.ref_table as AiUsageRefTable,
     refId: pg.ref_id,
     replyTimeMs: pg.reply_time_ms,
     aiUsageAction: pg.ai_usage_action,
     tokenInfo: pg.token_info as object,
-    tokenPrice: newBig(pg.token_price),
+    tokenPrice: fromDbCurrency(pg.token_price),
     aiModelName: pg.ai_model_name,
   };
 
@@ -69,7 +71,7 @@ export function aiUsageFromJson(json: AiUsageJson): AiUsage {
     createdAt: toDate(json.createdAt),
     aiRequestAt: toDate(json.aiRequestAt),
     aiReplyAt: toDate(json.aiReplyAt),
-    tokenUsed: newBig(json.tokenUsed),
+    tokenUsed: json.tokenUsed,
     confidence: json.confidence,
     refTable: json.refTable,
     refId: json.refId,
@@ -103,14 +105,14 @@ export function aiUsageToPg(domain: AiUsage): AiUsagePg {
     created_at: toISO(domain.createdAt),
     ai_request_at: toISO(domain.aiRequestAt),
     ai_reply_at: toISO(domain.aiReplyAt),
-    token_used: domain.tokenUsed.toFixed(2),
+    token_used: domain.tokenUsed,
     confidence: domain.confidence,
     ref_table: domain.refTable,
     ref_id: domain.refId,
     reply_time_ms: domain.replyTimeMs,
     ai_usage_action: domain.aiUsageAction,
     token_info: domain.tokenInfo as JsonValue,
-    token_price: domain.tokenPrice.toFixed(2),
+    token_price: toDbCurrency(domain.tokenPrice),
     ai_model_name: domain.aiModelName,
   };
 }
@@ -143,14 +145,14 @@ export function aiUsageToJson(domain: AiUsage): AiUsageJson {
     createdAt: toISO(domain.createdAt),
     aiRequestAt: toISO(domain.aiRequestAt),
     aiReplyAt: toISO(domain.aiReplyAt),
-    tokenUsed: domain.tokenUsed.toFixed(2),
+    tokenUsed: domain.tokenUsed,
     confidence: domain.confidence,
     refTable: domain.refTable,
     refId: domain.refId,
     replyTimeMs: domain.replyTimeMs,
     aiUsageAction: domain.aiUsageAction,
     tokenInfo: domain.tokenInfo,
-    tokenPrice: domain.tokenPrice.toFixed(2),
+    tokenPrice: domain.tokenPrice.toString(),
     aiModelName: domain.aiModelName,
   };
 }
@@ -170,7 +172,7 @@ export function aiUsageToResponse(domain: AiUsage): AiUsageResponse {
     createdAt: toResponseDate(domain.createdAt),
     aiRequestAt: toResponseDate(domain.aiRequestAt),
     aiReplyAt: toResponseDate(domain.aiReplyAt),
-    tokenUsed: domain.tokenUsed.toFixed(2),
+    tokenUsed: domain.tokenUsed,
     confidence: domain.confidence,
     refTable: domain.refTable,
     refId: domain.refId,

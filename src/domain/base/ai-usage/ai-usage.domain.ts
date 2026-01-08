@@ -5,7 +5,6 @@ import { AiModelName, AiUsageAction } from '@infra/db/db';
 
 import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
-import { newBig } from '@shared/common/common.func';
 
 import { AiUsageRefTable } from './ai-usage.constant';
 import type {
@@ -23,7 +22,7 @@ export class AiUsage extends DomainEntity<AiUsagePg> {
   readonly createdAt: Date;
   readonly aiRequestAt: Date;
   readonly aiReplyAt: Date | null;
-  readonly tokenUsed: Big;
+  readonly tokenUsed: number;
   readonly tokenPrice: Big;
   readonly tokenInfo: object;
   readonly confidence: number;
@@ -51,7 +50,7 @@ export class AiUsage extends DomainEntity<AiUsagePg> {
 
     const writable = this as Writable<typeof this>;
     writable.aiReplyAt = myDayjs().toDate();
-    writable.tokenUsed = newBig(data.tokenUsed);
+    writable.tokenUsed = data.tokenUsed;
     writable.confidence = data.confidence;
     writable.replyTimeMs = myDayjs(writable.aiReplyAt).diff(
       writable.aiRequestAt,
@@ -64,8 +63,7 @@ export class AiUsage extends DomainEntity<AiUsagePg> {
 
   stopRecordError() {
     const writable = this as Writable<typeof this>;
-    writable.aiReplyAt = myDayjs().toDate();
-    writable.tokenUsed = newBig(-1);
+    writable.aiReplyAt = null;
     writable.confidence = -1;
     writable.replyTimeMs = myDayjs(writable.aiReplyAt).diff(
       writable.aiRequestAt,

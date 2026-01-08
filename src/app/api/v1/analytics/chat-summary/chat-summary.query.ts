@@ -10,11 +10,12 @@ import { jsonObjectFrom } from 'kysely/helpers/postgres';
 import { MainDb } from '@infra/db/db.main';
 
 import { newBig } from '@shared/common/common.func';
+import { fromDbCurrency } from '@shared/common/common.transformer';
 import { QueryInterface } from '@shared/common/common.type';
 import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import {
-  ChatSummaryAnalyticSummary,
+  ChatSummaryAnalytic,
   ChatSummaryDto,
   ChatSummaryResponse,
 } from './chat-summary.dto';
@@ -26,31 +27,67 @@ export class ChatSummaryQuery implements QueryInterface {
   async exec(query: ChatSummaryDto): Promise<ChatSummaryResponse> {
     const raw = await this.getRaw(query);
 
-    const summary: ChatSummaryAnalyticSummary = {
-      totalTokenUsed: newBig(raw?.totalTokenUsed || 0).toFixed(2),
-      totalPrice: newBig(raw?.totalPrice || 0).toFixed(2),
-      totalChatUsages: newBig(raw?.totalChatUsages || 0).toFixed(2),
-      avgReplyTimeMs: Number(raw?.avgReplyTimeMs || 0),
-      avgConfidence: Number(raw?.avgConfidence || 0),
+    const metaCalc = {
+      totalPrice: newBig(0),
+      totalTokenUsed: 0,
+      totalChatUsages: 0,
+      avgReplyTimeMs: 0,
+      avgConfidence: 0,
     };
 
-    return toHttpSuccess({
-      data: {
-        analytic: {
-          timestamp: raw?.timestamp,
-          summary,
-          relations: {
-            project: raw?.project
-              ? { attributes: projectPgToResponse(raw.project) }
-              : undefined,
-            userGroup: raw?.userGroup
-              ? { attributes: userGroupPgToResponse(raw.userGroup) }
-              : undefined,
-            user: raw?.user
-              ? { attributes: userPgToResponse(raw.user) }
-              : undefined,
-          },
+    const chatSummaries: ChatSummaryAnalytic[] = raw.map((rawData) => {
+      const price = fromDbCurrency(rawData.totalPrice || '0');
+      const tokens = Number(rawData.totalTokenUsed || 0);
+      const usages = Number(rawData.totalChatUsages || 0);
+      const replyTime = Number(rawData.avgReplyTimeMs || 0);
+      const confidence = Number(rawData.avgConfidence || 0);
+
+      // Aggregate
+      metaCalc.totalPrice = metaCalc.totalPrice.add(price);
+      metaCalc.totalTokenUsed += tokens;
+      metaCalc.totalChatUsages += usages;
+      metaCalc.avgReplyTimeMs += replyTime;
+      metaCalc.avgConfidence += confidence;
+
+      return {
+        timestamp: rawData.timestamp,
+        summary: {
+          totalPrice: price.toFixed(2),
+          totalTokenUsed: tokens,
+          totalChatUsages: usages,
+          avgReplyTimeMs: replyTime,
+          avgConfidence: confidence,
         },
+        relations: {
+          project: rawData?.project
+            ? { attributes: projectPgToResponse(rawData.project) }
+            : undefined,
+          userGroup: rawData?.userGroup
+            ? { attributes: userGroupPgToResponse(rawData.userGroup) }
+            : undefined,
+          user: rawData?.user
+            ? { attributes: userPgToResponse(rawData.user) }
+            : undefined,
+        },
+      };
+    });
+
+    // cal average
+    if (chatSummaries.length > 0) {
+      metaCalc.avgReplyTimeMs = metaCalc.avgReplyTimeMs / chatSummaries.length;
+      metaCalc.avgConfidence = metaCalc.avgConfidence / chatSummaries.length;
+    }
+
+    return toHttpSuccess({
+      meta: {
+        totalPrice: metaCalc.totalPrice.toFixed(2),
+        totalTokenUsed: metaCalc.totalTokenUsed,
+        totalChatUsages: metaCalc.totalChatUsages,
+        avgReplyTimeMs: metaCalc.avgReplyTimeMs,
+        avgConfidence: metaCalc.avgConfidence,
+      },
+      data: {
+        chatSummaries,
       },
     });
   }
@@ -155,6 +192,6 @@ export class ChatSummaryQuery implements QueryInterface {
       .where('ai_usages.ai_usage_action', 'in', AI_USAGE_CHAT_ACTION)
       .where(aiUsagesTableFilter);
 
-    return qb.executeTakeFirst();
+    return qb.execute();
   }
 }

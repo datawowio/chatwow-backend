@@ -1,6 +1,8 @@
 import { newBig } from '@shared/common/common.func';
 import {
+  fromDbCurrency,
   toDate,
+  toDbCurrency,
   toISO,
   toResponseDate,
 } from '@shared/common/common.transformer';
@@ -21,9 +23,9 @@ export function aiUsageUserGroupFromPg(
     id: pg.id,
     createdAt: toDate(pg.created_at),
     userGroupId: pg.user_group_id,
-    tokenUsed: newBig(pg.token_used),
-    chatCount: newBig(pg.chat_count),
-    tokenPrice: newBig(pg.token_price),
+    tokenUsed: pg.token_used,
+    chatCount: pg.chat_count,
+    tokenPrice: fromDbCurrency(pg.token_price),
     aiUsageId: pg.ai_usage_id,
   };
 
@@ -49,8 +51,8 @@ export function aiUsageUserGroupFromJson(
     id: json.id,
     createdAt: toDate(json.createdAt),
     userGroupId: json.userGroupId,
-    tokenUsed: newBig(json.tokenUsed),
-    chatCount: newBig(json.chatCount),
+    tokenUsed: json.tokenUsed,
+    chatCount: json.chatCount,
     tokenPrice: newBig(json.tokenPrice),
     aiUsageId: json.aiUsageId,
   };
@@ -73,9 +75,9 @@ export function aiUsageUserGroupToPg(
     id: domain.id,
     created_at: toISO(domain.createdAt),
     user_group_id: domain.userGroupId,
-    token_used: domain.tokenUsed.toFixed(2),
-    chat_count: domain.chatCount.toFixed(2),
-    token_price: domain.tokenPrice.toFixed(2),
+    token_used: domain.tokenUsed,
+    chat_count: domain.chatCount,
+    token_price: toDbCurrency(domain.tokenPrice),
     ai_usage_id: domain.aiUsageId,
   };
 }
@@ -101,9 +103,9 @@ export function aiUsageUserGroupToJson(
     id: domain.id,
     createdAt: toISO(domain.createdAt),
     userGroupId: domain.userGroupId,
-    tokenUsed: domain.tokenUsed.toFixed(2),
-    chatCount: domain.chatCount.toFixed(2),
-    tokenPrice: domain.tokenPrice.toFixed(2),
+    tokenUsed: domain.tokenUsed,
+    chatCount: domain.chatCount,
+    tokenPrice: domain.tokenPrice.toString(),
     aiUsageId: domain.aiUsageId,
   };
 }

@@ -9,8 +9,6 @@ import { match } from 'ts-pattern';
 import { MainDb } from '@infra/db/db.main';
 import { TransactionService } from '@infra/db/transaction/transaction.service';
 
-import { newBig } from '@shared/common/common.func';
-
 import { ProcessAiUsageJobData } from './process-ai-usage.type';
 
 type Entity = {
@@ -65,8 +63,8 @@ export class ProcessAiUsageCommand {
       aiUsageUserGroups: res.map((r) =>
         newAiUsageUserGroup({
           aiUsageId: aiUsage.id,
-          chatCount: newBig(1).div(groupLength),
-          tokenUsed: aiUsage.tokenUsed.div(groupLength),
+          chatCount: 1 / groupLength,
+          tokenUsed: aiUsage.tokenUsed / groupLength,
           tokenPrice: aiUsage.tokenPrice.div(groupLength),
           userGroupId: r.userGroupId,
         }),

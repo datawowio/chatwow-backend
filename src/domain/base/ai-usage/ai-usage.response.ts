@@ -22,7 +22,7 @@ export class AiUsageResponse {
   replyTimeMs: number | null;
 
   @ApiProperty({ example: 100 })
-  tokenUsed: string;
+  tokenUsed: number;
 
   @ApiProperty({ example: 99 })
   confidence: number;

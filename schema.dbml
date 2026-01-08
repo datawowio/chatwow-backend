@@ -316,8 +316,8 @@ Table "ai_usages" {
   "ai_request_at" timestamptz [not null]
   "ai_reply_at" timestamptz
   "reply_time_ms" int4
-  "token_used" numeric(10,2) [not null]
-  "token_price" numeric(10,2) [not null]
+  "token_used" float8 [not null]
+  "token_price" int8 [not null]
   "token_info" jsonb [not null]
   "confidence" int2 [not null]
   "ref_table" text [not null]
@@ -332,9 +332,9 @@ Table "ai_usage_user_groups" {
   "id" uuid [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "user_group_id" uuid
-  "token_used" numeric(10,2) [not null]
-  "token_price" numeric(10,2) [not null]
-  "chat_count" numeric(10,2) [not null]
+  "token_price" int8 [not null]
+  "token_used" float8 [not null]
+  "chat_count" float8 [not null]
   "ai_usage_id" uuid [not null]
 
   Indexes {
@@ -347,7 +347,7 @@ Table "ai_models" {
   "ai_model_name" ai_model_name [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "price_per_token" numeric(10,2) [not null]
+  "price_per_token" int8 [not null]
 }
 
 Table "app_configurations" {

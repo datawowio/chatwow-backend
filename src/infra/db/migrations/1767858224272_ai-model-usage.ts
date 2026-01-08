@@ -36,8 +36,8 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('ai_request_at', 'timestamptz', (col) => col.notNull())
     .addColumn('ai_reply_at', 'timestamptz')
     .addColumn('reply_time_ms', 'int4')
-    .addColumn('token_used', 'decimal(10, 2)', (col) => col.notNull())
-    .addColumn('token_price', 'decimal(10, 2)', (col) => col.notNull())
+    .addColumn('token_used', 'double precision', (col) => col.notNull())
+    .addColumn('token_price', 'int8', (col) => col.notNull())
     .addColumn('token_info', 'jsonb', (col) => col.notNull())
     .addColumn('confidence', 'int2', (col) => col.notNull())
     .addColumn('ref_table', 'text', (col) => col.notNull())
@@ -60,9 +60,9 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
     .addColumn('user_group_id', 'uuid', (col) => col)
-    .addColumn('token_used', 'decimal(10, 2)', (col) => col.notNull())
-    .addColumn('token_price', 'decimal(10, 2)', (col) => col.notNull())
-    .addColumn('chat_count', 'decimal(10, 2)', (col) => col.notNull())
+    .addColumn('token_price', 'int8', (col) => col.notNull())
+    .addColumn('token_used', 'double precision', (col) => col.notNull())
+    .addColumn('chat_count', 'double precision', (col) => col.notNull())
     .addColumn('ai_usage_id', 'uuid', (col) =>
       col.references('ai_usages.id').onDelete('cascade').notNull(),
     )
@@ -92,7 +92,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('updated_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
-    .addColumn('price_per_token', 'decimal(10, 2)', (col) => col.notNull())
+    .addColumn('price_per_token', 'int8', (col) => col.notNull())
     .execute();
 
   await db
@@ -101,7 +101,7 @@ export async function up(db: Kysely<any>): Promise<void> {
       ai_model_name: 'GPT_DW',
       created_at: myDayjs().toISOString(),
       updated_at: myDayjs().toISOString(),
-      price_per_token: '10.00',
+      price_per_token: '1000',
     })
     .execute();
 

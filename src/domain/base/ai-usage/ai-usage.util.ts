@@ -1,6 +1,9 @@
+import Big from 'big.js';
 import { match } from 'ts-pattern';
 
 import type { EB } from '@infra/db/db.common';
+
+import { newBig } from '@shared/common/common.func';
 
 import { AiUsage } from './ai-usage.domain';
 
@@ -10,6 +13,7 @@ export function aiUsagesTableFilter(eb: EB<'ai_usages'>) {
 
 export function calcTokenPrice(aiUsage: AiUsage) {
   return match(aiUsage.aiModelName)
-    .with('GPT_DW', () => aiUsage.tokenUsed.mul(10))
+    .returnType<Big>()
+    .with('GPT_DW', () => newBig(aiUsage.tokenUsed * 10))
     .exhaustive();
 }

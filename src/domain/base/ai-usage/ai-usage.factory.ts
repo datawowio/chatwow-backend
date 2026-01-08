@@ -18,7 +18,7 @@ export function newAiUsage({ actorId, data }: AiUsageNewData): AiUsage {
     projectId: data.projectId,
     aiRequestAt: myDayjs().toDate(),
     aiReplyAt: null,
-    tokenUsed: newBig(0),
+    tokenUsed: 0,
     confidence: 0,
     refTable: data.refTable,
     refId: data.refId,
@@ -53,7 +53,7 @@ export function mockAiUsage(
       : myDayjs().add(1, 'second').toDate(),
     tokenUsed: isDefined(data.tokenUsed)
       ? data.tokenUsed
-      : newBig(faker.number.int({ min: 10, max: 100 })),
+      : faker.number.int({ min: 10, max: 100 }),
     tokenPrice: newBig(faker.number.int({ min: 1, max: 100 })),
     confidence: isDefined(data.confidence) ? data.confidence : 99,
     aiModelName: valueOr(data.aiModelName, 'GPT_DW'),

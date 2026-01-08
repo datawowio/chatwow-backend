@@ -13,9 +13,9 @@ export class AiUsageUserGroup extends DomainEntity<AiUsageUserGroupPg> {
   readonly id: string;
   readonly createdAt: Date;
   readonly userGroupId: string | null;
-  readonly tokenUsed: Big;
+  readonly tokenUsed: number;
   readonly tokenPrice: Big;
-  readonly chatCount: Big;
+  readonly chatCount: number;
   readonly aiUsageId: string;
 
   constructor(plain: AiUsageUserGroupPlain) {

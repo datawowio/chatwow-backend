@@ -43,13 +43,13 @@ export function mockAiUsageUserGroup(
     userGroupId: isDefined(data.userGroupId) ? data.userGroupId : null,
     tokenUsed: isDefined(data.tokenUsed)
       ? data.tokenUsed
-      : newBig(faker.number.int({ min: 10, max: 100 })),
+      : faker.number.int({ min: 10, max: 100 }),
     tokenPrice: isDefined(data.tokenPrice)
       ? data.tokenPrice
       : newBig(faker.number.int({ min: 10, max: 100 })),
     chatCount: isDefined(data.chatCount)
       ? data.chatCount
-      : newBig(faker.number.int({ min: 1, max: 10 })),
+      : faker.number.int({ min: 1, max: 10 }),
   });
 }
 

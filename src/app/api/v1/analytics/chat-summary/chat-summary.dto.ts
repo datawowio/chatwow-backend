@@ -54,15 +54,24 @@ class ChatSummaryAnalyticRelations {
   user?: ChatSummaryAnalyticRelationsUser;
 }
 
-export class ChatSummaryAnalyticSummary {
-  totalTokenUsed: string;
+class ChatSummaryAnalyticSummary {
+  @ApiProperty({ type: 'string' })
   totalPrice: string;
-  totalChatUsages: string;
+
+  @ApiProperty({ type: 'number' })
+  totalTokenUsed: number;
+
+  @ApiProperty({ type: 'number' })
+  totalChatUsages: number;
+
+  @ApiProperty({ type: 'number' })
   avgReplyTimeMs: number;
+
+  @ApiProperty({ type: 'number' })
   avgConfidence: number;
 }
 
-class ChatSummaryAnalytic {
+export class ChatSummaryAnalytic {
   @ApiProperty({ type: 'string', format: 'date-time' })
   timestamp?: string;
 
@@ -73,12 +82,32 @@ class ChatSummaryAnalytic {
   relations: ChatSummaryAnalyticRelations;
 }
 
+class ChatSummaryMeta {
+  @ApiProperty({ type: 'string' })
+  totalPrice: string;
+
+  @ApiProperty({ type: 'number' })
+  totalTokenUsed: number;
+
+  @ApiProperty({ type: 'number' })
+  totalChatUsages: number;
+
+  @ApiProperty({ type: 'number' })
+  avgReplyTimeMs: number;
+
+  @ApiProperty({ type: 'number' })
+  avgConfidence: number;
+}
+
 class ChatSummaryData {
   @ApiProperty({ type: () => ChatSummaryAnalytic, isArray: true })
-  analytic: ChatSummaryAnalytic;
+  chatSummaries: ChatSummaryAnalytic[];
 }
 
 export class ChatSummaryResponse extends StandardResponse {
+  @ApiProperty({ type: () => ChatSummaryMeta })
+  meta: ChatSummaryMeta;
+
   @ApiProperty({ type: () => ChatSummaryData })
   data: ChatSummaryData;
 }

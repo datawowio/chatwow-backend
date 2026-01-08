@@ -16,12 +16,12 @@ export type AiUsageUserGroupNewData = {
   aiUsageId: string;
   userGroupId: string | null;
   tokenPrice: Big;
-  tokenUsed: Big;
-  chatCount: Big;
+  tokenUsed: number;
+  chatCount: number;
 };
 
 export type AiUsageUserGroupUpdateData = {
-  tokenUsed?: Big;
-  chatCount?: Big;
+  tokenUsed?: number;
+  chatCount?: number;
   tokenPrice?: Big;
 };

@@ -37,8 +37,6 @@ export type LineSessionStatus = "ACTIVE" | "INACTIVE";
 
 export type MessageStatus = "DEAD" | "FAIL" | "INVALID_PAYLOAD" | "SUCCESS";
 
-export type Numeric = ColumnType<string, number | string, number | string>;
-
 export type ProjectStatus = "ACTIVE" | "INACTIVE" | "PROCESSING";
 
 export type UserRole = "ADMIN" | "MANAGER" | "USER";
@@ -48,7 +46,7 @@ export type UserStatus = "ACTIVE" | "INACTIVE" | "PENDING_REGISTRATION";
 export interface AiModels {
   ai_model_name: AiModelName;
   created_at: Generated<string>;
-  price_per_token: Numeric;
+  price_per_token: string;
   updated_at: Generated<string>;
 }
 
@@ -66,17 +64,17 @@ export interface AiUsages {
   ref_table: string;
   reply_time_ms: number | null;
   token_info: Json;
-  token_price: Numeric;
-  token_used: Numeric;
+  token_price: string;
+  token_used: number;
 }
 
 export interface AiUsageUserGroups {
   ai_usage_id: string;
-  chat_count: Numeric;
+  chat_count: number;
   created_at: Generated<string>;
   id: string;
-  token_price: Numeric;
-  token_used: Numeric;
+  token_price: string;
+  token_used: number;
   user_group_id: string | null;
 }
 

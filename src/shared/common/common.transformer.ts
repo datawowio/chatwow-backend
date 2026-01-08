@@ -112,3 +112,15 @@ export function toOptionalNumber(v?: string) {
 
   return toNumber(v);
 }
+
+export function toDbCurrency(big: Big) {
+  return big.mul(100).toString();
+}
+
+export function intToDbCurrency(num: number) {
+  return (num * 100).toString();
+}
+
+export function fromDbCurrency(num: string | number) {
+  return new Big(num).div(100);
+}
