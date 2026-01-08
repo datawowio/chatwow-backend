@@ -1,3 +1,4 @@
+import Big from 'big.js';
 import type duration from 'dayjs/plugin/duration';
 import type { ReadonlyDeep, ReadonlyTuple, UnionToTuple } from 'type-fest';
 
@@ -54,7 +55,11 @@ export type Serialized<T> = {
     ? string
     : T[K] extends Date | null
       ? string | null
-      : T[K];
+      : T[K] & T[K] extends Big
+        ? string
+        : T[K] extends Big | null
+          ? string | null
+          : T[K];
 };
 
 export type DayjsDuration = duration.DurationUnitsObjectType;

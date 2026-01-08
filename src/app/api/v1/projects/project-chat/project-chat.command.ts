@@ -13,6 +13,7 @@ import { Project } from '@domain/base/project/project.domain';
 import { projectFromPgWithState } from '@domain/base/project/project.mapper';
 import { AiApiService } from '@domain/logic/ai-api/ai-api.service';
 import { AiFileService } from '@domain/logic/ai-file/ai-file.service';
+import { DomainEventQueue } from '@domain/queue/domain-event/domain-event.queue';
 import { Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
@@ -48,6 +49,7 @@ export class ProjectChatCommand implements CommandInterface {
     private loggerService: LoggerService,
     private transactionService: TransactionService,
     private aiFileService: AiFileService,
+    private domainEventQueue: DomainEventQueue,
   ) {}
 
   async exec(
@@ -101,7 +103,10 @@ export class ProjectChatCommand implements CommandInterface {
         lineChatLogs: [entity.userChatLog, botChatLog],
       });
 
-      await this.aiUsageService.save(aiUsage);
+      this.domainEventQueue.jobProcessAiUsage({
+        owner: 'project',
+        aiUsage,
+      });
     });
   }
 
@@ -164,11 +169,13 @@ export class ProjectChatCommand implements CommandInterface {
     });
 
     const aiUsage = newAiUsage({
-      userId: projectChatSession.userId,
-      projectId: project.id,
-      aiUsageAction: 'CHAT_PROJECT',
-      refId: botChatLog.id,
-      refTable: AI_USAGE_REF_TABLE.PROJECT_CHAT_LOG,
+      actorId: projectChatSession.userId,
+      data: {
+        projectId: project.id,
+        aiUsageAction: 'CHAT_PROJECT',
+        refId: botChatLog.id,
+        refTable: AI_USAGE_REF_TABLE.PROJECT_CHAT_LOG,
+      },
     }).record();
 
     try {

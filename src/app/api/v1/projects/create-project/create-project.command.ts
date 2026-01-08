@@ -162,7 +162,7 @@ export class CreateProjectCommand implements CommandInterface {
               );
 
               await this.projectDocumentService.save(projectDocument);
-              await this.queueDispatchService.projectDocumentMdGenerate(
+              this.queueDispatchService.projectDocumentMdGenerate(
                 projectDocument,
               );
             },
@@ -170,7 +170,7 @@ export class CreateProjectCommand implements CommandInterface {
         );
 
         // if have file generate summary also
-        await this.queueDispatchService.projectMdGenerate(entity.project);
+        this.queueDispatchService.projectMdGenerate(entity.project);
       }
     });
   }

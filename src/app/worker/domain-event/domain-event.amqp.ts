@@ -1,3 +1,4 @@
+import { aiUsageFromJsonState } from '@domain/base/ai-usage/ai-usage.mapper';
 import { passwordResetTokenFromJsonState } from '@domain/base/password-reset-token/password-reset-token.mapper';
 import { projectDocumentFromJsonState } from '@domain/base/project-document/project-document.mapper';
 import { projectFromJsonState } from '@domain/base/project/project.mapper';
@@ -13,6 +14,11 @@ import { OmitJobMeta } from '../worker.type';
 import { ForgotPasswordQueueCommand } from './forgot-password/forgot-password.command';
 import type { ForgotPasswordJobInput } from './forgot-password/forgot-password.type';
 import { ForgotPasswordJobData } from './forgot-password/forgot-password.type';
+import { ProcessAiUsageCommand } from './process-ai-usage/process-ai-usage.command';
+import {
+  ProcessAiUsageJobData,
+  ProcessAiUsageJobInput,
+} from './process-ai-usage/process-ai-usage.type';
 import { SavedProjectDocumentQueueCommand } from './saved-project-document/saved-project-document.command';
 import {
   SavedProjectDocumentData,
@@ -33,6 +39,7 @@ export class DomainEventAmqp extends BaseAmqpHandler {
     private forgotPasswordQueueCommand: ForgotPasswordQueueCommand,
     private savedProjectDocumentQueueCommand: SavedProjectDocumentQueueCommand,
     private savedProjectQueueCommand: SavedProjectQueueCommand,
+    private processAiUsageCommand: ProcessAiUsageCommand,
   ) {
     super();
   }
@@ -68,5 +75,15 @@ export class DomainEventAmqp extends BaseAmqpHandler {
     const data: SavedProjectData = projectFromJsonState(input);
 
     return this.savedProjectQueueCommand.exec(data);
+  }
+
+  @QueueTask(DOMAIN_EVENT_QUEUES.PROCESS_AI_USAGE.name)
+  async processAiUsage(input: OmitJobMeta<ProcessAiUsageJobInput>) {
+    const data: ProcessAiUsageJobData = {
+      owner: input.owner,
+      aiUsage: aiUsageFromJsonState(input.aiUsage),
+    };
+
+    return this.processAiUsageCommand.exec(data);
   }
 }

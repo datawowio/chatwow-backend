@@ -262,17 +262,30 @@ Table "audit_logs" {
 
 Table "ai_usages" {
   "id" uuid [pk, not null]
-  "user_id" uuid
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "created_by_id" uuid
   "ai_usage_action" ai_usage_action [not null]
   "project_id" uuid [not null]
-  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "ai_request_at" timestamptz [not null]
   "ai_reply_at" timestamptz
   "reply_time_ms" int4
-  "token_used" int4 [not null]
+  "token_used" numeric(10,2) [not null]
   "confidence" int2 [not null]
   "ref_table" text [not null]
   "ref_id" uuid [not null]
+}
+
+Table "ai_usage_user_groups" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "user_group_id" uuid
+  "token_used" numeric(10,2) [not null]
+  "chat_count" numeric(10,2) [not null]
+  "ai_usage_id" uuid [not null]
+
+  Indexes {
+    ai_usage_id [type: btree, name: "ai_usage_user_groups_ai_usage_id_idx"]
+  }
 }
 
 Table "sessions" {
@@ -316,6 +329,8 @@ Table "message_tasks" {
   "updated_at" timestamptz [not null, default: `now()`]
   "expire_at" timestamptz [not null]
 }
+
+Ref "ai_usage_user_groups_ai_usage_id_fkey":"ai_usages"."id" < "ai_usage_user_groups"."ai_usage_id" [delete: cascade]
 
 Ref "audit_logs_created_by_id_fkey":"users"."id" < "audit_logs"."created_by_id"
 

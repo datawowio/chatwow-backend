@@ -102,9 +102,7 @@ export class CreateProjectDocumentCommand implements CommandInterface {
       await this.projectService.save(entity.project);
     });
 
-    await this.queueDispatchService.projectDocumentMdGenerate(
-      entity.projectDocument,
-    );
+    this.queueDispatchService.projectDocumentMdGenerate(entity.projectDocument);
   }
 
   async getProject(claims: UserClaims, projectId: string) {

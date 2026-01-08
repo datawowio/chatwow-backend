@@ -5,7 +5,7 @@ export const DOMAIN_EVENT_QUEUES = {
   FORGOT_PASSWORD: { name: 'forgot-password' },
   SAVED_PROJECT_DOCUMENT: { name: 'saved-project-document' },
   SAVED_PROJECT: { name: 'saved-project' },
-  AI_USAGE_SAVE_LATER: { name: 'ai-usage-save-later' },
+  PROCESS_AI_USAGE: { name: 'process-ai-usage' },
 } as const satisfies Record<string, QueueConfig>;
 
 export const CRON_QUEUES = {

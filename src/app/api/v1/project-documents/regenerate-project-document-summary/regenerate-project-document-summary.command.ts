@@ -59,6 +59,6 @@ export class RegenerateProjectDocumentSummaryCommand
 
   async save(projectDocument: ProjectDocument) {
     await this.projectDocumentService.save(projectDocument);
-    await this.queueDispatchService.projectDocumentMdGenerate(projectDocument);
+    this.queueDispatchService.projectDocumentMdGenerate(projectDocument);
   }
 }

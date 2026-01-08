@@ -17,11 +17,18 @@ export type AiUsageJson = Serialized<AiUsagePlain>;
 export type AiUsageJsonState = WithPgState<AiUsageJson, AiUsagePg>;
 
 export type AiUsageNewData = {
-  userId?: string | null;
-  projectId: string;
-  refTable: AiUsageRefTable;
-  refId: string;
-  aiUsageAction: AiUsageAction;
+  actorId?: string | null;
+  data: {
+    projectId: string;
+    refTable: AiUsageRefTable;
+    refId: string;
+    aiUsageAction: AiUsageAction;
+    userGroupId?: string | null;
+  };
+};
+
+export type AiUsageUpdateData = {
+  userGroupId?: string | null;
 };
 
 export type AiUsageStopRecordData = {

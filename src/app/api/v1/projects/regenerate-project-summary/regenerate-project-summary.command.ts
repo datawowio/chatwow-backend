@@ -54,6 +54,6 @@ export class RegenerateProjectSummaryCommand implements CommandInterface {
 
   async save(project: Project) {
     await this.projectService.save(project);
-    await this.queueDispatchService.projectMdGenerate(project);
+    this.queueDispatchService.projectMdGenerate(project);
   }
 }

@@ -1,3 +1,4 @@
+import { newBig } from '@shared/common/common.func';
 import {
   toDate,
   toISO,
@@ -13,12 +14,12 @@ import type { AiUsageJson, AiUsagePg, AiUsagePlain } from './ai-usage.type';
 export function aiUsageFromPg(pg: AiUsagePg): AiUsage {
   const plain: AiUsagePlain = {
     id: pg.id,
-    userId: pg.user_id,
+    createdById: pg.created_by_id,
     projectId: pg.project_id,
     createdAt: toDate(pg.created_at),
     aiRequestAt: toDate(pg.ai_request_at),
     aiReplyAt: toDate(pg.ai_reply_at),
-    tokenUsed: pg.token_used,
+    tokenUsed: newBig(pg.token_used),
     confidence: pg.confidence,
     refTable: pg.ref_table as AiUsageRefTable,
     refId: pg.ref_id,
@@ -36,7 +37,7 @@ export function aiUsageFromPgWithState(pg: AiUsagePg): AiUsage {
 export function aiUsageFromPlain(plainData: AiUsagePlain): AiUsage {
   const plain: AiUsagePlain = {
     id: plainData.id,
-    userId: plainData.userId,
+    createdById: plainData.createdById,
     projectId: plainData.projectId,
     createdAt: plainData.createdAt,
     aiRequestAt: plainData.aiRequestAt,
@@ -55,12 +56,12 @@ export function aiUsageFromPlain(plainData: AiUsagePlain): AiUsage {
 export function aiUsageFromJson(json: AiUsageJson): AiUsage {
   const plain: AiUsagePlain = {
     id: json.id,
-    userId: json.userId,
+    createdById: json.createdById,
     projectId: json.projectId,
     createdAt: toDate(json.createdAt),
     aiRequestAt: toDate(json.aiRequestAt),
     aiReplyAt: toDate(json.aiReplyAt),
-    tokenUsed: json.tokenUsed,
+    tokenUsed: newBig(json.tokenUsed),
     confidence: json.confidence,
     refTable: json.refTable,
     refId: json.refId,
@@ -86,12 +87,12 @@ export function aiUsageToPg(domain: AiUsage): AiUsagePg {
 
   return {
     id: domain.id,
-    user_id: domain.userId,
+    created_by_id: domain.createdById,
     project_id: domain.projectId,
     created_at: toISO(domain.createdAt),
     ai_request_at: toISO(domain.aiRequestAt),
     ai_reply_at: toISO(domain.aiReplyAt),
-    token_used: domain.tokenUsed,
+    token_used: domain.tokenUsed.toFixed(2),
     confidence: domain.confidence,
     ref_table: domain.refTable,
     ref_id: domain.refId,
@@ -103,7 +104,7 @@ export function aiUsageToPg(domain: AiUsage): AiUsagePg {
 export function aiUsageToPlain(domain: AiUsage): AiUsagePlain {
   return {
     id: domain.id,
-    userId: domain.userId,
+    createdById: domain.createdById,
     projectId: domain.projectId,
     createdAt: domain.createdAt,
     aiRequestAt: domain.aiRequestAt,
@@ -120,12 +121,12 @@ export function aiUsageToPlain(domain: AiUsage): AiUsagePlain {
 export function aiUsageToJson(domain: AiUsage): AiUsageJson {
   return {
     id: domain.id,
-    userId: domain.userId,
+    createdById: domain.createdById,
     projectId: domain.projectId,
     createdAt: toISO(domain.createdAt),
     aiRequestAt: toISO(domain.aiRequestAt),
     aiReplyAt: toISO(domain.aiReplyAt),
-    tokenUsed: domain.tokenUsed,
+    tokenUsed: domain.tokenUsed.toFixed(2),
     confidence: domain.confidence,
     refTable: domain.refTable,
     refId: domain.refId,
@@ -149,7 +150,7 @@ export function aiUsageToResponse(domain: AiUsage): AiUsageResponse {
     createdAt: toResponseDate(domain.createdAt),
     aiRequestAt: toResponseDate(domain.aiRequestAt),
     aiReplyAt: toResponseDate(domain.aiReplyAt),
-    tokenUsed: domain.tokenUsed,
+    tokenUsed: domain.tokenUsed.toFixed(2),
     confidence: domain.confidence,
     refTable: domain.refTable,
     refId: domain.refId,

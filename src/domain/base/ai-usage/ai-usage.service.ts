@@ -132,8 +132,8 @@ export class AiUsageService {
     return this.db.read
       .selectFrom('ai_usages')
       .where(aiUsagesTableFilter)
-      .$if(!!filter?.userIds?.length, (qb) =>
-        qb.where('ai_usages.user_id', 'in', filter!.userIds!),
+      .$if(!!filter?.createdByIds?.length, (qb) =>
+        qb.where('ai_usages.created_by_id', 'in', filter!.createdByIds!),
       )
       .$if(!!filter?.projectIds?.length, (qb) =>
         qb.where('ai_usages.project_id', 'in', filter!.projectIds!),

@@ -8,7 +8,7 @@ import { getSortZod } from '@shared/zod/zod.util';
 
 export const aiUsageFilterZod = z
   .object({
-    userIds: parmUuidsZod.optional(),
+    createdByIds: parmUuidsZod.optional(),
     projectIds: parmUuidsZod.optional(),
     refTable: z.string().optional(),
     refId: z.string().optional(),

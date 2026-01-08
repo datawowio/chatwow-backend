@@ -35,6 +35,8 @@ export type LineSessionStatus = "ACTIVE" | "INACTIVE";
 
 export type MessageStatus = "DEAD" | "FAIL" | "INVALID_PAYLOAD" | "SUCCESS";
 
+export type Numeric = ColumnType<string, number | string, number | string>;
+
 export type ProjectStatus = "ACTIVE" | "INACTIVE" | "PROCESSING";
 
 export type UserRole = "ADMIN" | "MANAGER" | "USER";
@@ -47,13 +49,22 @@ export interface AiUsages {
   ai_usage_action: AiUsageAction;
   confidence: number;
   created_at: Generated<string>;
+  created_by_id: string | null;
   id: string;
   project_id: string;
   ref_id: string;
   ref_table: string;
   reply_time_ms: number | null;
-  token_used: number;
-  user_id: string | null;
+  token_used: Numeric;
+}
+
+export interface AiUsageUserGroups {
+  ai_usage_id: string;
+  chat_count: Numeric;
+  created_at: Generated<string>;
+  id: string;
+  token_used: Numeric;
+  user_group_id: string | null;
 }
 
 export interface AuditLogs {
@@ -256,6 +267,7 @@ export interface UserVerifications {
 }
 
 export interface DB {
+  ai_usage_user_groups: AiUsageUserGroups;
   ai_usages: AiUsages;
   audit_logs: AuditLogs;
   line_accounts: LineAccounts;

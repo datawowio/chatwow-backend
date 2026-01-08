@@ -22,12 +22,12 @@ export class HandleLineWebhookCommand {
     lineBotId: string,
     data: LineWebHookMessage,
   ) {
-    const linebot = await this.lineBotService.findOne(lineBotId);
-    if (!linebot) {
+    const lineBot = await this.lineBotService.findOne(lineBotId);
+    if (!lineBot) {
       throw new ApiException(404, 'lineBotNotFound');
     }
 
-    const { channelAccessToken, channelSecret } = lineBotToPlain(linebot);
+    const { channelAccessToken, channelSecret } = lineBotToPlain(lineBot);
 
     const lineService = new LineService({
       channelAccessToken,

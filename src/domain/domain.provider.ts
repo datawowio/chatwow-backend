@@ -1,3 +1,4 @@
+import { AiUsageUserGroupModule } from './base/ai-usage-user-group/ai-usage-user-group.module';
 import { AiUsageModule } from './base/ai-usage/ai-usage.module';
 import { AuditLogModule } from './base/audit-log/audit-log.module';
 import { LineAccountModule } from './base/line-account/line-account.module';
@@ -27,6 +28,7 @@ import { QueueModule } from './queue/queue.module';
 export const DOMAIN_PROVIDER = [
   //
   AiUsageModule,
+  AiUsageUserGroupModule,
   AuditLogModule,
   LineAccountModule,
   LineChatLogModule,

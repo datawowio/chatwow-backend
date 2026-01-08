@@ -1,4 +1,5 @@
 import { render } from '@react-email/render';
+import Big from 'big.js';
 import * as path from 'path';
 import type React from 'react';
 import * as R from 'remeda';
@@ -169,4 +170,8 @@ export function orUndefined<T, V>(
   }
 
   return cb(val);
+}
+
+export function newBig(num: Big.BigSource) {
+  return new Big(num);
 }
