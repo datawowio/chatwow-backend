@@ -9,8 +9,6 @@ import { aiUsageFromPlain } from './ai-usage.mapper';
 import type { AiUsageNewData, AiUsagePlain } from './ai-usage.type';
 
 export function newAiUsage(data: AiUsageNewData): AiUsage {
-  // actorId is not used in ai_usage table, but it is in the NewData type.
-  // I will ignore it for now.
   return aiUsageFromPlain({
     id: uuidV7(),
     createdAt: myDayjs().toDate(),

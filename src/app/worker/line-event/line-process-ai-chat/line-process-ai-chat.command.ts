@@ -77,7 +77,7 @@ export class LineProcessAiChatCommand {
       botMessage = res.data.text;
       aiUsage.stopRecord({
         tokenUsed: res.data.tokenUsed,
-        confidence: 100,
+        confidence: res.data.confidence,
       });
     }
 

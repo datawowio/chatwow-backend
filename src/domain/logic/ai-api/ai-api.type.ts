@@ -20,6 +20,7 @@ export type AiRawResponse = {
 export type AiResponse = {
   text: string;
   tokenUsed: number;
+  confidence: number;
 };
 
 export type AiChat =
