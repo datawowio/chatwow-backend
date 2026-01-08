@@ -5,13 +5,16 @@ import { BaseAmqpHandler } from '@infra/global/amqp/amqp.abstract';
 import { QueueTask } from '@shared/task/task.decorator';
 
 import { CRON_QUEUES } from '../worker.constant';
+import { CleanupCommand } from './cleanup/cleanup.command';
 
 @Injectable()
 export class CronAmqp extends BaseAmqpHandler {
-  @QueueTask(CRON_QUEUES.SAMPLE.name)
-  async processSample() {
-    console.log('XXxxxXXXXXXXXX');
-    console.log(`Cron Test Proccessed`);
-    console.log('XXxxxXXXXXXXXX');
+  constructor(private cleanupCommand: CleanupCommand) {
+    super();
+  }
+
+  @QueueTask(CRON_QUEUES.CLEAN_UP.name)
+  async processCleanup() {
+    await this.cleanupCommand.exec();
   }
 }

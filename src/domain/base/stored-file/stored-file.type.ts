@@ -1,4 +1,4 @@
-import type { StoredFiles } from '@infra/db/db';
+import type { FileExposeType, StoredFiles } from '@infra/db/db';
 import type { DBModel } from '@infra/db/db.common';
 
 import type { Plain, Serialized } from '@shared/common/common.type';
@@ -22,7 +22,7 @@ export type StoredFileNewData = {
   filesizeByte?: number;
   refName?: STORED_FILE_REF_NAME;
   storageName?: string;
-  isPublic?: boolean;
+  fileExposeType?: FileExposeType;
   expireAt?: Date;
 };
 
@@ -32,7 +32,7 @@ export type StoredFileUpdateData = {
   ownerId?: string;
   refName?: STORED_FILE_REF_NAME;
   expireAt?: Date;
-  isPublic?: boolean;
+  fileExposeType?: FileExposeType;
   filesizeByte?: number;
   keyPath?: string;
 };

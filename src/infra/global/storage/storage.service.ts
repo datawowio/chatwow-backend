@@ -11,7 +11,12 @@ import {
   _Object,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { lookup as mimeLookup } from 'mime-types';
 import { Readable } from 'stream';
@@ -27,7 +32,7 @@ import { S3_STORAGE } from './storage.provider';
 import { StorageOptions } from './storage.type';
 
 @Injectable()
-export class StorageService implements OnModuleInit {
+export class StorageService implements OnModuleInit, OnModuleDestroy {
   defaultBucket: string;
   enable: boolean;
 
@@ -37,6 +42,10 @@ export class StorageService implements OnModuleInit {
     private configService: ConfigService,
     private loggerService: LoggerService,
   ) {}
+
+  onModuleDestroy() {
+    this.s3?.destroy();
+  }
 
   async onModuleInit() {
     const storageConfig =
@@ -291,7 +300,9 @@ export class StorageService implements OnModuleInit {
     }
   }
 
-  async list(opts?: StorageOptions & { prefix?: string }): Promise<_Object[]> {
+  async list(
+    opts?: StorageOptions & { prefix?: string; continuationToken?: string },
+  ): Promise<{ content: _Object[]; continuationToken?: string }> {
     if (!this.enable) {
       throw new ApiException(500, 'storageDisable');
     }
@@ -301,12 +312,16 @@ export class StorageService implements OnModuleInit {
         new ListObjectsV2Command({
           Bucket: opts?.bucket || this.defaultBucket,
           Prefix: opts?.prefix || '',
+          ContinuationToken: opts?.continuationToken,
         }),
       );
-      return res.Contents ?? [];
+      return {
+        content: res.Contents ?? [],
+        continuationToken: res.NextContinuationToken,
+      };
     } catch (e: any) {
       this.loggerService.error(e);
-      return [];
+      return { content: [] };
     }
   }
 

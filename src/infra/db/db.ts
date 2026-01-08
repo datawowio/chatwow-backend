@@ -17,6 +17,8 @@ export type ChatSender = "BOT" | "USER";
 
 export type DocumentStatus = "ACTIVE" | "INACTIVE" | "PROCESSING";
 
+export type FileExposeType = "NONE" | "PRESIGN" | "PUBLIC";
+
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
@@ -215,10 +217,10 @@ export interface StoredFiles {
   created_at: Generated<string>;
   expire_at: string | null;
   extension: string;
+  file_expose_type: Generated<FileExposeType>;
   filename: string;
   filesize_byte: string;
   id: string;
-  is_public: Generated<boolean>;
   key_path: string;
   mime_type: string;
   owner_id: string;

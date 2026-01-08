@@ -31,6 +31,12 @@ Enum "document_status" {
   "PROCESSING"
 }
 
+Enum "file_expose_type" {
+  "PUBLIC"
+  "PRESIGN"
+  "NONE"
+}
+
 Enum "line_session_status" {
   "ACTIVE"
   "INACTIVE"
@@ -185,13 +191,13 @@ Table "stored_files" {
   "filesize_byte" int8 [not null]
   "storage_name" text [not null, default: 's3']
   "presign_url" text [not null]
-  "is_public" bool [not null, default: false]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "mime_type" text [not null]
   "extension" text [not null]
   "checksum" text
   "expire_at" timestamptz
+  "file_expose_type" file_expose_type [not null, default: 'PRESIGN']
 
   Indexes {
     (owner_id, ref_name) [type: btree, name: "stored_files_owner_id_ref_name_idx"]

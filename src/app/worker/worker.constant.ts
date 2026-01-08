@@ -9,7 +9,6 @@ export const DOMAIN_EVENT_QUEUES = {
 } as const satisfies Record<string, QueueConfig>;
 
 export const CRON_QUEUES = {
-  SAMPLE: { name: 'sample' },
   CLEAN_UP: { name: 'cleanup' },
 } as const;
 

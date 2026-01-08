@@ -134,6 +134,36 @@ export async function up(db: Kysely<any>): Promise<void> {
       },
     })
     .execute();
+
+  //
+  // ALTER STORED FILE
+  //
+
+  await db.schema
+    .createType('file_expose_type')
+    .asEnum(['PUBLIC', 'PRESIGN', 'NONE'])
+    .execute();
+
+  await db.schema
+    .alterTable('stored_files')
+    .addColumn('file_expose_type', sql`file_expose_type`, (col) =>
+      col.notNull().defaultTo('PRESIGN'),
+    )
+    .execute();
+
+  await db
+    .updateTable('stored_files')
+    .set((eb) => ({
+      file_expose_type: eb
+        .case()
+        .when('is_public', '=', true)
+        .then(sql`'PUBLIC'::file_expose_type`)
+        .else(sql`'PRESIGN'::file_expose_type`)
+        .end(),
+    }))
+    .execute();
+
+  await db.schema.alterTable('stored_files').dropColumn('is_public').execute();
 }
 
 export async function down(db: Kysely<any>): Promise<void> {

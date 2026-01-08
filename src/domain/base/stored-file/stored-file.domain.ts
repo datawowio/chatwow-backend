@@ -1,3 +1,5 @@
+import { FileExposeType } from '@infra/db/db';
+
 import { getFileExtension } from '@shared/common/common.buffer';
 import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
@@ -20,7 +22,7 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
   readonly filename: string;
   readonly filesizeByte: number;
   readonly storageName: string;
-  readonly isPublic: boolean;
+  readonly fileExposeType: FileExposeType;
   readonly createdAt: Date;
   readonly updatedAt: Date;
   readonly extension: string;
@@ -39,7 +41,6 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
       keyPath: getStoredFileKey({
         id: isDefined(data.id) ? data.id : this.id,
         ownerTable: this.ownerTable,
-        isPublic: isDefined(data.isPublic) ? data.isPublic : this.isPublic,
       }),
       ownerTable: this.ownerTable,
       storageName: this.storageName,
@@ -61,7 +62,9 @@ export class StoredFile extends DomainEntity<StoredFilePg> {
       filename: isDefined(data.filename) ? data.filename : this.filename,
       refName: isDefined(data.refName) ? data.refName : this.refName,
       expireAt: isDefined(data.expireAt) ? data.expireAt : this.expireAt,
-      isPublic: isDefined(data.isPublic) ? data.isPublic : this.isPublic,
+      fileExposeType: isDefined(data.fileExposeType)
+        ? data.fileExposeType
+        : this.fileExposeType,
     };
 
     Object.assign(this, plain);

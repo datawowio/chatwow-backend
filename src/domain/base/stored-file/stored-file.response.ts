@@ -13,7 +13,7 @@ export class StoredFileResponse {
   filesizeByte: number;
 
   @ApiProperty({ example: 'https://presigned-url', nullable: true })
-  presignUrl: string;
+  presignUrl: string | null;
 
   @ApiProperty({ example: DATE_EXAMPLE, nullable: true })
   createdAt: string;
