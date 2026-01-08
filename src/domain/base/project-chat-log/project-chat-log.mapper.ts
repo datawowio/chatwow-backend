@@ -20,7 +20,7 @@ export function projectChatLogFromPg(pg: ProjectChatLogPg): ProjectChatLog {
     parentId: pg.parent_id,
   };
 
-  return new ProjectChatLog(plain);
+  return projectChatLogFromPlain(plain);
 }
 
 export function projectChatLogFromPgWithState(
@@ -54,7 +54,7 @@ export function projectChatLogFromJson(
     parentId: json.parentId,
   };
 
-  return new ProjectChatLog(plain);
+  return projectChatLogFromPlain(plain);
 }
 
 export function projectChatLogFromJsonWithState(

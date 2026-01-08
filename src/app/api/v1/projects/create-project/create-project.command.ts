@@ -1,3 +1,5 @@
+import { AppConfiguration } from '@domain/base/app-configuration/app-configuration.domain';
+import { AppConfigurationService } from '@domain/base/app-configuration/app-configuration.service';
 import { ProjectDocument } from '@domain/base/project-document/project-document.domain';
 import { newProjectDocument } from '@domain/base/project-document/project-document.factory';
 import { projectDocumentToResponse } from '@domain/base/project-document/project-document.mapper';
@@ -37,6 +39,7 @@ import { toHttpSuccess } from '@shared/http/http.mapper';
 import { CreateProjectDto, CreateProjectResponse } from './create-project.dto';
 
 type Entity = {
+  aiConfig: AppConfiguration<'AI'>;
   project: Project;
   userGroups: UserGroup[];
   manageUsers: User[];
@@ -59,6 +62,7 @@ export class CreateProjectCommand implements CommandInterface {
     private userGroupProjectService: UserGroupProjectService,
     private transactionService: TransactionService,
     private aiFileService: AiFileService,
+    private appConfigurationService: AppConfigurationService,
     private queueDispatchService: QueueDispatchService,
   ) {}
 
@@ -75,6 +79,7 @@ export class CreateProjectCommand implements CommandInterface {
     });
     const userGroups = await this.getUserGroups(body.userGroupIds);
     const manageUsers = await this.getMangeUsers(body.manageUserIds);
+    const aiConfig = await this.appConfigurationService.findConfig('AI');
 
     const projectDocumentsFiles: Entity['projectDocumentsFiles'] = [];
 
@@ -106,6 +111,7 @@ export class CreateProjectCommand implements CommandInterface {
       userGroups,
       projectDocumentsFiles,
       manageUsers,
+      aiConfig,
     });
 
     return toHttpSuccess({
@@ -164,13 +170,17 @@ export class CreateProjectCommand implements CommandInterface {
               await this.projectDocumentService.save(projectDocument);
               this.queueDispatchService.projectDocumentMdGenerate(
                 projectDocument,
+                entity.aiConfig,
               );
             },
           ),
         );
 
         // if have file generate summary also
-        this.queueDispatchService.projectMdGenerate(entity.project);
+        this.queueDispatchService.projectMdGenerate(
+          entity.project,
+          entity.aiConfig,
+        );
       }
     });
   }

@@ -1,11 +1,12 @@
 import { type Kysely, sql } from 'kysely';
 
+import { uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
 
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     //
-    .createType('ai_model')
+    .createType('ai_model_name')
     .asEnum(['GPT_DW'])
     .execute();
 
@@ -29,12 +30,15 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
     .addColumn('created_by_id', 'uuid', (col) => col)
+    .addColumn('ai_model_name', sql`ai_model_name`, (col) => col.notNull())
     .addColumn('ai_usage_action', sql`ai_usage_action`, (col) => col.notNull())
     .addColumn('project_id', 'uuid', (col) => col.notNull())
     .addColumn('ai_request_at', 'timestamptz', (col) => col.notNull())
     .addColumn('ai_reply_at', 'timestamptz')
     .addColumn('reply_time_ms', 'int4')
     .addColumn('token_used', 'decimal(10, 2)', (col) => col.notNull())
+    .addColumn('token_price', 'decimal(10, 2)', (col) => col.notNull())
+    .addColumn('token_info', 'jsonb', (col) => col.notNull())
     .addColumn('confidence', 'int2', (col) => col.notNull())
     .addColumn('ref_table', 'text', (col) => col.notNull())
     .addColumn('ref_id', 'uuid', (col) => col.notNull())
@@ -57,6 +61,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     )
     .addColumn('user_group_id', 'uuid', (col) => col)
     .addColumn('token_used', 'decimal(10, 2)', (col) => col.notNull())
+    .addColumn('token_price', 'decimal(10, 2)', (col) => col.notNull())
     .addColumn('chat_count', 'decimal(10, 2)', (col) => col.notNull())
     .addColumn('ai_usage_id', 'uuid', (col) =>
       col.references('ai_usages.id').onDelete('cascade').notNull(),
@@ -80,7 +85,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   //
   await db.schema
     .createTable('ai_models')
-    .addColumn('ai_model', sql`ai_model`, (col) => col.primaryKey())
+    .addColumn('ai_model_name', sql`ai_model_name`, (col) => col.primaryKey())
     .addColumn('created_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
@@ -93,7 +98,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db
     .insertInto('ai_models')
     .values({
-      ai_model: 'GPT_DW',
+      ai_model_name: 'GPT_DW',
       created_at: myDayjs().toISOString(),
       updated_at: myDayjs().toISOString(),
       price_per_token: '10.00',
@@ -114,6 +119,20 @@ export async function up(db: Kysely<any>): Promise<void> {
     )
     .addColumn('config_key', 'text', (col) => col.notNull().unique())
     .addColumn('config_data', 'jsonb', (col) => col.notNull())
+    .execute();
+
+  await db
+    .insertInto('app_configurations')
+    .values({
+      id: uuidV7(),
+      created_at: myDayjs().toISOString(),
+      updated_at: myDayjs().toISOString(),
+      config_key: 'AI',
+      config_data: {
+        model: 'GPT_DW',
+        apiKey: null,
+      },
+    })
     .execute();
 }
 

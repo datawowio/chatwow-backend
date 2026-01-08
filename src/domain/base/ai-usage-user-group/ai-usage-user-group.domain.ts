@@ -14,6 +14,7 @@ export class AiUsageUserGroup extends DomainEntity<AiUsageUserGroupPg> {
   readonly createdAt: Date;
   readonly userGroupId: string | null;
   readonly tokenUsed: Big;
+  readonly tokenPrice: Big;
   readonly chatCount: Big;
   readonly aiUsageId: string;
 
@@ -30,6 +31,9 @@ export class AiUsageUserGroup extends DomainEntity<AiUsageUserGroupPg> {
       aiUsageId: this.aiUsageId,
       tokenUsed: isDefined(data.tokenUsed) ? data.tokenUsed : this.tokenUsed,
       chatCount: isDefined(data.chatCount) ? data.chatCount : this.chatCount,
+      tokenPrice: isDefined(data.tokenPrice)
+        ? data.tokenPrice
+        : this.tokenPrice,
     };
 
     Object.assign(this, plain);

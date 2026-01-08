@@ -1,3 +1,4 @@
+import { AppConfigurationService } from '@domain/base/app-configuration/app-configuration.service';
 import { Project } from '@domain/base/project/project.domain';
 import { projectToResponse } from '@domain/base/project/project.mapper';
 import { ProjectService } from '@domain/base/project/project.service';
@@ -16,6 +17,7 @@ import { RegenerateProjectSummaryResponse } from './regenerate-project-summary.d
 export class RegenerateProjectSummaryCommand implements CommandInterface {
   constructor(
     private projectService: ProjectService,
+    private appConfigurationService: AppConfigurationService,
     private queueDispatchService: QueueDispatchService,
   ) {}
 
@@ -23,7 +25,7 @@ export class RegenerateProjectSummaryCommand implements CommandInterface {
     claims: UserClaims,
     id: string,
   ): Promise<RegenerateProjectSummaryResponse> {
-    const project = await this.find(claims, id);
+    const { project, aiConfig } = await this.find(claims, id);
     project.edit({
       actorId: claims.userId,
       data: {
@@ -32,6 +34,8 @@ export class RegenerateProjectSummaryCommand implements CommandInterface {
     });
 
     await this.save(project);
+
+    this.queueDispatchService.projectMdGenerate(project, aiConfig);
 
     return toHttpSuccess({
       data: {
@@ -42,18 +46,18 @@ export class RegenerateProjectSummaryCommand implements CommandInterface {
     });
   }
 
-  async find(claims: UserClaims, id: string): Promise<Project> {
+  async find(claims: UserClaims, id: string) {
     const project = await this.projectService.findOne(id, claims);
-
     if (!project) {
       throw new ApiException(400, 'projectNotFound');
     }
 
-    return project;
+    const aiConfig = await this.appConfigurationService.findConfig('AI');
+
+    return { project, aiConfig };
   }
 
   async save(project: Project) {
     await this.projectService.save(project);
-    this.queueDispatchService.projectMdGenerate(project);
   }
 }

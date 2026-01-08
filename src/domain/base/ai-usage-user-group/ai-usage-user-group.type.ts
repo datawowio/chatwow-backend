@@ -15,6 +15,7 @@ export type AiUsageUserGroupJson = Serialized<AiUsageUserGroupPlain>;
 export type AiUsageUserGroupNewData = {
   aiUsageId: string;
   userGroupId: string | null;
+  tokenPrice: Big;
   tokenUsed: Big;
   chatCount: Big;
 };
@@ -22,4 +23,5 @@ export type AiUsageUserGroupNewData = {
 export type AiUsageUserGroupUpdateData = {
   tokenUsed?: Big;
   chatCount?: Big;
+  tokenPrice?: Big;
 };

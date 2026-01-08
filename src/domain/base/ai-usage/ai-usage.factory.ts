@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import type { SetRequired } from 'type-fest';
 
 import { uuidV7 } from '@shared/common/common.crypto';
@@ -23,6 +24,9 @@ export function newAiUsage({ actorId, data }: AiUsageNewData): AiUsage {
     refId: data.refId,
     replyTimeMs: null,
     aiUsageAction: data.aiUsageAction,
+    tokenPrice: newBig(0),
+    aiModelName: data.aiModelName,
+    tokenInfo: {},
   });
 }
 
@@ -47,8 +51,13 @@ export function mockAiUsage(
     aiReplyAt: isDefined(data.aiReplyAt)
       ? data.aiReplyAt
       : myDayjs().add(1, 'second').toDate(),
-    tokenUsed: isDefined(data.tokenUsed) ? data.tokenUsed : newBig(20),
+    tokenUsed: isDefined(data.tokenUsed)
+      ? data.tokenUsed
+      : newBig(faker.number.int({ min: 10, max: 100 })),
+    tokenPrice: newBig(faker.number.int({ min: 1, max: 100 })),
     confidence: isDefined(data.confidence) ? data.confidence : 99,
+    aiModelName: valueOr(data.aiModelName, 'GPT_DW'),
+    tokenInfo: {},
     refTable: data.refTable,
     refId: valueOr(data.refId, uuidV7()),
     replyTimeMs: isDefined(data.replyTimeMs) ? data.replyTimeMs : 0,

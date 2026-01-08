@@ -1,3 +1,4 @@
+import { AppConfigurationService } from '@domain/base/app-configuration/app-configuration.service';
 import { ProjectDocument } from '@domain/base/project-document/project-document.domain';
 import { projectDocumentToResponse } from '@domain/base/project-document/project-document.mapper';
 import { ProjectDocumentService } from '@domain/base/project-document/project-document.service';
@@ -19,13 +20,14 @@ export class RegenerateProjectDocumentSummaryCommand
   constructor(
     private projectDocumentService: ProjectDocumentService,
     private queueDispatchService: QueueDispatchService,
+    private appConfigurationService: AppConfigurationService,
   ) {}
 
   async exec(
     claims: UserClaims,
     id: string,
   ): Promise<RegenerateProjectDocumentSummaryResponse> {
-    const projectDocument = await this.find(claims, id);
+    const { projectDocument, aiConfig } = await this.find(claims, id);
     projectDocument.edit({
       actorId: claims.userId,
       data: {
@@ -34,6 +36,10 @@ export class RegenerateProjectDocumentSummaryCommand
     });
 
     await this.save(projectDocument);
+    this.queueDispatchService.projectDocumentMdGenerate(
+      projectDocument,
+      aiConfig,
+    );
 
     return toHttpSuccess({
       data: {
@@ -44,7 +50,7 @@ export class RegenerateProjectDocumentSummaryCommand
     });
   }
 
-  async find(claims: UserClaims, id: string): Promise<ProjectDocument> {
+  async find(claims: UserClaims, id: string) {
     const projectDocument = await this.projectDocumentService.findOne(
       id,
       claims,
@@ -54,11 +60,12 @@ export class RegenerateProjectDocumentSummaryCommand
       throw new ApiException(404, 'projectDocumentNotFound');
     }
 
-    return projectDocument;
+    const aiConfig = await this.appConfigurationService.findConfig('AI');
+
+    return { projectDocument, aiConfig };
   }
 
   async save(projectDocument: ProjectDocument) {
     await this.projectDocumentService.save(projectDocument);
-    this.queueDispatchService.projectDocumentMdGenerate(projectDocument);
   }
 }

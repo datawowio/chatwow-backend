@@ -1,7 +1,8 @@
 import { AI_USAGE_REF_TABLE } from '@domain/base/ai-usage/ai-usage.constant';
 import { AiUsage } from '@domain/base/ai-usage/ai-usage.domain';
 import { newAiUsage } from '@domain/base/ai-usage/ai-usage.factory';
-import { AiUsageService } from '@domain/base/ai-usage/ai-usage.service';
+import { AppConfiguration } from '@domain/base/app-configuration/app-configuration.domain';
+import { AppConfigurationService } from '@domain/base/app-configuration/app-configuration.service';
 import { ProjectChatLog } from '@domain/base/project-chat-log/project-chat-log.domain';
 import { newProjectChatLog } from '@domain/base/project-chat-log/project-chat-log.factory';
 import { projectChatLogToResponse } from '@domain/base/project-chat-log/project-chat-log.mapper';
@@ -31,6 +32,7 @@ import { toHttpSuccess } from '@shared/http/http.mapper';
 import { ProjectChatDto, ProjectChatResponse } from './project-chat.dto';
 
 type Entity = {
+  aiConfig: AppConfiguration<'AI'>;
   projectChatSession: ProjectChatSession;
   project: Project;
   userChatLog: ProjectChatLog;
@@ -45,10 +47,10 @@ export class ProjectChatCommand implements CommandInterface {
     private projectChatLogService: ProjectChatLogService,
     private projectChatSessionService: ProjectChatSessionService,
     private aiApiService: AiApiService,
-    private aiUsageService: AiUsageService,
     private loggerService: LoggerService,
     private transactionService: TransactionService,
     private aiFileService: AiFileService,
+    private appConfigurationService: AppConfigurationService,
     private domainEventQueue: DomainEventQueue,
   ) {}
 
@@ -142,6 +144,7 @@ export class ProjectChatCommand implements CommandInterface {
     }
 
     const project = projectFromPgWithState(chatSession.project);
+    const aiConfig = await this.appConfigurationService.findConfig('AI');
 
     const userChatLog = newProjectChatLog({
       chatSender: 'USER',
@@ -151,6 +154,7 @@ export class ProjectChatCommand implements CommandInterface {
     });
 
     return {
+      aiConfig,
       projectChatSession: projectChatSessionFromPgWithState(chatSession),
       project,
       userChatLog,
@@ -159,7 +163,7 @@ export class ProjectChatCommand implements CommandInterface {
 
   async processAiChat(
     text: string,
-    { project, projectChatSession, userChatLog }: Entity,
+    { project, projectChatSession, userChatLog, aiConfig }: Entity,
   ) {
     const botChatLog = newProjectChatLog({
       chatSender: 'BOT',
@@ -175,6 +179,7 @@ export class ProjectChatCommand implements CommandInterface {
         aiUsageAction: 'CHAT_PROJECT',
         refId: botChatLog.id,
         refTable: AI_USAGE_REF_TABLE.PROJECT_CHAT_LOG,
+        aiModelName: aiConfig.configData.model,
       },
     }).record();
 
@@ -183,6 +188,7 @@ export class ProjectChatCommand implements CommandInterface {
         text,
         project: project,
         sessionId: projectChatSession.id,
+        aiConfig,
       });
 
       if (res.isSuccess) {

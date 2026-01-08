@@ -23,10 +23,11 @@ export function aiUsageUserGroupFromPg(
     userGroupId: pg.user_group_id,
     tokenUsed: newBig(pg.token_used),
     chatCount: newBig(pg.chat_count),
+    tokenPrice: newBig(pg.token_price),
     aiUsageId: pg.ai_usage_id,
   };
 
-  return new AiUsageUserGroup(plain);
+  return aiUsageUserGroupFromPlain(plain);
 }
 
 export function aiUsageUserGroupFromPgWithState(
@@ -50,10 +51,11 @@ export function aiUsageUserGroupFromJson(
     userGroupId: json.userGroupId,
     tokenUsed: newBig(json.tokenUsed),
     chatCount: newBig(json.chatCount),
+    tokenPrice: newBig(json.tokenPrice),
     aiUsageId: json.aiUsageId,
   };
 
-  return new AiUsageUserGroup(plain);
+  return aiUsageUserGroupFromPlain(plain);
 }
 export function aiUsageUserGroupFromJsonState(
   jsonState: WithPgState<AiUsageUserGroupJson, AiUsageUserGroupPg>,
@@ -73,6 +75,7 @@ export function aiUsageUserGroupToPg(
     user_group_id: domain.userGroupId,
     token_used: domain.tokenUsed.toFixed(2),
     chat_count: domain.chatCount.toFixed(2),
+    token_price: domain.tokenPrice.toFixed(2),
     ai_usage_id: domain.aiUsageId,
   };
 }
@@ -87,6 +90,7 @@ export function aiUsageUserGroupToPlain(
     tokenUsed: domain.tokenUsed,
     chatCount: domain.chatCount,
     aiUsageId: domain.aiUsageId,
+    tokenPrice: domain.tokenPrice,
   };
 }
 
@@ -99,6 +103,7 @@ export function aiUsageUserGroupToJson(
     userGroupId: domain.userGroupId,
     tokenUsed: domain.tokenUsed.toFixed(2),
     chatCount: domain.chatCount.toFixed(2),
+    tokenPrice: domain.tokenPrice.toFixed(2),
     aiUsageId: domain.aiUsageId,
   };
 }

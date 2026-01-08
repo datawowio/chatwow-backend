@@ -9,7 +9,7 @@ Enum "actor_type" {
   "SYSTEM"
 }
 
-Enum "ai_model" {
+Enum "ai_model_name" {
   "GPT_DW"
 }
 
@@ -264,54 +264,6 @@ Table "audit_logs" {
   }
 }
 
-Table "ai_usages" {
-  "id" uuid [pk, not null]
-  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "created_by_id" uuid
-  "ai_usage_action" ai_usage_action [not null]
-  "project_id" uuid [not null]
-  "ai_request_at" timestamptz [not null]
-  "ai_reply_at" timestamptz
-  "reply_time_ms" int4
-  "token_used" numeric(10,2) [not null]
-  "confidence" int2 [not null]
-  "ref_table" text [not null]
-  "ref_id" uuid [not null]
-
-  Indexes {
-    project_id [type: btree, name: "ai_usages_project_id_idx"]
-  }
-}
-
-Table "ai_usage_user_groups" {
-  "id" uuid [pk, not null]
-  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "user_group_id" uuid
-  "token_used" numeric(10,2) [not null]
-  "chat_count" numeric(10,2) [not null]
-  "ai_usage_id" uuid [not null]
-
-  Indexes {
-    ai_usage_id [type: btree, name: "ai_usage_user_groups_ai_usage_id_idx"]
-    user_group_id [type: btree, name: "ai_usage_user_groups_user_group_id_idx"]
-  }
-}
-
-Table "ai_models" {
-  "ai_model" ai_model [pk, not null]
-  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "price_per_token" numeric(10,2) [not null]
-}
-
-Table "app_configurations" {
-  "id" uuid [pk, not null]
-  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "config_key" text [unique, not null]
-  "config_data" jsonb [not null]
-}
-
 Table "sessions" {
   "id" uuid [pk, not null]
   "user_id" uuid [not null]
@@ -352,6 +304,58 @@ Table "message_tasks" {
   "created_at" timestamptz [not null, default: `now()`]
   "updated_at" timestamptz [not null, default: `now()`]
   "expire_at" timestamptz [not null]
+}
+
+Table "ai_usages" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "created_by_id" uuid
+  "ai_model_name" ai_model_name [not null]
+  "ai_usage_action" ai_usage_action [not null]
+  "project_id" uuid [not null]
+  "ai_request_at" timestamptz [not null]
+  "ai_reply_at" timestamptz
+  "reply_time_ms" int4
+  "token_used" numeric(10,2) [not null]
+  "token_price" numeric(10,2) [not null]
+  "token_info" jsonb [not null]
+  "confidence" int2 [not null]
+  "ref_table" text [not null]
+  "ref_id" uuid [not null]
+
+  Indexes {
+    project_id [type: btree, name: "ai_usages_project_id_idx"]
+  }
+}
+
+Table "ai_usage_user_groups" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "user_group_id" uuid
+  "token_used" numeric(10,2) [not null]
+  "token_price" numeric(10,2) [not null]
+  "chat_count" numeric(10,2) [not null]
+  "ai_usage_id" uuid [not null]
+
+  Indexes {
+    ai_usage_id [type: btree, name: "ai_usage_user_groups_ai_usage_id_idx"]
+    user_group_id [type: btree, name: "ai_usage_user_groups_user_group_id_idx"]
+  }
+}
+
+Table "ai_models" {
+  "ai_model_name" ai_model_name [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "price_per_token" numeric(10,2) [not null]
+}
+
+Table "app_configurations" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "config_key" text [unique, not null]
+  "config_data" jsonb [not null]
 }
 
 Ref "ai_usage_user_groups_ai_usage_id_fkey":"ai_usages"."id" < "ai_usage_user_groups"."ai_usage_id" [delete: cascade]

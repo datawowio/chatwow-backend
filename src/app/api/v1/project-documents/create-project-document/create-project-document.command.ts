@@ -1,3 +1,5 @@
+import { AppConfiguration } from '@domain/base/app-configuration/app-configuration.domain';
+import { AppConfigurationService } from '@domain/base/app-configuration/app-configuration.service';
 import { ProjectDocument } from '@domain/base/project-document/project-document.domain';
 import { newProjectDocument } from '@domain/base/project-document/project-document.factory';
 import { projectDocumentToResponse } from '@domain/base/project-document/project-document.mapper';
@@ -28,6 +30,7 @@ import {
 } from './create-project-document.dto';
 
 type Entity = {
+  aiConfig: AppConfiguration<'AI'>;
   projectDocument: ProjectDocument;
   storedFile: StoredFile;
   project: Project;
@@ -42,6 +45,7 @@ export class CreateProjectDocumentCommand implements CommandInterface {
     private transactionService: TransactionService,
     private aiFileService: AiFileService,
     private queueDispatchService: QueueDispatchService,
+    private appConfigurationService: AppConfigurationService,
   ) {}
 
   async exec(
@@ -56,6 +60,8 @@ export class CreateProjectDocumentCommand implements CommandInterface {
       claims,
       body.projectDocument.projectId,
     );
+    const aiConfig = await this.appConfigurationService.findConfig('AI');
+
     setProjectRequireRegenerate({
       project,
       projectDocuments: [projectDocument],
@@ -68,6 +74,7 @@ export class CreateProjectDocumentCommand implements CommandInterface {
     });
 
     await this.save({
+      aiConfig,
       projectDocument,
       storedFile,
       project,
@@ -102,7 +109,10 @@ export class CreateProjectDocumentCommand implements CommandInterface {
       await this.projectService.save(entity.project);
     });
 
-    this.queueDispatchService.projectDocumentMdGenerate(entity.projectDocument);
+    this.queueDispatchService.projectDocumentMdGenerate(
+      entity.projectDocument,
+      entity.aiConfig,
+    );
   }
 
   async getProject(claims: UserClaims, projectId: string) {

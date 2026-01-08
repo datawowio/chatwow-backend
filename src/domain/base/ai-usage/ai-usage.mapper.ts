@@ -1,3 +1,5 @@
+import { JsonValue } from '@infra/db/db';
+
 import { newBig } from '@shared/common/common.func';
 import {
   toDate,
@@ -25,9 +27,12 @@ export function aiUsageFromPg(pg: AiUsagePg): AiUsage {
     refId: pg.ref_id,
     replyTimeMs: pg.reply_time_ms,
     aiUsageAction: pg.ai_usage_action,
+    tokenInfo: pg.token_info as object,
+    tokenPrice: newBig(pg.token_price),
+    aiModelName: pg.ai_model_name,
   };
 
-  return new AiUsage(plain);
+  return aiUsageFromPlain(plain);
 }
 
 export function aiUsageFromPgWithState(pg: AiUsagePg): AiUsage {
@@ -48,6 +53,9 @@ export function aiUsageFromPlain(plainData: AiUsagePlain): AiUsage {
     refId: plainData.refId,
     replyTimeMs: plainData.replyTimeMs,
     aiUsageAction: plainData.aiUsageAction,
+    tokenInfo: plainData.tokenInfo,
+    tokenPrice: plainData.tokenPrice,
+    aiModelName: plainData.aiModelName,
   };
 
   return new AiUsage(plain);
@@ -67,9 +75,12 @@ export function aiUsageFromJson(json: AiUsageJson): AiUsage {
     refId: json.refId,
     replyTimeMs: json.replyTimeMs,
     aiUsageAction: json.aiUsageAction,
+    tokenInfo: json.tokenInfo,
+    tokenPrice: newBig(json.tokenPrice),
+    aiModelName: json.aiModelName,
   };
 
-  return new AiUsage(plain);
+  return aiUsageFromPlain(plain);
 }
 export function aiUsageFromJsonState(
   jsonState: WithPgState<AiUsageJson, AiUsagePg>,
@@ -98,6 +109,9 @@ export function aiUsageToPg(domain: AiUsage): AiUsagePg {
     ref_id: domain.refId,
     reply_time_ms: domain.replyTimeMs,
     ai_usage_action: domain.aiUsageAction,
+    token_info: domain.tokenInfo as JsonValue,
+    token_price: domain.tokenPrice.toFixed(2),
+    ai_model_name: domain.aiModelName,
   };
 }
 
@@ -115,6 +129,9 @@ export function aiUsageToPlain(domain: AiUsage): AiUsagePlain {
     refId: domain.refId,
     replyTimeMs: domain.replyTimeMs,
     aiUsageAction: domain.aiUsageAction,
+    tokenInfo: domain.tokenInfo,
+    tokenPrice: domain.tokenPrice,
+    aiModelName: domain.aiModelName,
   };
 }
 
@@ -132,6 +149,9 @@ export function aiUsageToJson(domain: AiUsage): AiUsageJson {
     refId: domain.refId,
     replyTimeMs: domain.replyTimeMs,
     aiUsageAction: domain.aiUsageAction,
+    tokenInfo: domain.tokenInfo,
+    tokenPrice: domain.tokenPrice.toFixed(2),
+    aiModelName: domain.aiModelName,
   };
 }
 export function aiUsageToJsonState(

@@ -1,6 +1,8 @@
 import { AI_USAGE_REF_TABLE } from '@domain/base/ai-usage/ai-usage.constant';
 import { AiUsage } from '@domain/base/ai-usage/ai-usage.domain';
 import { newAiUsage } from '@domain/base/ai-usage/ai-usage.factory';
+import { AppConfiguration } from '@domain/base/app-configuration/app-configuration.domain';
+import { AppConfigurationService } from '@domain/base/app-configuration/app-configuration.service';
 import { LineChatLog } from '@domain/base/line-chat-log/line-chat-log.domain';
 import { newLineChatLog } from '@domain/base/line-chat-log/line-chat-log.factory';
 import { LineSession } from '@domain/base/line-session/line-session.domain';
@@ -23,6 +25,7 @@ import { LINE_AI_ERROR_REPLY } from '../line-event.constant';
 import { LineProcessAiChatJobData } from './line-process-ai-chat.type';
 
 type Entity = {
+  aiConfig: AppConfiguration<'AI'>;
   project: Project;
   user: User;
   lineSession: LineSession;
@@ -37,6 +40,7 @@ export class LineProcessAiChatCommand {
     private aiApiService: AiApiService,
     private lineEventQueue: LineEventQueue,
     private loggerService: LoggerService,
+    private appConfigurationService: AppConfigurationService,
     private domainEventQueue: DomainEventQueue,
   ) {}
 
@@ -59,6 +63,7 @@ export class LineProcessAiChatCommand {
         aiUsageAction: 'CHAT_LINE',
         refId: botChatLog.id,
         refTable: AI_USAGE_REF_TABLE.LINE_CHAT_LOG,
+        aiModelName: entity.aiConfig.configData.model,
       },
     });
 
@@ -66,6 +71,7 @@ export class LineProcessAiChatCommand {
       text: body.message,
       project: entity.project,
       sessionId: entity.lineSession.id,
+      aiConfig: entity.aiConfig,
     });
 
     if (!res.isSuccess) {
@@ -136,8 +142,10 @@ export class LineProcessAiChatCommand {
 
     const project = projectFromPgWithState(rawProject);
     const user = userFromPgWithState(rawUser);
+    const aiConfig = await this.appConfigurationService.findConfig('AI');
 
     return {
+      aiConfig,
       project,
       user,
       lineSession,

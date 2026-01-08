@@ -1,3 +1,4 @@
+import { AppConfiguration } from '@domain/base/app-configuration/app-configuration.domain';
 import { Project } from '@domain/base/project/project.domain';
 import { AxiosError } from 'axios';
 
@@ -5,6 +6,7 @@ export type SendAiApiOpts = {
   text: string;
   project: Project;
   sessionId: string;
+  aiConfig: AppConfiguration<'AI'>;
 };
 
 export type AiRequest = {

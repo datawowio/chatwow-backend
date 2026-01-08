@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import type { SetRequired } from 'type-fest';
 
 import { uuidV7 } from '@shared/common/common.crypto';
@@ -21,6 +22,7 @@ export function newAiUsageUserGroup(
     aiUsageId: data.aiUsageId,
     userGroupId: data.userGroupId,
     tokenUsed: data.tokenUsed,
+    tokenPrice: data.tokenPrice,
     chatCount: data.chatCount,
   });
 }
@@ -39,8 +41,15 @@ export function mockAiUsageUserGroup(
     createdAt: isDefined(data.createdAt) ? data.createdAt : myDayjs().toDate(),
     aiUsageId: data.aiUsageId,
     userGroupId: isDefined(data.userGroupId) ? data.userGroupId : null,
-    tokenUsed: isDefined(data.tokenUsed) ? data.tokenUsed : newBig(100),
-    chatCount: isDefined(data.chatCount) ? data.chatCount : newBig(10),
+    tokenUsed: isDefined(data.tokenUsed)
+      ? data.tokenUsed
+      : newBig(faker.number.int({ min: 10, max: 100 })),
+    tokenPrice: isDefined(data.tokenPrice)
+      ? data.tokenPrice
+      : newBig(faker.number.int({ min: 10, max: 100 })),
+    chatCount: isDefined(data.chatCount)
+      ? data.chatCount
+      : newBig(faker.number.int({ min: 1, max: 10 })),
   });
 }
 

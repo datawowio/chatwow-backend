@@ -1,4 +1,4 @@
-import type { AiUsageAction, AiUsages } from '@infra/db/db';
+import type { AiModelName, AiUsageAction, AiUsages } from '@infra/db/db';
 import type { DBModel } from '@infra/db/db.common';
 
 import type {
@@ -24,6 +24,7 @@ export type AiUsageNewData = {
     refId: string;
     aiUsageAction: AiUsageAction;
     userGroupId?: string | null;
+    aiModelName: AiModelName;
   };
 };
 

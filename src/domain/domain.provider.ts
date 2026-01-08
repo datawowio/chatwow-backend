@@ -1,5 +1,7 @@
+import { AiModelModule } from './base/ai-model/ai-model.module';
 import { AiUsageUserGroupModule } from './base/ai-usage-user-group/ai-usage-user-group.module';
 import { AiUsageModule } from './base/ai-usage/ai-usage.module';
+import { AppConfigurationModule } from './base/app-configuration/app-configuration.module';
 import { AuditLogModule } from './base/audit-log/audit-log.module';
 import { LineAccountModule } from './base/line-account/line-account.module';
 import { LineBotModule } from './base/line-bot/line-bot.module';
@@ -27,8 +29,10 @@ import { QueueModule } from './queue/queue.module';
 
 export const DOMAIN_PROVIDER = [
   //
+  AiModelModule,
   AiUsageModule,
   AiUsageUserGroupModule,
+  AppConfigurationModule,
   AuditLogModule,
   LineAccountModule,
   LineChatLogModule,

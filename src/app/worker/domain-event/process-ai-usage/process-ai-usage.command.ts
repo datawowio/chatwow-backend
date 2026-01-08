@@ -66,7 +66,8 @@ export class ProcessAiUsageCommand {
         newAiUsageUserGroup({
           aiUsageId: aiUsage.id,
           chatCount: newBig(1).div(groupLength),
-          tokenUsed: newBig(aiUsage.tokenUsed).div(groupLength),
+          tokenUsed: aiUsage.tokenUsed.div(groupLength),
+          tokenPrice: aiUsage.tokenPrice.div(groupLength),
           userGroupId: r.userGroupId,
         }),
       ),
