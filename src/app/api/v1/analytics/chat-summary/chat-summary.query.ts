@@ -6,11 +6,14 @@ import { userPgToResponse } from '@domain/base/user/user.mapper';
 import { Injectable } from '@nestjs/common';
 import { sql } from 'kysely';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
+import { match } from 'ts-pattern';
 
+import { Ref } from '@infra/db/db.common';
 import { MainDb } from '@infra/db/db.main';
-import { sortQb } from '@infra/db/db.util';
+import { addPagination, queryCount, sortQb } from '@infra/db/db.util';
 
 import { newBig } from '@shared/common/common.func';
+import { getPagination } from '@shared/common/common.pagination';
 import { toCurrencyDisplay } from '@shared/common/common.transformer';
 import { QueryInterface } from '@shared/common/common.type';
 import { toHttpSuccess } from '@shared/http/http.mapper';
@@ -26,7 +29,7 @@ export class ChatSummaryQuery implements QueryInterface {
   constructor(private db: MainDb) {}
 
   async exec(query: ChatSummaryDto): Promise<ChatSummaryResponse> {
-    const raw = await this.getRaw(query);
+    const { result, totalCount } = await this.getRaw(query);
 
     const metaCalc = {
       totalPrice: newBig(0),
@@ -37,7 +40,7 @@ export class ChatSummaryQuery implements QueryInterface {
       totalAnswerable: 0,
     };
 
-    const chatSummaries: ChatSummaryAnalytic[] = raw.map((rawData) => {
+    const chatSummaries: ChatSummaryAnalytic[] = result.map((rawData) => {
       const price = newBig(rawData.totalPrice || 0);
       const tokens = Number(rawData.totalTokenUsed || 0);
       const usages = Number(rawData.totalChatUsages || 0);
@@ -57,11 +60,11 @@ export class ChatSummaryQuery implements QueryInterface {
         timestamp: rawData.timestamp,
         summary: {
           totalPrice: toCurrencyDisplay(price),
-          totalTokenUsed: tokens,
-          totalChatUsages: usages,
-          avgReplyTimeMs: replyTime,
-          avgConfidence: confidence,
-          totalAnswerable: answerable,
+          totalTokenUsed: +tokens.toFixed(2),
+          totalChatUsages: +usages.toFixed(2),
+          avgReplyTimeMs: +replyTime.toFixed(2),
+          avgConfidence: +confidence.toFixed(2),
+          totalAnswerable: +answerable.toFixed(2),
         },
         relations: {
           project: rawData?.project
@@ -87,12 +90,15 @@ export class ChatSummaryQuery implements QueryInterface {
       meta: {
         summary: {
           totalPrice: toCurrencyDisplay(metaCalc.totalPrice),
-          totalTokenUsed: metaCalc.totalTokenUsed,
-          totalAnswerable: metaCalc.totalAnswerable,
-          totalChatUsages: metaCalc.totalChatUsages,
-          avgReplyTimeMs: metaCalc.avgReplyTimeMs,
-          avgConfidence: metaCalc.avgConfidence,
+          totalTokenUsed: +metaCalc.totalTokenUsed.toFixed(2),
+          totalAnswerable: +metaCalc.totalAnswerable.toFixed(2),
+          totalChatUsages: +metaCalc.totalChatUsages.toFixed(2),
+          avgReplyTimeMs: +metaCalc.avgReplyTimeMs.toFixed(2),
+          avgConfidence: +metaCalc.avgConfidence.toFixed(2),
         },
+        pagination: totalCount
+          ? getPagination(result, totalCount, query.group!.pagination)
+          : undefined,
       },
       data: {
         chatSummaries,
@@ -102,6 +108,40 @@ export class ChatSummaryQuery implements QueryInterface {
 
   async getRaw(query: ChatSummaryDto) {
     const filter = query.filter;
+    const mainColumn = this.getMainColumn(query);
+
+    const filterQb = this.db.read
+      .selectFrom('ai_usages')
+      .leftJoin(
+        'ai_usage_user_groups',
+        'ai_usage_user_groups.ai_usage_id',
+        'ai_usages.id',
+      )
+      .where('ai_usages.ai_usage_action', 'in', AI_USAGE_CHAT_ACTION)
+      .where(aiUsagesTableFilter)
+      .$if(!!filter?.userGroupIds?.length, (q) =>
+        q.where(
+          'ai_usage_user_groups.user_group_id',
+          'in',
+          filter!.userGroupIds!,
+        ),
+      )
+      .$if(!!filter?.startAt, (q) =>
+        q.where('ai_usages.ai_request_at', '>=', filter!.startAt!),
+      )
+      .$if(!!filter?.endAt, (q) =>
+        q.where('ai_usages.ai_request_at', '<=', filter!.endAt!),
+      )
+      .$if(!!filter?.projectIds?.length, (q) =>
+        q.where('ai_usages.project_id', 'in', filter!.projectIds!),
+      )
+      .$if(!!filter?.userIds?.length, (q) =>
+        q.where('ai_usages.created_by_id', 'in', filter!.userIds!),
+      )
+      .$call((q) => addPagination(q, query.group?.pagination))
+      .select(mainColumn)
+      .groupBy(mainColumn)
+      .orderBy(({ fn }) => fn.min('ai_usages.ai_reply_at'), 'asc');
 
     let initSelectQb = this.db.read
       .selectFrom('ai_usages')
@@ -117,7 +157,7 @@ export class ChatSummaryQuery implements QueryInterface {
         fn.avg<string>('ai_usages.confidence').as('avgConfidence'),
       ]);
 
-    if (query.groupBy === 'userGroup') {
+    if (query.group?.by === 'userGroup') {
       // if user group we need to reset select but still same schema
       initSelectQb = initSelectQb
         .clearSelect()
@@ -125,13 +165,6 @@ export class ChatSummaryQuery implements QueryInterface {
           'ai_usage_user_groups',
           'ai_usage_user_groups.ai_usage_id',
           'ai_usages.id',
-        )
-        .$if(!!filter?.userGroupIds?.length, (q) =>
-          q.where(
-            'ai_usage_user_groups.user_group_id',
-            'in',
-            filter!.userGroupIds!,
-          ),
         )
         .select(({ fn }) => [
           fn.count('ai_usage_user_groups.token_used').as('totalTokenUsed'),
@@ -147,8 +180,19 @@ export class ChatSummaryQuery implements QueryInterface {
     }
 
     const qb = initSelectQb
-      .$if(!!query.sort?.length, (q) =>
-        sortQb(q, query.sort!, {
+      .$if(!!query.period, (q) =>
+        q
+          .select(({ fn, ref }) =>
+            fn<string>('date_trunc', [
+              sql.lit(query.period),
+              ref('ai_usages.ai_request_at'),
+            ]).as('timestamp'),
+          )
+          .groupBy('timestamp')
+          .orderBy('timestamp', 'asc'),
+      )
+      .$if(!!query.group?.sort?.length, (q) =>
+        sortQb(q, query.group!.sort!, {
           totalTokenUsed: 'totalTokenUsed',
           totalPrice: 'totalPrice',
           avgReplyTimeMs: 'avgReplyTimeMs',
@@ -157,7 +201,7 @@ export class ChatSummaryQuery implements QueryInterface {
           avgConfidence: 'avgConfidence',
         }),
       )
-      .$if(query.groupBy === 'userGroup', (q) =>
+      .$if(query.group?.by === 'userGroup', (q) =>
         q
           .innerJoin(
             'ai_usage_user_groups',
@@ -179,7 +223,7 @@ export class ChatSummaryQuery implements QueryInterface {
           .groupBy('ai_usage_user_groups.user_group_id')
           .orderBy('ai_usage_user_groups.user_group_id', 'asc'),
       )
-      .$if(query.groupBy === 'project', (q) =>
+      .$if(query.group?.by === 'project', (q) =>
         q
           .select((eb) =>
             jsonObjectFrom(
@@ -192,7 +236,7 @@ export class ChatSummaryQuery implements QueryInterface {
           .groupBy('ai_usages.project_id')
           .orderBy('ai_usages.project_id', 'asc'),
       )
-      .$if(query.groupBy === 'user', (q) =>
+      .$if(query.group?.by === 'user', (q) =>
         q
           .select((eb) =>
             jsonObjectFrom(
@@ -205,33 +249,26 @@ export class ChatSummaryQuery implements QueryInterface {
           .groupBy('ai_usages.created_by_id')
           .orderBy('ai_usages.created_by_id', 'asc'),
       )
-      .$if(!!query.period, (q) =>
-        q
-          .select(({ fn, ref }) =>
-            fn<string>('date_trunc', [
-              sql.lit(query.period),
-              ref('ai_usages.ai_request_at'),
-            ]).as('timestamp'),
-          )
-          .groupBy('timestamp')
-          .orderBy('timestamp', 'asc'),
-      )
-      .$if(!!filter?.startAt, (q) =>
-        q.where('ai_usages.ai_request_at', '>=', filter!.startAt!),
-      )
-      .$if(!!filter?.endAt, (q) =>
-        q.where('ai_usages.ai_request_at', '<=', filter!.endAt!),
-      )
-      .$if(!!filter?.projectIds?.length, (q) =>
-        q.where('ai_usages.project_id', 'in', filter!.projectIds!),
-      )
-      .$if(!!filter?.userIds?.length, (q) =>
-        q.where('ai_usages.created_by_id', 'in', filter!.userIds!),
-      )
-      .where('ai_usages.ai_usage_action', 'in', AI_USAGE_CHAT_ACTION)
-      .where(aiUsagesTableFilter)
-      .$if(!!query.limit, (q) => q.limit(query.limit!));
+      // any here because complex
+      .where(mainColumn as any, 'in', filterQb);
 
-    return qb.execute();
+    let totalCount: number | null = null;
+    if (query.group?.pagination) {
+      totalCount = await filterQb.$call((q) => queryCount(q));
+    }
+
+    const result = await qb.execute();
+
+    return { result, totalCount };
+  }
+
+  getMainColumn(query: ChatSummaryDto) {
+    return match(query.group?.by)
+      .returnType<Ref<'ai_usages' | 'ai_usage_user_groups'>>()
+      .with('project', () => 'ai_usages.project_id')
+      .with('user', () => 'ai_usages.created_by_id')
+      .with('userGroup', () => 'ai_usage_user_groups.user_group_id')
+      .with(undefined, () => 'ai_usages.id')
+      .exhaustive();
   }
 }

@@ -9,17 +9,38 @@ import type { ParsedSort } from '@shared/common/common.type';
 
 import type { DB } from './db';
 
-export async function queryCount(qb: SelectQueryBuilder<DB, any, any>) {
+type QueryCountOptions<DB, TB extends keyof DB & string> = {
+  keepOriginal?: boolean;
+  distinct?: StringReference<DB, TB>;
+};
+export async function queryCount<DB, TB extends keyof DB & string, U>(
+  qb: SelectQueryBuilder<DB, TB, U>,
+  opts?: QueryCountOptions<DB, TB>,
+) {
+  if (!opts?.keepOriginal) {
+    qb = qb
+      //
+      .clearLimit()
+      .clearOffset()
+      .clearOrderBy()
+      .clearGroupBy();
+  }
+
   const resp = await qb
     .clearSelect()
-    .select(({ fn }) => fn.countAll().as('total'))
+    .$if(!!opts?.distinct, (q) =>
+      q.select(({ fn }) => fn.count(opts!.distinct!).distinct().as('total')),
+    )
+    .$if(!opts?.distinct, (q) =>
+      q.select(({ fn }) => fn.countAll().as('total')),
+    )
     .executeTakeFirst();
 
-  if (!resp?.total) {
+  if (!resp?.['total']) {
     return 0;
   }
 
-  return parseInt(resp.total as string);
+  return parseInt(resp['total'] as string);
 }
 
 export async function queryExists(qb: SelectQueryBuilder<DB, any, any>) {

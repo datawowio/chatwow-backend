@@ -11,11 +11,16 @@ get {
 }
 
 params:query {
-  ~groupBy: userGroup
-  ~sort: -totalPrice
-  ~limit: 7
-  ~filter[startAt]: 2025-09-08T13:04:26.134Z
   ~period: day
+  ~group[by]: userGroup
+  ~group[pagination][page]: 1
+  ~group[pagination][perPage]: 2
+  ~group[sort]: -totalPrice
+  ~filter[startAt]: 2025-09-08T13:04:26.134Z
+  ~filter[endAt]: 2025-09-08T13:04:26.134Z
+  ~filter[projectIds]: 2025-09-08T13:04:26.134Z
+  ~filter[userIds]: 2025-09-08T13:04:26.134Z
+  ~filter[userGroupIds]: 019ba1da-874a-70af-8b8b-2783ba7c1c40
 }
 
 settings {

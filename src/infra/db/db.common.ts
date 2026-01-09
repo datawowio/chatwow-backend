@@ -7,6 +7,7 @@ import type {
   SelectQueryBuilder,
   Selectable,
   SqlBool,
+  StringReference,
   Transaction,
 } from 'kysely';
 import { FileMigrationProvider, Migrator, sql } from 'kysely';
@@ -43,6 +44,7 @@ export type Strict<T, Shape> = T extends Shape
   : never;
 
 export type EB<T extends keyof DB> = ExpressionBuilder<DB, T>;
+export type Ref<T extends keyof DB> = StringReference<DB, T>;
 export type EX<T> = Expression<T>;
 export type SelectQB<T extends keyof DB> = SelectQueryBuilder<DB, T, object>;
 export type SelectAnyQB<T extends keyof DB> = SelectQueryBuilder<DB, T, any>;
