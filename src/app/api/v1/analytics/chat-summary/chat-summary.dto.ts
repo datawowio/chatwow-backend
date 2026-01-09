@@ -5,16 +5,29 @@ import { ApiProperty } from '@nestjs/swagger';
 import { anyPass } from 'remeda';
 import z from 'zod';
 
+import {
+  toOptionalNumber,
+  toSplitCommaArray,
+} from '@shared/common/common.transformer';
 import { IDomainData } from '@shared/common/common.type';
 import { isISOString, isUndefined } from '@shared/common/common.validator';
 import { StandardResponse } from '@shared/http/http.response.dto';
-import { zodDto } from '@shared/zod/zod.util';
+import { getSortZod, zodDto } from '@shared/zod/zod.util';
 
 // ========== Request ================
 
 const zod = z.object({
   period: z.enum(['day', 'month', 'year']).optional(),
   groupBy: z.enum(['project', 'userGroup', 'user']).optional(),
+  limit: z.string().optional().transform(toOptionalNumber),
+  sort: getSortZod([
+    'totalTokenUsed',
+    'totalPrice',
+    'avgReplyTimeMs',
+    'totalChatUsages',
+    'totalAnswerable',
+    'avgConfidence',
+  ]).optional(),
   filter: z
     .object({
       startAt: z
@@ -24,6 +37,15 @@ const zod = z.object({
       endAt: z
         .string()
         .refine(anyPass([isUndefined, isISOString]))
+        .optional(),
+      projectIds: z
+        .preprocess(toSplitCommaArray, z.array(z.string().uuid()))
+        .optional(),
+      userIds: z
+        .preprocess(toSplitCommaArray, z.array(z.string().uuid()))
+        .optional(),
+      userGroupIds: z
+        .preprocess(toSplitCommaArray, z.array(z.string().uuid()))
         .optional(),
     })
     .optional(),
@@ -69,6 +91,9 @@ class ChatSummaryAnalyticSummary {
 
   @ApiProperty({ type: 'number' })
   avgConfidence: number;
+
+  @ApiProperty({ type: 'number' })
+  totalAnswerable: number;
 }
 
 export class ChatSummaryAnalytic {
@@ -82,7 +107,7 @@ export class ChatSummaryAnalytic {
   relations: ChatSummaryAnalyticRelations;
 }
 
-class ChatSummaryMeta {
+class ChatSummaryMetaSummary {
   @ApiProperty({ type: 'string' })
   totalPrice: string;
 
@@ -93,10 +118,18 @@ class ChatSummaryMeta {
   totalChatUsages: number;
 
   @ApiProperty({ type: 'number' })
+  totalAnswerable: number;
+
+  @ApiProperty({ type: 'number' })
   avgReplyTimeMs: number;
 
   @ApiProperty({ type: 'number' })
   avgConfidence: number;
+}
+
+class ChatSummaryMeta {
+  @ApiProperty({ type: () => ChatSummaryMetaSummary })
+  summary: ChatSummaryMetaSummary;
 }
 
 class ChatSummaryData {

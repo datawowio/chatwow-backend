@@ -37,7 +37,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('ai_reply_at', 'timestamptz')
     .addColumn('reply_time_ms', 'int4')
     .addColumn('token_used', 'double precision', (col) => col.notNull())
-    .addColumn('token_price', 'int8', (col) => col.notNull())
+    .addColumn('token_price', 'decimal(20, 10)', (col) => col.notNull())
     .addColumn('token_info', 'jsonb', (col) => col.notNull())
     .addColumn('confidence', 'int2', (col) => col.notNull())
     .addColumn('ref_table', 'text', (col) => col.notNull())
@@ -60,7 +60,7 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
     .addColumn('user_group_id', 'uuid', (col) => col)
-    .addColumn('token_price', 'int8', (col) => col.notNull())
+    .addColumn('token_price', 'decimal(20, 10)', (col) => col.notNull())
     .addColumn('token_used', 'double precision', (col) => col.notNull())
     .addColumn('chat_count', 'double precision', (col) => col.notNull())
     .addColumn('ai_usage_id', 'uuid', (col) =>
@@ -92,7 +92,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('updated_at', 'timestamptz', (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
-    .addColumn('price_per_token', 'int8', (col) => col.notNull())
+    .addColumn('price_per_token', 'decimal(20, 10)', (col) => col.notNull())
     .execute();
 
   await db

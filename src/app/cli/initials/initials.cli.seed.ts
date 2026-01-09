@@ -13,12 +13,13 @@ import { UserGroupService } from '@domain/base/user-group/user-group.service';
 import { UserManageProjectService } from '@domain/base/user-manage-project/user-manage-project.service';
 import { newUserVerification } from '@domain/base/user-verification/user-verification.factory';
 import { UserVerificationService } from '@domain/base/user-verification/user-verification.service';
-import { mockUsers, newUser } from '@domain/base/user/user.factory';
+import { mockUser, mockUsers } from '@domain/base/user/user.factory';
 import { UserService } from '@domain/base/user/user.service';
 import { Command, CommandRunner } from 'nest-commander';
 
 import { TransactionService } from '@infra/db/transaction/transaction.service';
 
+import { SUPERADMIN_UUID } from '@shared/common/common.constant';
 import { getRandomIds } from '@shared/common/common.func';
 
 @Command({
@@ -52,16 +53,14 @@ export class InitialsCliSeed extends CommandRunner {
   }
 
   private async _initAll(): Promise<void> {
-    const superAdmin = newUser({
-      actorId: null,
-      data: {
-        email: 'superadmin@example.com',
-        password: 'password',
-        role: 'ADMIN',
-        firstName: 'superadmin',
-        lastName: 'superadmin',
-        userStatus: 'ACTIVE',
-      },
+    const superAdmin = mockUser({
+      id: SUPERADMIN_UUID,
+      email: 'superadmin@example.com',
+      password: 'password',
+      role: 'ADMIN',
+      firstName: 'superadmin',
+      lastName: 'superadmin',
+      userStatus: 'ACTIVE',
     });
     const superAdminVerification = newUserVerification({
       userId: superAdmin.id,

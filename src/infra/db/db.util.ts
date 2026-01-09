@@ -43,15 +43,15 @@ export function filterQbIds<DB, TB extends keyof DB & string, U>(
   );
 }
 
-type ColumnMap<DB, TB extends keyof DB & string, T extends string> = Record<
+type ColumnMap<DB, TB extends keyof DB & string, T extends string, O> = Record<
   T,
-  StringReference<DB, TB>
+  (keyof O & string) | StringReference<DB, TB>
 >;
-export function sortQb<DB, TB extends keyof DB & string, T extends string>(
-  qb: SelectQueryBuilder<DB, TB, any>,
+export function sortQb<DB, TB extends keyof DB & string, T extends string, O>(
+  qb: SelectQueryBuilder<DB, TB, O>,
   sorts: ParsedSort<T> | undefined,
-  mapper: Readonly<ColumnMap<DB, TB, T>>,
-): SelectQueryBuilder<DB, TB, any> {
+  mapper: Readonly<ColumnMap<DB, TB, T, O>>,
+): SelectQueryBuilder<DB, TB, O> {
   sorts ??= [];
 
   let q = qb;

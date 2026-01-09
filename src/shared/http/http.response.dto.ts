@@ -6,7 +6,7 @@ import {
   IStandardResponse,
 } from './http.standard';
 
-class PaginationResponseSchema implements IPaginationSchema {
+export class PaginationResponseSchema implements IPaginationSchema {
   @ApiProperty({ example: 1 })
   page: number;
 

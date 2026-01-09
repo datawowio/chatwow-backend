@@ -2,9 +2,7 @@ import { JsonValue } from '@infra/db/db';
 
 import { newBig } from '@shared/common/common.func';
 import {
-  fromDbCurrency,
   toDate,
-  toDbCurrency,
   toISO,
   toResponseDate,
 } from '@shared/common/common.transformer';
@@ -30,7 +28,7 @@ export function aiUsageFromPg(pg: AiUsagePg): AiUsage {
     replyTimeMs: pg.reply_time_ms,
     aiUsageAction: pg.ai_usage_action,
     tokenInfo: pg.token_info as object,
-    tokenPrice: fromDbCurrency(pg.token_price),
+    tokenPrice: newBig(pg.token_price),
     aiModelName: pg.ai_model_name,
   };
 
@@ -112,7 +110,7 @@ export function aiUsageToPg(domain: AiUsage): AiUsagePg {
     reply_time_ms: domain.replyTimeMs,
     ai_usage_action: domain.aiUsageAction,
     token_info: domain.tokenInfo as JsonValue,
-    token_price: toDbCurrency(domain.tokenPrice),
+    token_price: domain.tokenPrice.toString(),
     ai_model_name: domain.aiModelName,
   };
 }

@@ -17,3 +17,7 @@ export function calcTokenPrice(aiUsage: AiUsage) {
     .with('GPT_DW', () => newBig(aiUsage.tokenUsed * 10))
     .exhaustive();
 }
+
+export function isAnswerableConfidence(confidence: number) {
+  return confidence > 50;
+}

@@ -5,15 +5,17 @@ meta {
 }
 
 get {
-  url: {{url}}/v1/analytics/chat-summary?filter[startAt]=2026-01-08T13:04:26.134Z&period=day&groupBy=userGroup
+  url: {{url}}/v1/analytics/chat-summary
   body: none
   auth: inherit
 }
 
 params:query {
-  filter[startAt]: 2026-01-08T13:04:26.134Z
-  period: day
-  groupBy: userGroup
+  ~groupBy: userGroup
+  ~sort: -totalPrice
+  ~limit: 7
+  ~filter[startAt]: 2025-09-08T13:04:26.134Z
+  ~period: day
 }
 
 settings {

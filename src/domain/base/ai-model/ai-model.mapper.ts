@@ -1,8 +1,7 @@
 import { newBig } from '@shared/common/common.func';
 import {
-  fromDbCurrency,
+  toCurrencyDisplay,
   toDate,
-  toDbCurrency,
   toISO,
   toResponseDate,
 } from '@shared/common/common.transformer';
@@ -17,7 +16,7 @@ export function aiModelFromPg(pg: AiModelPg): AiModel {
     aiModelName: pg.ai_model_name,
     createdAt: toDate(pg.created_at),
     updatedAt: toDate(pg.updated_at),
-    pricePerToken: fromDbCurrency(pg.price_per_token),
+    pricePerToken: newBig(pg.price_per_token),
   };
 
   return aiModelFromPlain(plain);
@@ -55,7 +54,7 @@ export function aiModelToPg(domain: AiModel): AiModelPg {
     ai_model_name: domain.aiModelName,
     created_at: toISO(domain.createdAt),
     updated_at: toISO(domain.updatedAt),
-    price_per_token: toDbCurrency(domain.pricePerToken),
+    price_per_token: domain.pricePerToken.toString(),
   };
 }
 
@@ -90,7 +89,7 @@ export function aiModelToResponse(domain: AiModel): AiModelResponse {
     aiModel: domain.aiModelName,
     createdAt: toResponseDate(domain.createdAt),
     updatedAt: toResponseDate(domain.updatedAt),
-    pricePerToken: domain.pricePerToken.toFixed(2),
+    pricePerToken: toCurrencyDisplay(domain.pricePerToken),
   };
 }
 

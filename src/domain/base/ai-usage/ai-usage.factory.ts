@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import type { SetRequired } from 'type-fest';
+import { Writable } from 'type-fest';
 
 import { uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
@@ -35,44 +36,57 @@ export function newAiUsages(data: AiUsageNewData[]): AiUsage[] {
 }
 
 export function mockAiUsage(
-  data: SetRequired<
-    Partial<AiUsagePlain>,
-    'projectId' | 'createdById' | 'refTable'
-  >,
+  data: SetRequired<Partial<AiUsagePlain>, 'projectId' | 'createdById'>,
 ): AiUsage {
-  return aiUsageFromPlain({
+  const requestAt = isDefined(data.aiRequestAt)
+    ? data.aiRequestAt
+    : myDayjs(
+        faker.date.between({
+          from: '2025-01-01T00:00:00.000Z',
+          to: '2026-01-01T00:00:00.000Z',
+        }),
+      ).toDate();
+
+  const entity = aiUsageFromPlain({
     id: isDefined(data.id) ? data.id : uuidV7(),
-    createdAt: isDefined(data.createdAt) ? data.createdAt : myDayjs().toDate(),
+    createdAt: isDefined(data.createdAt) ? data.createdAt : requestAt,
     createdById: data.createdById,
     projectId: data.projectId,
-    aiRequestAt: isDefined(data.aiRequestAt)
-      ? data.aiRequestAt
-      : myDayjs().toDate(),
+    aiRequestAt: isDefined(data.aiRequestAt) ? data.aiRequestAt : requestAt,
     aiReplyAt: isDefined(data.aiReplyAt)
       ? data.aiReplyAt
-      : myDayjs().add(1, 'second').toDate(),
+      : myDayjs(requestAt)
+          .add(faker.number.int({ min: 10, max: 100 }), 'second')
+          .toDate(),
     tokenUsed: isDefined(data.tokenUsed)
       ? data.tokenUsed
       : faker.number.int({ min: 10, max: 100 }),
     tokenPrice: newBig(faker.number.int({ min: 1, max: 100 })),
-    confidence: isDefined(data.confidence) ? data.confidence : 99,
+    confidence: isDefined(data.confidence)
+      ? data.confidence
+      : faker.number.int({ min: 1, max: 100 }),
     aiModelName: valueOr(data.aiModelName, 'GPT_DW'),
     tokenInfo: {},
-    refTable: data.refTable,
+    refTable: valueOr(data.refTable, 'line_chat_logs'),
     refId: valueOr(data.refId, uuidV7()),
     replyTimeMs: isDefined(data.replyTimeMs) ? data.replyTimeMs : 0,
     aiUsageAction: isDefined(data.aiUsageAction)
       ? data.aiUsageAction
       : 'CHAT_LINE',
   });
+
+  const writable = entity as Writable<typeof entity>;
+  writable.replyTimeMs = myDayjs(writable.aiReplyAt).diff(
+    writable.aiRequestAt,
+    'milliseconds',
+  );
+
+  return entity;
 }
 
 export function mockAiUsages(
   amount: number,
-  data: SetRequired<
-    Partial<AiUsagePlain>,
-    'projectId' | 'createdById' | 'refTable'
-  >,
+  data: SetRequired<Partial<AiUsagePlain>, 'projectId' | 'createdById'>,
 ): AiUsage[] {
   return Array(amount)
     .fill(0)

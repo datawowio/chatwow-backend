@@ -8,9 +8,10 @@ import { sql } from 'kysely';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
 import { MainDb } from '@infra/db/db.main';
+import { sortQb } from '@infra/db/db.util';
 
 import { newBig } from '@shared/common/common.func';
-import { fromDbCurrency } from '@shared/common/common.transformer';
+import { toCurrencyDisplay } from '@shared/common/common.transformer';
 import { QueryInterface } from '@shared/common/common.type';
 import { toHttpSuccess } from '@shared/http/http.mapper';
 
@@ -33,14 +34,16 @@ export class ChatSummaryQuery implements QueryInterface {
       totalChatUsages: 0,
       avgReplyTimeMs: 0,
       avgConfidence: 0,
+      totalAnswerable: 0,
     };
 
     const chatSummaries: ChatSummaryAnalytic[] = raw.map((rawData) => {
-      const price = fromDbCurrency(rawData.totalPrice || '0');
+      const price = newBig(rawData.totalPrice || 0);
       const tokens = Number(rawData.totalTokenUsed || 0);
       const usages = Number(rawData.totalChatUsages || 0);
       const replyTime = Number(rawData.avgReplyTimeMs || 0);
       const confidence = Number(rawData.avgConfidence || 0);
+      const answerable = Number(rawData.totalAnswerable || 0);
 
       // Aggregate
       metaCalc.totalPrice = metaCalc.totalPrice.add(price);
@@ -48,15 +51,17 @@ export class ChatSummaryQuery implements QueryInterface {
       metaCalc.totalChatUsages += usages;
       metaCalc.avgReplyTimeMs += replyTime;
       metaCalc.avgConfidence += confidence;
+      metaCalc.totalAnswerable += answerable;
 
       return {
         timestamp: rawData.timestamp,
         summary: {
-          totalPrice: price.toFixed(2),
+          totalPrice: toCurrencyDisplay(price),
           totalTokenUsed: tokens,
           totalChatUsages: usages,
           avgReplyTimeMs: replyTime,
           avgConfidence: confidence,
+          totalAnswerable: answerable,
         },
         relations: {
           project: rawData?.project
@@ -80,11 +85,14 @@ export class ChatSummaryQuery implements QueryInterface {
 
     return toHttpSuccess({
       meta: {
-        totalPrice: metaCalc.totalPrice.toFixed(2),
-        totalTokenUsed: metaCalc.totalTokenUsed,
-        totalChatUsages: metaCalc.totalChatUsages,
-        avgReplyTimeMs: metaCalc.avgReplyTimeMs,
-        avgConfidence: metaCalc.avgConfidence,
+        summary: {
+          totalPrice: toCurrencyDisplay(metaCalc.totalPrice),
+          totalTokenUsed: metaCalc.totalTokenUsed,
+          totalAnswerable: metaCalc.totalAnswerable,
+          totalChatUsages: metaCalc.totalChatUsages,
+          avgReplyTimeMs: metaCalc.avgReplyTimeMs,
+          avgConfidence: metaCalc.avgConfidence,
+        },
       },
       data: {
         chatSummaries,
@@ -102,6 +110,10 @@ export class ChatSummaryQuery implements QueryInterface {
         fn.sum<string>('ai_usages.token_price').as('totalPrice'),
         fn.avg<string>('ai_usages.reply_time_ms').as('avgReplyTimeMs'),
         fn.count<string>('ai_usages.id').as('totalChatUsages'),
+        fn
+          .count<string>('ai_usages.id')
+          .filterWhere('ai_usages.confidence', '>=', 50)
+          .as('totalAnswerable'),
         fn.avg<string>('ai_usages.confidence').as('avgConfidence'),
       ]);
 
@@ -114,26 +126,36 @@ export class ChatSummaryQuery implements QueryInterface {
           'ai_usage_user_groups.ai_usage_id',
           'ai_usages.id',
         )
+        .$if(!!filter?.userGroupIds?.length, (q) =>
+          q.where(
+            'ai_usage_user_groups.user_group_id',
+            'in',
+            filter!.userGroupIds!,
+          ),
+        )
         .select(({ fn }) => [
           fn.count('ai_usage_user_groups.token_used').as('totalTokenUsed'),
           fn.sum('ai_usage_user_groups.token_price').as('totalPrice'),
           fn.avg('ai_usages.reply_time_ms').as('avgReplyTimeMs'),
           fn.sum('ai_usage_user_groups.chat_count').as('totalChatUsages'),
+          fn
+            .count<string>('ai_usage_user_groups.chat_count')
+            .filterWhere('ai_usages.confidence', '>=', 50)
+            .as('totalAnswerable'),
           fn.avg('ai_usages.confidence').as('avgConfidence'),
         ]) as typeof qb;
     }
 
     const qb = initSelectQb
-      .$if(!!query.period, (q) =>
-        q
-          .select(({ fn, ref }) =>
-            fn<string>('date_trunc', [
-              sql.lit(query.period),
-              ref('ai_usages.ai_request_at'),
-            ]).as('timestamp'),
-          )
-          .groupBy('timestamp')
-          .orderBy('timestamp', 'asc'),
+      .$if(!!query.sort?.length, (q) =>
+        sortQb(q, query.sort!, {
+          totalTokenUsed: 'totalTokenUsed',
+          totalPrice: 'totalPrice',
+          avgReplyTimeMs: 'avgReplyTimeMs',
+          totalChatUsages: 'totalChatUsages',
+          totalAnswerable: 'totalAnswerable',
+          avgConfidence: 'avgConfidence',
+        }),
       )
       .$if(query.groupBy === 'userGroup', (q) =>
         q
@@ -183,14 +205,32 @@ export class ChatSummaryQuery implements QueryInterface {
           .groupBy('ai_usages.created_by_id')
           .orderBy('ai_usages.created_by_id', 'asc'),
       )
+      .$if(!!query.period, (q) =>
+        q
+          .select(({ fn, ref }) =>
+            fn<string>('date_trunc', [
+              sql.lit(query.period),
+              ref('ai_usages.ai_request_at'),
+            ]).as('timestamp'),
+          )
+          .groupBy('timestamp')
+          .orderBy('timestamp', 'asc'),
+      )
       .$if(!!filter?.startAt, (q) =>
         q.where('ai_usages.ai_request_at', '>=', filter!.startAt!),
       )
       .$if(!!filter?.endAt, (q) =>
         q.where('ai_usages.ai_request_at', '<=', filter!.endAt!),
       )
+      .$if(!!filter?.projectIds?.length, (q) =>
+        q.where('ai_usages.project_id', 'in', filter!.projectIds!),
+      )
+      .$if(!!filter?.userIds?.length, (q) =>
+        q.where('ai_usages.created_by_id', 'in', filter!.userIds!),
+      )
       .where('ai_usages.ai_usage_action', 'in', AI_USAGE_CHAT_ACTION)
-      .where(aiUsagesTableFilter);
+      .where(aiUsagesTableFilter)
+      .$if(!!query.limit, (q) => q.limit(query.limit!));
 
     return qb.execute();
   }

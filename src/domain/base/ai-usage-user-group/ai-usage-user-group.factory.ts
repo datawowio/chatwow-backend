@@ -38,7 +38,14 @@ export function mockAiUsageUserGroup(
 ): AiUsageUserGroup {
   return aiUsageUserGroupFromPlain({
     id: isDefined(data.id) ? data.id : uuidV7(),
-    createdAt: isDefined(data.createdAt) ? data.createdAt : myDayjs().toDate(),
+    createdAt: isDefined(data.createdAt)
+      ? data.createdAt
+      : myDayjs(
+          faker.date.between({
+            from: '2025-01-01T00:00:00.000Z',
+            to: '2026-01-01T00:00:00.000Z',
+          }),
+        ).toDate(),
     aiUsageId: data.aiUsageId,
     userGroupId: isDefined(data.userGroupId) ? data.userGroupId : null,
     tokenUsed: isDefined(data.tokenUsed)

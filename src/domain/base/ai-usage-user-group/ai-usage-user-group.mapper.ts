@@ -1,8 +1,6 @@
 import { newBig } from '@shared/common/common.func';
 import {
-  fromDbCurrency,
   toDate,
-  toDbCurrency,
   toISO,
   toResponseDate,
 } from '@shared/common/common.transformer';
@@ -25,7 +23,7 @@ export function aiUsageUserGroupFromPg(
     userGroupId: pg.user_group_id,
     tokenUsed: pg.token_used,
     chatCount: pg.chat_count,
-    tokenPrice: fromDbCurrency(pg.token_price),
+    tokenPrice: newBig(pg.token_price),
     aiUsageId: pg.ai_usage_id,
   };
 
@@ -77,7 +75,7 @@ export function aiUsageUserGroupToPg(
     user_group_id: domain.userGroupId,
     token_used: domain.tokenUsed,
     chat_count: domain.chatCount,
-    token_price: toDbCurrency(domain.tokenPrice),
+    token_price: domain.tokenPrice.toString(),
     ai_usage_id: domain.aiUsageId,
   };
 }
