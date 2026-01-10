@@ -1,4 +1,3 @@
-import { AI_USAGE_CHAT_ACTION } from '@domain/base/ai-usage/ai-usage.constant';
 import { aiUsagesTableFilter } from '@domain/base/ai-usage/ai-usage.util';
 import { projectPgToResponse } from '@domain/base/project/project.mapper';
 import { userGroupPgToResponse } from '@domain/base/user-group/user-group.mapper';
@@ -19,28 +18,42 @@ import { QueryInterface } from '@shared/common/common.type';
 import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import {
-  ChatSummaryAnalytic,
-  ChatSummaryDto,
-  ChatSummaryResponse,
-} from './chat-summary.dto';
+  AiUsageSummaryAnalytic,
+  AiUsageSummaryDto,
+  AiUsageSummaryResponse,
+} from './ai-usage-summary.dto';
 
 @Injectable()
-export class ChatSummaryQuery implements QueryInterface {
+export class AiUsageSummaryQuery implements QueryInterface {
   constructor(private db: MainDb) {}
 
-  async exec(query: ChatSummaryDto): Promise<ChatSummaryResponse> {
+  async exec(query: AiUsageSummaryDto): Promise<AiUsageSummaryResponse> {
     const { result, totalCount } = await this.getRaw(query);
 
     const metaCalc = {
       totalPrice: newBig(0),
       totalTokenUsed: 0,
       totalChatUsages: 0,
+      totalAnswerable: 0,
       avgReplyTimeMs: 0,
       avgConfidence: 0,
-      totalAnswerable: 0,
+
+      maxPrice: newBig(0),
+      maxTokenUsed: 0,
+      maxChatUsages: 0,
+      maxAnswerable: 0,
+      maxAvgReplyTimeMs: 0,
+      maxAvgConfidence: 0,
+
+      minPrice: newBig(0),
+      minTokenUsed: 0,
+      minChatUsages: 0,
+      minAnswerable: 0,
+      minAvgReplyTimeMs: 0,
+      minAvgConfidence: 0,
     };
 
-    const chatSummaries: ChatSummaryAnalytic[] = result.map((rawData) => {
+    const aiUsageSummaries: AiUsageSummaryAnalytic[] = result.map((rawData) => {
       const price = newBig(rawData.totalPrice || 0);
       const tokens = Number(rawData.totalTokenUsed || 0);
       const usages = Number(rawData.totalChatUsages || 0);
@@ -55,6 +68,62 @@ export class ChatSummaryQuery implements QueryInterface {
       metaCalc.avgReplyTimeMs += replyTime;
       metaCalc.avgConfidence += confidence;
       metaCalc.totalAnswerable += answerable;
+
+      metaCalc.maxPrice = price.gt(metaCalc.maxPrice)
+        ? price
+        : metaCalc.maxPrice;
+      metaCalc.maxTokenUsed =
+        tokens > metaCalc.maxTokenUsed ? tokens : metaCalc.maxTokenUsed;
+      metaCalc.maxChatUsages =
+        usages > metaCalc.maxChatUsages ? usages : metaCalc.maxChatUsages;
+      metaCalc.maxAnswerable =
+        answerable > metaCalc.maxAnswerable
+          ? answerable
+          : metaCalc.maxAnswerable;
+      metaCalc.maxAvgReplyTimeMs =
+        replyTime > metaCalc.maxAvgReplyTimeMs
+          ? replyTime
+          : metaCalc.maxAvgReplyTimeMs;
+      metaCalc.maxAvgConfidence =
+        confidence > metaCalc.maxAvgConfidence
+          ? confidence
+          : metaCalc.maxAvgConfidence;
+
+      metaCalc.minPrice = metaCalc.minPrice.eq(0)
+        ? price
+        : price.lt(metaCalc.minPrice)
+          ? price
+          : metaCalc.minPrice;
+      metaCalc.minTokenUsed =
+        metaCalc.minTokenUsed === 0
+          ? tokens
+          : tokens < metaCalc.minTokenUsed
+            ? tokens
+            : metaCalc.minTokenUsed;
+      metaCalc.minChatUsages =
+        metaCalc.minChatUsages === 0
+          ? usages
+          : usages < metaCalc.minChatUsages
+            ? usages
+            : metaCalc.minChatUsages;
+      metaCalc.minAnswerable =
+        metaCalc.minAnswerable === 0
+          ? answerable
+          : answerable < metaCalc.minAnswerable
+            ? answerable
+            : metaCalc.minAnswerable;
+      metaCalc.minAvgReplyTimeMs =
+        metaCalc.minAvgReplyTimeMs === 0
+          ? replyTime
+          : replyTime < metaCalc.minAvgReplyTimeMs
+            ? replyTime
+            : metaCalc.minAvgReplyTimeMs;
+      metaCalc.minAvgConfidence =
+        metaCalc.minAvgConfidence === 0
+          ? confidence
+          : confidence < metaCalc.minAvgConfidence
+            ? confidence
+            : metaCalc.minAvgConfidence;
 
       return {
         timestamp: rawData.timestamp,
@@ -81,32 +150,47 @@ export class ChatSummaryQuery implements QueryInterface {
     });
 
     // cal average
-    if (chatSummaries.length > 0) {
-      metaCalc.avgReplyTimeMs = metaCalc.avgReplyTimeMs / chatSummaries.length;
-      metaCalc.avgConfidence = metaCalc.avgConfidence / chatSummaries.length;
+    if (aiUsageSummaries.length > 0) {
+      metaCalc.avgReplyTimeMs =
+        metaCalc.avgReplyTimeMs / aiUsageSummaries.length;
+      metaCalc.avgConfidence = metaCalc.avgConfidence / aiUsageSummaries.length;
     }
 
     return toHttpSuccess({
       meta: {
-        summary: {
+        pageSummary: {
           totalPrice: toCurrencyDisplay(metaCalc.totalPrice),
           totalTokenUsed: +metaCalc.totalTokenUsed.toFixed(2),
           totalAnswerable: +metaCalc.totalAnswerable.toFixed(2),
           totalChatUsages: +metaCalc.totalChatUsages.toFixed(2),
           avgReplyTimeMs: +metaCalc.avgReplyTimeMs.toFixed(2),
           avgConfidence: +metaCalc.avgConfidence.toFixed(2),
+
+          maxPrice: toCurrencyDisplay(metaCalc.maxPrice),
+          maxTokenUsed: +metaCalc.maxTokenUsed.toFixed(2),
+          maxAnswerable: +metaCalc.maxAnswerable.toFixed(2),
+          maxChatUsages: +metaCalc.maxChatUsages.toFixed(2),
+          maxAvgReplyTimeMs: +metaCalc.maxAvgReplyTimeMs.toFixed(2),
+          maxAvgConfidence: +metaCalc.maxAvgConfidence.toFixed(2),
+
+          minPrice: toCurrencyDisplay(metaCalc.minPrice),
+          minTokenUsed: +metaCalc.minTokenUsed.toFixed(2),
+          minAnswerable: +metaCalc.minAnswerable.toFixed(2),
+          minChatUsages: +metaCalc.minChatUsages.toFixed(2),
+          minAvgReplyTimeMs: +metaCalc.minAvgReplyTimeMs.toFixed(2),
+          minAvgConfidence: +metaCalc.minAvgConfidence.toFixed(2),
         },
         pagination: totalCount
           ? getPagination(result, totalCount, query.group!.pagination)
           : undefined,
       },
       data: {
-        chatSummaries,
+        chatSummaries: aiUsageSummaries,
       },
     });
   }
 
-  async getRaw(query: ChatSummaryDto) {
+  async getRaw(query: AiUsageSummaryDto) {
     const filter = query.filter;
     const mainColumn = this.getMainColumn(query);
 
@@ -117,8 +201,10 @@ export class ChatSummaryQuery implements QueryInterface {
         'ai_usage_user_groups.ai_usage_id',
         'ai_usages.id',
       )
-      .where('ai_usages.ai_usage_action', 'in', AI_USAGE_CHAT_ACTION)
       .where(aiUsagesTableFilter)
+      .$if(!!filter?.aiUsageActions?.length, (q) =>
+        q.where('ai_usages.ai_usage_action', 'in', filter!.aiUsageActions!),
+      )
       .$if(!!filter?.userGroupIds?.length, (q) =>
         q.where(
           'ai_usage_user_groups.user_group_id',
@@ -262,7 +348,7 @@ export class ChatSummaryQuery implements QueryInterface {
     return { result, totalCount };
   }
 
-  getMainColumn(query: ChatSummaryDto) {
+  getMainColumn(query: AiUsageSummaryDto) {
     return match(query.group?.by)
       .returnType<Ref<'ai_usages' | 'ai_usage_user_groups'>>()
       .with('project', () => 'ai_usages.project_id')

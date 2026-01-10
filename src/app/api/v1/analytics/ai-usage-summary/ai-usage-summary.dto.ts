@@ -1,3 +1,4 @@
+import { AI_USAGE_ACTION } from '@domain/base/ai-usage/ai-usage.constant';
 import { ProjectResponse } from '@domain/base/project/project.response';
 import { UserGroupResponse } from '@domain/base/user-group/user-group.response';
 import { UserResponse } from '@domain/base/user/user.response';
@@ -17,7 +18,7 @@ import { getSortZod, paginationZod, zodDto } from '@shared/zod/zod.util';
 // ========== Request ================
 
 const zod = z.object({
-  period: z.enum(['day', 'month', 'year']).optional(),
+  period: z.enum(['hour', 'day', 'week', 'month', 'year']).optional(),
   group: z
     .object({
       by: z.enum(['project', 'userGroup', 'user']),
@@ -42,6 +43,9 @@ const zod = z.object({
         .string()
         .refine(anyPass([isUndefined, isISOString]))
         .optional(),
+      aiUsageActions: z
+        .preprocess(toSplitCommaArray, z.array(z.enum(AI_USAGE_ACTION)))
+        .optional(),
       projectIds: z
         .preprocess(toSplitCommaArray, z.array(z.string().uuid()))
         .optional(),
@@ -55,32 +59,32 @@ const zod = z.object({
     .optional(),
 });
 
-export class ChatSummaryDto extends zodDto(zod) {}
+export class AiUsageSummaryDto extends zodDto(zod) {}
 
 // ========== Response ================
 
-class ChatSummaryAnalyticRelationsUserGroup implements IDomainData {
+class AiUsageSummaryAnalyticRelationsUserGroup implements IDomainData {
   @ApiProperty({ type: () => UserGroupResponse })
   attributes: UserGroupResponse;
 }
 
-class ChatSummaryAnalyticRelationsProject implements IDomainData {
+class AiUsageSummaryAnalyticRelationsProject implements IDomainData {
   @ApiProperty({ type: () => ProjectResponse })
   attributes: ProjectResponse;
 }
 
-class ChatSummaryAnalyticRelationsUser implements IDomainData {
+class AiUsageSummaryAnalyticRelationsUser implements IDomainData {
   @ApiProperty({ type: () => UserResponse })
   attributes: UserResponse;
 }
 
-class ChatSummaryAnalyticRelations {
-  userGroup?: ChatSummaryAnalyticRelationsUserGroup;
-  project?: ChatSummaryAnalyticRelationsProject;
-  user?: ChatSummaryAnalyticRelationsUser;
+class AiUsageSummaryAnalyticRelations {
+  userGroup?: AiUsageSummaryAnalyticRelationsUserGroup;
+  project?: AiUsageSummaryAnalyticRelationsProject;
+  user?: AiUsageSummaryAnalyticRelationsUser;
 }
 
-class ChatSummaryAnalyticSummary {
+class AiUsageSummaryAnalyticSummary {
   @ApiProperty({ type: 'string' })
   totalPrice: string;
 
@@ -100,18 +104,18 @@ class ChatSummaryAnalyticSummary {
   totalAnswerable: number;
 }
 
-export class ChatSummaryAnalytic {
+export class AiUsageSummaryAnalytic {
   @ApiProperty({ type: 'string', format: 'date-time' })
   timestamp?: string;
 
-  @ApiProperty({ type: () => ChatSummaryAnalyticSummary })
-  summary: ChatSummaryAnalyticSummary;
+  @ApiProperty({ type: () => AiUsageSummaryAnalyticSummary })
+  summary: AiUsageSummaryAnalyticSummary;
 
-  @ApiProperty({ type: () => ChatSummaryAnalyticRelations })
-  relations: ChatSummaryAnalyticRelations;
+  @ApiProperty({ type: () => AiUsageSummaryAnalyticRelations })
+  relations: AiUsageSummaryAnalyticRelations;
 }
 
-class ChatSummaryMetaSummary {
+class AiUsageSummaryPageSummary {
   @ApiProperty({ type: 'string' })
   totalPrice: string;
 
@@ -129,25 +133,61 @@ class ChatSummaryMetaSummary {
 
   @ApiProperty({ type: 'number' })
   avgConfidence: number;
+
+  @ApiProperty({ type: 'string' })
+  maxPrice: string;
+
+  @ApiProperty({ type: 'number' })
+  maxTokenUsed: number;
+
+  @ApiProperty({ type: 'number' })
+  maxChatUsages: number;
+
+  @ApiProperty({ type: 'number' })
+  maxAnswerable: number;
+
+  @ApiProperty({ type: 'number' })
+  maxAvgReplyTimeMs: number;
+
+  @ApiProperty({ type: 'number' })
+  maxAvgConfidence: number;
+
+  @ApiProperty({ type: 'string' })
+  minPrice: string;
+
+  @ApiProperty({ type: 'number' })
+  minTokenUsed: number;
+
+  @ApiProperty({ type: 'number' })
+  minChatUsages: number;
+
+  @ApiProperty({ type: 'number' })
+  minAnswerable: number;
+
+  @ApiProperty({ type: 'number' })
+  minAvgReplyTimeMs: number;
+
+  @ApiProperty({ type: 'number' })
+  minAvgConfidence: number;
 }
 
-class ChatSummaryMeta {
-  @ApiProperty({ type: () => ChatSummaryMetaSummary })
-  summary: ChatSummaryMetaSummary;
+class AiUsageSummaryMeta {
+  @ApiProperty({ type: () => AiUsageSummaryPageSummary })
+  pageSummary: AiUsageSummaryPageSummary;
 
   @ApiProperty({ type: () => PaginationResponseSchema })
   pagination?: PaginationResponseSchema;
 }
 
-class ChatSummaryData {
-  @ApiProperty({ type: () => ChatSummaryAnalytic, isArray: true })
-  chatSummaries: ChatSummaryAnalytic[];
+class AiUsageSummaryData {
+  @ApiProperty({ type: () => AiUsageSummaryAnalytic, isArray: true })
+  chatSummaries: AiUsageSummaryAnalytic[];
 }
 
-export class ChatSummaryResponse extends StandardResponse {
-  @ApiProperty({ type: () => ChatSummaryMeta })
-  meta: ChatSummaryMeta;
+export class AiUsageSummaryResponse extends StandardResponse {
+  @ApiProperty({ type: () => AiUsageSummaryMeta })
+  meta: AiUsageSummaryMeta;
 
-  @ApiProperty({ type: () => ChatSummaryData })
-  data: ChatSummaryData;
+  @ApiProperty({ type: () => AiUsageSummaryData })
+  data: AiUsageSummaryData;
 }

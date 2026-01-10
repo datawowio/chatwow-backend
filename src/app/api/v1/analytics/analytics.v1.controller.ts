@@ -2,22 +2,22 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 
 import {
-  ChatSummaryDto,
-  ChatSummaryResponse,
-} from './chat-summary/chat-summary.dto';
-import { ChatSummaryQuery } from './chat-summary/chat-summary.query';
+  AiUsageSummaryDto,
+  AiUsageSummaryResponse,
+} from './ai-usage-summary/ai-usage-summary.dto';
+import { AiUsageSummaryQuery } from './ai-usage-summary/ai-usage-summary.query';
 
 @Controller({ path: 'analytics', version: '1' })
 export class AnalyticsV1Controller {
-  constructor(private chatSummaryQuery: ChatSummaryQuery) {}
+  constructor(private chatSummaryQuery: AiUsageSummaryQuery) {}
 
-  @Get('chat-summary')
+  @Get('ai-usage')
   @ApiResponse({
-    type: () => ChatSummaryResponse,
+    type: () => AiUsageSummaryResponse,
   })
-  async chatSummary(
+  async AiUsageSummary(
     //
-    @Query() query: ChatSummaryDto,
+    @Query() query: AiUsageSummaryDto,
   ) {
     return this.chatSummaryQuery.exec(query);
   }

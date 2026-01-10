@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 
+import { AiUsageSummaryQuery } from './ai-usage-summary/ai-usage-summary.query';
 import { AnalyticsV1Controller } from './analytics.v1.controller';
-import { ChatSummaryQuery } from './chat-summary/chat-summary.query';
 
 @Module({
-  providers: [ChatSummaryQuery],
+  providers: [AiUsageSummaryQuery],
   controllers: [AnalyticsV1Controller],
 })
 export class AnalyticsV1Module {}

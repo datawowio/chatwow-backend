@@ -1,16 +1,17 @@
 meta {
-  name: chat-summary
+  name: ai-usage
   type: http
   seq: 1
 }
 
 get {
-  url: {{url}}/v1/analytics/chat-summary
+  url: {{url}}/v1/analytics/ai-usage?filter[aiUsageActions]=CHAT_LINE,CHAT_PROJECT
   body: none
   auth: inherit
 }
 
 params:query {
+  filter[aiUsageActions]: CHAT_LINE,CHAT_PROJECT
   ~period: day
   ~group[by]: userGroup
   ~group[pagination][page]: 1
