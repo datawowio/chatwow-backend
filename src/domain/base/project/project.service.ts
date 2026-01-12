@@ -125,7 +125,6 @@ export class ProjectService {
 
     return this.db.read
       .selectFrom('projects')
-      .select('projects.id')
       .where(projectsTableFilter)
       .$if(isDefined(actor), (q) => addProjectActorFilter(q, actor!))
       .$if(isDefined(filter?.projectName), (q) =>

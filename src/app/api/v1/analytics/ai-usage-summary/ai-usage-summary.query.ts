@@ -196,11 +196,6 @@ export class AiUsageSummaryQuery implements QueryInterface {
 
     const baseQuery = this.db.read
       .selectFrom('ai_usages')
-      .leftJoin(
-        'ai_usage_user_groups',
-        'ai_usage_user_groups.ai_usage_id',
-        'ai_usages.id',
-      )
       .where(aiUsagesTableFilter)
       .$if(!!filter?.aiUsageActions?.length, (q) =>
         q.where('ai_usages.ai_usage_action', 'in', filter!.aiUsageActions!),
@@ -216,6 +211,13 @@ export class AiUsageSummaryQuery implements QueryInterface {
       )
       .$if(!!filter?.userIds?.length, (q) =>
         q.where('ai_usages.created_by_id', 'in', filter!.userIds!),
+      );
+
+    const filterQb = baseQuery
+      .innerJoin(
+        'ai_usage_user_groups',
+        'ai_usage_user_groups.ai_usage_id',
+        'ai_usages.id',
       )
       .$if(!!filter?.userGroupIds?.length, (q) =>
         q.where(
@@ -223,9 +225,7 @@ export class AiUsageSummaryQuery implements QueryInterface {
           'in',
           filter!.userGroupIds!,
         ),
-      );
-
-    const filterQb = baseQuery
+      )
       .$call((q) => addPagination(q, query.group?.pagination))
       .select(mainColumn)
       .groupBy(mainColumn)
