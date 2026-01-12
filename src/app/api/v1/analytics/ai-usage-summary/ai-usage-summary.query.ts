@@ -194,7 +194,7 @@ export class AiUsageSummaryQuery implements QueryInterface {
     const filter = query.filter;
     const mainColumn = this.getMainColumn(query);
 
-    const filterQb = this.db.read
+    const baseQuery = this.db.read
       .selectFrom('ai_usages')
       .leftJoin(
         'ai_usage_user_groups',
@@ -204,13 +204,6 @@ export class AiUsageSummaryQuery implements QueryInterface {
       .where(aiUsagesTableFilter)
       .$if(!!filter?.aiUsageActions?.length, (q) =>
         q.where('ai_usages.ai_usage_action', 'in', filter!.aiUsageActions!),
-      )
-      .$if(!!filter?.userGroupIds?.length, (q) =>
-        q.where(
-          'ai_usage_user_groups.user_group_id',
-          'in',
-          filter!.userGroupIds!,
-        ),
       )
       .$if(!!filter?.startAt, (q) =>
         q.where('ai_usages.ai_request_at', '>=', filter!.startAt!),
@@ -224,24 +217,31 @@ export class AiUsageSummaryQuery implements QueryInterface {
       .$if(!!filter?.userIds?.length, (q) =>
         q.where('ai_usages.created_by_id', 'in', filter!.userIds!),
       )
+      .$if(!!filter?.userGroupIds?.length, (q) =>
+        q.where(
+          'ai_usage_user_groups.user_group_id',
+          'in',
+          filter!.userGroupIds!,
+        ),
+      );
+
+    const filterQb = baseQuery
       .$call((q) => addPagination(q, query.group?.pagination))
       .select(mainColumn)
       .groupBy(mainColumn)
       .orderBy(({ fn }) => fn.min('ai_usages.ai_reply_at'), 'asc');
 
-    let initSelectQb = this.db.read
-      .selectFrom('ai_usages')
-      .select(({ fn }) => [
-        fn.count<string>('ai_usages.token_used').as('totalTokenUsed'),
-        fn.sum<string>('ai_usages.token_price').as('totalPrice'),
-        fn.avg<string>('ai_usages.reply_time_ms').as('avgReplyTimeMs'),
-        fn.count<string>('ai_usages.id').as('totalChatUsages'),
-        fn
-          .count<string>('ai_usages.id')
-          .filterWhere('ai_usages.confidence', '>=', 50)
-          .as('totalAnswerable'),
-        fn.avg<string>('ai_usages.confidence').as('avgConfidence'),
-      ]);
+    let initSelectQb = baseQuery.select(({ fn }) => [
+      fn.count<string>('ai_usages.token_used').as('totalTokenUsed'),
+      fn.sum<string>('ai_usages.token_price').as('totalPrice'),
+      fn.avg<string>('ai_usages.reply_time_ms').as('avgReplyTimeMs'),
+      fn.count<string>('ai_usages.id').as('totalChatUsages'),
+      fn
+        .count<string>('ai_usages.id')
+        .filterWhere('ai_usages.confidence', '>=', 50)
+        .as('totalAnswerable'),
+      fn.avg<string>('ai_usages.confidence').as('avgConfidence'),
+    ]);
 
     if (query.group?.by === 'userGroup') {
       // if user group we need to reset select but still same schema
