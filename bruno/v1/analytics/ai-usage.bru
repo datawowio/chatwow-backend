@@ -38,6 +38,10 @@ docs {
   
   ### Response Explain
   
+  `meta`
+  - `pageSummary`: ข้อมูลผลสรุป **ภายใน page เท่านั้นไม่ใช่ทั้ง db**
+  - `pagination?`(optional): หากเปิดใช้งาน pagination จะมี meta ของ pagination ให้
+  
   `chatSummaries`
   เป็น array ของข้อมูลทั้งหมด ภายในแต่ละ object จะแบ่งข้อมูลออกเป็น 3section
   - timestamp
