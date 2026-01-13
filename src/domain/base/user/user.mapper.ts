@@ -3,11 +3,10 @@ import {
   toISO,
   toResponseDate,
 } from '@shared/common/common.transformer';
-import type { WithPgState } from '@shared/common/common.type';
 
 import { User } from './user.domain';
 import type { UserResponse } from './user.response';
-import type { UserJson, UserPg, UserPlain } from './user.type';
+import type { UserJson, UserJsonState, UserPg, UserPlain } from './user.type';
 
 export function userFromPg(pg: UserPg): User {
   const plain: UserPlain = {
@@ -72,7 +71,7 @@ export function userFromJson(json: UserJson): User {
 
   return new User(plain);
 }
-export function userFromJsonState(jsonState: WithPgState<UserJson, UserPg>) {
+export function userFromJsonState(jsonState: UserJsonState) {
   const domain = userFromJson(jsonState.data);
   domain.setPgState(jsonState.state);
 
@@ -132,7 +131,7 @@ export function userToJson(domain: User): UserJson {
     lineAccountId: domain.lineAccountId,
   };
 }
-export function userToJsonState(domain: User): WithPgState<UserJson, UserPg> {
+export function userToJsonState(domain: User): UserJsonState {
   return {
     state: domain.pgState,
     data: userToJson(domain),

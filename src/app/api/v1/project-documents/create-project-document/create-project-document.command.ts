@@ -116,7 +116,9 @@ export class CreateProjectDocumentCommand implements CommandInterface {
   }
 
   async getProject(claims: UserClaims, projectId: string) {
-    const project = await this.projectService.findOne(projectId, claims);
+    const project = await this.projectService.findOne(projectId, {
+      manager: claims,
+    });
     if (!project) {
       throw new ApiException(404, 'projectNotFound');
     }

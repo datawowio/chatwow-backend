@@ -1,0 +1,11 @@
+meta {
+  name: get-my-projects
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{url}}/v1/users/me/projects
+  body: none
+  auth: inherit
+}

@@ -43,15 +43,15 @@ export class UsersV1Controller {
   constructor(
     //
     private addUserCommand: AddUserCommand,
-    private editUserCommand: EditUserCommand,
-    private listUsersQuery: ListUsersQuery,
-    private getUserQuery: GetUserQuery,
-    private resendInviteCommand: ResendInviteCommand,
-    private userSummaryQuery: UserSummaryQuery,
-    private deleteUserCommand: DeleteUserCommand,
     private checkMeQuery: CheckMeQuery,
     private checkUserQuery: CheckUserQuery,
+    private deleteUserCommand: DeleteUserCommand,
+    private editUserCommand: EditUserCommand,
+    private getUserQuery: GetUserQuery,
+    private listUsersQuery: ListUsersQuery,
+    private resendInviteCommand: ResendInviteCommand,
     private updateMeCommand: UpdateMeCommand,
+    private userSummaryQuery: UserSummaryQuery,
   ) {}
 
   @Get()

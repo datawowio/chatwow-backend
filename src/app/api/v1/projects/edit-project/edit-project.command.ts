@@ -115,7 +115,7 @@ export class EditProjectCommand implements CommandInterface {
   }
 
   async find(claims: UserClaims, id: string): Promise<Entity> {
-    const project = await this.projectService.findOne(id, claims);
+    const project = await this.projectService.findOne(id, { manager: claims });
 
     if (!project) {
       throw new ApiException(400, 'projectNotFound');

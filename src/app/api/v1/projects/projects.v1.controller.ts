@@ -39,6 +39,11 @@ import {
 } from './get-project/get-project.dto';
 import { GetProjectQuery } from './get-project/get-project.query';
 import {
+  ListMyProjectsDto,
+  ListMyProjectsResponse,
+} from './list-my-projects/list-my-projects.dto';
+import { ListMyProjectsQuery } from './list-my-projects/list-my-projects.query';
+import {
   ListProjectsDto,
   ListProjectsResponse,
 } from './list-projects/list-projects.dto';
@@ -56,6 +61,7 @@ export class ProjectsV1Controller {
   constructor(
     private listProjectsQuery: ListProjectsQuery,
     private getProjectsQuery: GetProjectQuery,
+    private listMyProjectsQuery: ListMyProjectsQuery,
     private createProjectCommand: CreateProjectCommand,
     private storedFileService: StoredFileService,
     private editProjectCommand: EditProjectCommand,
@@ -96,6 +102,41 @@ export class ProjectsV1Controller {
       ownerTable: STORED_FILE_OWNER_TABLE.PROJECT_DOCUMENT,
       isPublic: false,
     });
+  }
+
+  @Get('me')
+  @ApiResponse({ type: () => ListMyProjectsResponse })
+  async getSelfProjects(
+    @UserClaims() claims: UserClaims,
+    @Query() query: ListMyProjectsDto,
+  ): Promise<ListMyProjectsResponse> {
+    return this.listMyProjectsQuery.exec(claims, query);
+  }
+
+  @Post('me/:id/chat-session')
+  @ApiResponse({
+    type: () => CreateChatSessionResponse,
+  })
+  @UseIdempotent()
+  async createChatSession(
+    @IdempotentContext() idemCtx: IdempotentContext,
+    @UserClaims() claims: UserClaims,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.createChatSessionCommand.exec(idemCtx, claims, id);
+  }
+
+  @Post('me/:id/chat-session/:sessionId/chat')
+  @ApiResponse({
+    type: () => ProjectChatResponse,
+  })
+  async projectChat(
+    @UserClaims() claims: UserClaims,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('sessionId', ParseUUIDPipe) sessionId: string,
+    @Body() body: ProjectChatDto,
+  ) {
+    return this.projectChatCommand.exec(claims, id, sessionId, body);
   }
 
   @Patch(':id')
@@ -140,31 +181,5 @@ export class ProjectsV1Controller {
     @Param('id', ParseUUIDPipe) id: string,
   ) {
     return this.regenerateProjectSummaryCommand.exec(claims, id);
-  }
-
-  @Post(':id/chat-session')
-  @ApiResponse({
-    type: () => CreateChatSessionResponse,
-  })
-  @UseIdempotent()
-  async createChatSession(
-    @IdempotentContext() idemCtx: IdempotentContext,
-    @UserClaims() claims: UserClaims,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
-    return this.createChatSessionCommand.exec(idemCtx, claims, id);
-  }
-
-  @Post(':id/chat-session/:sessionId/chat')
-  @ApiResponse({
-    type: () => ProjectChatResponse,
-  })
-  async projectChat(
-    @UserClaims() claims: UserClaims,
-    @Param('id', ParseUUIDPipe) id: string,
-    @Param('sessionId', ParseUUIDPipe) sessionId: string,
-    @Body() body: ProjectChatDto,
-  ) {
-    return this.projectChatCommand.exec(claims, id, sessionId, body);
   }
 }

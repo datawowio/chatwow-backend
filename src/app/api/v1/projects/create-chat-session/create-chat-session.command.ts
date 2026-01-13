@@ -63,7 +63,9 @@ export class CreateChatSessionCommand implements CommandInterface {
   }
 
   async find(claims: UserClaims, projectId: string): Promise<Entity> {
-    const project = await this.projectService.findOne(projectId, claims);
+    const project = await this.projectService.findOne(projectId, {
+      actor: claims,
+    });
     if (!project) {
       throw new ApiException(404, 'projectNotFound');
     }

@@ -1,7 +1,7 @@
 import { projectDocumentPgToResponse } from '@domain/base/project-document/project-document.mapper';
 import { projectPgToResponse } from '@domain/base/project/project.mapper';
 import {
-  addProjectActorFilter,
+  addProjectManagerFilter,
   projectsTableFilter,
 } from '@domain/base/project/project.util';
 import { storedFilePgToResponse } from '@domain/base/stored-file/stored-file.mapper';
@@ -90,7 +90,7 @@ export class GetProjectQuery implements QueryInterface {
       .selectAll('projects')
       .where(projectsTableFilter)
       .where('projects.id', '=', id)
-      .$call((q) => addProjectActorFilter(q, actor))
+      .$call((q) => addProjectManagerFilter(q, actor))
       .limit(1)
       .executeTakeFirst();
 

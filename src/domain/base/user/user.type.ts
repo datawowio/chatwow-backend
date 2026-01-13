@@ -1,7 +1,11 @@
 import type { UserRole, UserStatus, Users } from '@infra/db/db';
 import type { DBModel } from '@infra/db/db.common';
 
-import type { Plain, Serialized } from '@shared/common/common.type';
+import type {
+  Plain,
+  Serialized,
+  WithPgState,
+} from '@shared/common/common.type';
 
 import type { User } from './user.domain';
 
@@ -9,6 +13,7 @@ export type UserPg = DBModel<Users>;
 export type UserPlain = Plain<User>;
 
 export type UserJson = Serialized<UserPlain>;
+export type UserJsonState = WithPgState<UserJson, UserPg>;
 
 export type UserNewData = {
   actorId: string | null;

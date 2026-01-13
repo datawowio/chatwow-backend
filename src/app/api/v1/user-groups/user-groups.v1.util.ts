@@ -1,5 +1,5 @@
 import {
-  addProjectActorFilter,
+  addProjectManagerFilter,
   projectsTableFilter,
 } from '@domain/base/project/project.util';
 import { usersTableFilter } from '@domain/base/user/user.util';
@@ -41,7 +41,7 @@ export function userGroupsV1InclusionQb(
               'user_groups.id',
             )
             .where(projectsTableFilter)
-            .$if(isDefined(actor), (q) => addProjectActorFilter(q, actor!))
+            .$if(isDefined(actor), (q) => addProjectManagerFilter(q, actor!))
             .selectAll(),
         ).as('projects'),
       ),
