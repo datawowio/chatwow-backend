@@ -36,7 +36,7 @@ import {
 } from './list-user-groups/list-user-groups.dto';
 import { ListUserGroupsQuery } from './list-user-groups/list-user-groups.query';
 
-@Controller({ path: 'user-groups', version: '1' })
+@Controller({ path: 'backoffice/user-groups', version: '1' })
 export class UserGroupsV1Controller {
   constructor(
     private createUserGroupCommand: CreateUserGroupCommand,

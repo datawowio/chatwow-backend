@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{url}}/v1/users?includes=manageProjects,userGroups,lineAccount&sort=-firstName&filter[search]=sup
+  url: {{url}}/v1/backoffice/users?includes=manageProjects,userGroups,lineAccount&sort=-firstName&filter[search]=sup
   body: none
   auth: inherit
 }

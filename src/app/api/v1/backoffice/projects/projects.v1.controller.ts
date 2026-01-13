@@ -15,12 +15,8 @@ import {
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 
-import { IdempotentContext } from '@infra/middleware/idempotent/idempotent.common';
-import { UseIdempotent } from '@infra/middleware/idempotent/idempotent.interceptor';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
-import { CreateChatSessionCommand } from './create-chat-session/create-chat-session.command';
-import { CreateChatSessionResponse } from './create-chat-session/create-chat-session.dto';
 import { CreateProjectCommand } from './create-project/create-project.command';
 import {
   CreateProjectDto,
@@ -39,36 +35,23 @@ import {
 } from './get-project/get-project.dto';
 import { GetProjectQuery } from './get-project/get-project.query';
 import {
-  ListMyProjectsDto,
-  ListMyProjectsResponse,
-} from './list-my-projects/list-my-projects.dto';
-import { ListMyProjectsQuery } from './list-my-projects/list-my-projects.query';
-import {
   ListProjectsDto,
   ListProjectsResponse,
 } from './list-projects/list-projects.dto';
 import { ListProjectsQuery } from './list-projects/list-projects.query';
-import { ProjectChatCommand } from './project-chat/project-chat.command';
-import {
-  ProjectChatDto,
-  ProjectChatResponse,
-} from './project-chat/project-chat.dto';
 import { RegenerateProjectSummaryCommand } from './regenerate-project-summary/regenerate-project-summary.command';
 import { RegenerateProjectSummaryResponse } from './regenerate-project-summary/regenerate-project-summary.dto';
 
-@Controller({ path: 'projects', version: '1' })
+@Controller({ path: 'backoffice/projects', version: '1' })
 export class ProjectsV1Controller {
   constructor(
     private listProjectsQuery: ListProjectsQuery,
     private getProjectsQuery: GetProjectQuery,
-    private listMyProjectsQuery: ListMyProjectsQuery,
     private createProjectCommand: CreateProjectCommand,
     private storedFileService: StoredFileService,
     private editProjectCommand: EditProjectCommand,
     private deleteProjectCommand: DeleteProjectCommand,
     private regenerateProjectSummaryCommand: RegenerateProjectSummaryCommand,
-    private createChatSessionCommand: CreateChatSessionCommand,
-    private projectChatCommand: ProjectChatCommand,
   ) {}
 
   @Post()
@@ -102,41 +85,6 @@ export class ProjectsV1Controller {
       ownerTable: STORED_FILE_OWNER_TABLE.PROJECT_DOCUMENT,
       isPublic: false,
     });
-  }
-
-  @Get('me')
-  @ApiResponse({ type: () => ListMyProjectsResponse })
-  async getSelfProjects(
-    @UserClaims() claims: UserClaims,
-    @Query() query: ListMyProjectsDto,
-  ): Promise<ListMyProjectsResponse> {
-    return this.listMyProjectsQuery.exec(claims, query);
-  }
-
-  @Post('me/:id/chat-session')
-  @ApiResponse({
-    type: () => CreateChatSessionResponse,
-  })
-  @UseIdempotent()
-  async createChatSession(
-    @IdempotentContext() idemCtx: IdempotentContext,
-    @UserClaims() claims: UserClaims,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
-    return this.createChatSessionCommand.exec(idemCtx, claims, id);
-  }
-
-  @Post('me/:id/chat-session/:sessionId/chat')
-  @ApiResponse({
-    type: () => ProjectChatResponse,
-  })
-  async projectChat(
-    @UserClaims() claims: UserClaims,
-    @Param('id', ParseUUIDPipe) id: string,
-    @Param('sessionId', ParseUUIDPipe) sessionId: string,
-    @Body() body: ProjectChatDto,
-  ) {
-    return this.projectChatCommand.exec(claims, id, sessionId, body);
   }
 
   @Patch(':id')

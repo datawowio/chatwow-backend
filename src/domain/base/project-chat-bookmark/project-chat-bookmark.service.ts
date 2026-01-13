@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Except } from 'type-fest';
 
 import { getErrorKey } from '@infra/db/db.common';
 import { MainDb } from '@infra/db/db.main';
@@ -16,7 +15,7 @@ import {
 } from './project-chat-bookmark.mapper';
 import { projectChatBookmarksTableFilter } from './project-chat-bookmark.util';
 import {
-  ProjectChatBookmarkCountQueryOptions,
+  ProjectChatBookmarkFilterOptions,
   ProjectChatBookmarkQueryOptions,
 } from './project-chat-bookmark.zod';
 
@@ -28,7 +27,7 @@ export class ProjectChatBookmarkService {
     opts ??= {};
     const { sort, pagination } = opts;
 
-    const qb = await this._getFilterQb(opts)
+    const qb = await this._getFilterQb(opts.filter)
       .select('project_chat_bookmarks.id')
       .$if(!!sort?.length, (q) =>
         sortQb(q, opts!.sort, {
@@ -42,12 +41,10 @@ export class ProjectChatBookmarkService {
     return getUniqueIds(qb);
   }
 
-  async getCount(opts?: ProjectChatBookmarkCountQueryOptions) {
+  async getCount(filter?: ProjectChatBookmarkFilterOptions) {
     const totalCount = await this
       //
-      ._getFilterQb({
-        filter: opts?.filter,
-      })
+      ._getFilterQb(filter)
       .$call((q) => queryCount(q));
 
     return totalCount;
@@ -156,17 +153,13 @@ export class ProjectChatBookmarkService {
     }
   }
 
-  private _getFilterQb(
-    opts?: Except<ProjectChatBookmarkQueryOptions, 'pagination'>,
-  ) {
-    const filter = opts?.filter;
-
+  private _getFilterQb(filter?: ProjectChatBookmarkFilterOptions) {
     return this.db.read
       .selectFrom('project_chat_bookmarks')
       .select('project_chat_bookmarks.id')
       .where(projectChatBookmarksTableFilter)
-      .$if(isDefined(filter?.projectId), (q) =>
-        q.where('project_chat_bookmarks.project_id', '=', filter!.projectId!),
+      .$if(!!filter?.projectIds?.length, (q) =>
+        q.where('project_chat_bookmarks.project_id', 'in', filter!.projectIds!),
       )
       .$if(isDefined(filter?.createdById), (q) =>
         q.where(

@@ -56,11 +56,10 @@ export class ProjectChatCommand implements CommandInterface {
 
   async exec(
     claims: UserClaims,
-    projectId: string,
     sessionId: string,
     body: ProjectChatDto,
   ): Promise<ProjectChatResponse> {
-    const entity = await this.find(claims, projectId, sessionId, body);
+    const entity = await this.find(claims, sessionId, body);
     const { botChatLog, aiUsage } = await this.processAiChat(body.text, entity);
 
     entity.botChatLog = botChatLog;
@@ -114,7 +113,6 @@ export class ProjectChatCommand implements CommandInterface {
 
   async find(
     claims: UserClaims,
-    projectId: string,
     sessionId: string,
     body: ProjectChatDto,
   ): Promise<Entity> {
@@ -137,7 +135,6 @@ export class ProjectChatCommand implements CommandInterface {
     if (
       !chatSession ||
       !chatSession.project ||
-      chatSession.project.id !== projectId ||
       chatSession.latest_chat_log_id !== body.previousChatId
     ) {
       throw new ApiException(404, 'chatSessionNotFound');

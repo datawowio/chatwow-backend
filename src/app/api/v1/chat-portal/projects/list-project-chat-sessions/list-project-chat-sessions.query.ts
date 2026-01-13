@@ -11,12 +11,12 @@ import { QueryInterface } from '@shared/common/common.type';
 import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import {
-  ListMyProjectsDto,
-  ListMyProjectsResponse,
-} from './list-my-projects.dto';
+  ListProjectChatSessionsDto,
+  ListProjectChatSessionsResponse,
+} from './list-project-chat-sessions.dto';
 
 @Injectable()
-export class ListMyProjectsQuery implements QueryInterface {
+export class ListProjectChatSessionsQuery implements QueryInterface {
   constructor(
     private db: MainDb,
     private projectsService: ProjectService,
@@ -24,8 +24,8 @@ export class ListMyProjectsQuery implements QueryInterface {
 
   async exec(
     claims: UserClaims,
-    query: ListMyProjectsDto,
-  ): Promise<ListMyProjectsResponse> {
+    query: ListProjectChatSessionsDto,
+  ): Promise<ListProjectChatSessionsResponse> {
     // default filter userId
     query.filter ??= {};
     query.filter.userId = claims.userId;
@@ -47,7 +47,7 @@ export class ListMyProjectsQuery implements QueryInterface {
     });
   }
 
-  async getRaw(query: ListMyProjectsDto) {
+  async getRaw(query: ListProjectChatSessionsDto) {
     const ids = await this.projectsService.getIds({
       options: {
         filter: query.filter,

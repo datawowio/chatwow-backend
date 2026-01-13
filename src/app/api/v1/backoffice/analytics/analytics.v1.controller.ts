@@ -7,7 +7,7 @@ import {
 } from './ai-usage-summary/ai-usage-summary.dto';
 import { AiUsageSummaryQuery } from './ai-usage-summary/ai-usage-summary.query';
 
-@Controller({ path: 'analytics', version: '1' })
+@Controller({ path: 'backoffice/analytics', version: '1' })
 export class AnalyticsV1Controller {
   constructor(private chatSummaryQuery: AiUsageSummaryQuery) {}
 

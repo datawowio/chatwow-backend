@@ -42,7 +42,7 @@ import { ListProjectDocumentsQuery } from './list-project-documents/list-project
 import { RegenerateProjectDocumentSummaryCommand } from './regenerate-project-document-summary/regenerate-project-document-summary.command';
 import { RegenerateProjectDocumentSummaryResponse } from './regenerate-project-document-summary/regenerate-project-document-summary.dto';
 
-@Controller({ path: 'project-documents', version: '1' })
+@Controller({ path: 'backoffice/project-documents', version: '1' })
 export class ProjectDocumentsV1Controller {
   constructor(
     private listProjectDocumentsQuery: ListProjectDocumentsQuery,

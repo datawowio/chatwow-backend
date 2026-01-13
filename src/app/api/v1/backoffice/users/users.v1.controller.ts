@@ -38,7 +38,7 @@ import {
 } from './user-summary/user-summary.dto';
 import { UserSummaryQuery } from './user-summary/user-summary.query';
 
-@Controller({ path: 'users', version: '1' })
+@Controller({ path: 'backoffice/users', version: '1' })
 export class UsersV1Controller {
   constructor(
     //
