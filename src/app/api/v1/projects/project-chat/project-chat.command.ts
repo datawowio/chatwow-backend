@@ -1,3 +1,8 @@
+import { AI_USAGE_REF_TABLE } from '@domain/base/ai-usage/ai-usage.constant';
+import { AiUsage } from '@domain/base/ai-usage/ai-usage.domain';
+import { newAiUsage } from '@domain/base/ai-usage/ai-usage.factory';
+import { AppConfiguration } from '@domain/base/app-configuration/app-configuration.domain';
+import { AppConfigurationService } from '@domain/base/app-configuration/app-configuration.service';
 import { ProjectChatLog } from '@domain/base/project-chat-log/project-chat-log.domain';
 import { newProjectChatLog } from '@domain/base/project-chat-log/project-chat-log.factory';
 import { projectChatLogToResponse } from '@domain/base/project-chat-log/project-chat-log.mapper';
@@ -9,6 +14,7 @@ import { Project } from '@domain/base/project/project.domain';
 import { projectFromPgWithState } from '@domain/base/project/project.mapper';
 import { AiApiService } from '@domain/logic/ai-api/ai-api.service';
 import { AiFileService } from '@domain/logic/ai-file/ai-file.service';
+import { DomainEventQueue } from '@domain/queue/domain-event/domain-event.queue';
 import { Injectable } from '@nestjs/common';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
 
@@ -26,9 +32,12 @@ import { toHttpSuccess } from '@shared/http/http.mapper';
 import { ProjectChatDto, ProjectChatResponse } from './project-chat.dto';
 
 type Entity = {
+  aiConfig: AppConfiguration<'AI'>;
   projectChatSession: ProjectChatSession;
   project: Project;
   userChatLog: ProjectChatLog;
+  botChatLog?: ProjectChatLog;
+  aiUsage?: AiUsage;
 };
 
 @Injectable()
@@ -41,6 +50,8 @@ export class ProjectChatCommand implements CommandInterface {
     private loggerService: LoggerService,
     private transactionService: TransactionService,
     private aiFileService: AiFileService,
+    private appConfigurationService: AppConfigurationService,
+    private domainEventQueue: DomainEventQueue,
   ) {}
 
   async exec(
@@ -50,13 +61,16 @@ export class ProjectChatCommand implements CommandInterface {
     body: ProjectChatDto,
   ): Promise<ProjectChatResponse> {
     const entity = await this.find(claims, projectId, sessionId, body);
-    const botChatLog = await this.processAiChat(body.text, entity);
+    const { botChatLog, aiUsage } = await this.processAiChat(body.text, entity);
+
+    entity.botChatLog = botChatLog;
+    entity.aiUsage = aiUsage;
 
     entity.projectChatSession.edit({
       latestChatLogId: botChatLog.id,
     });
 
-    await this.save(entity, botChatLog);
+    await this.save(entity);
 
     return toHttpSuccess({
       data: {
@@ -68,7 +82,17 @@ export class ProjectChatCommand implements CommandInterface {
     });
   }
 
-  async save(entity: Entity, botChatLog: ProjectChatLog): Promise<void> {
+  async save(entity: Entity): Promise<void> {
+    if (!entity.botChatLog) {
+      throw new ApiException(500, 'unexpectNoBotChatLog');
+    }
+    if (!entity.aiUsage) {
+      throw new ApiException(500, 'unexpectNoAiUsage');
+    }
+
+    const botChatLog = entity.botChatLog;
+    const aiUsage = entity.aiUsage;
+
     await this.transactionService.transaction(async () => {
       await this.projectChatLogService.saveBulk([
         entity.userChatLog,
@@ -79,6 +103,11 @@ export class ProjectChatCommand implements CommandInterface {
       await this.aiFileService.appendChatLogs({
         sessionId: entity.projectChatSession.id,
         lineChatLogs: [entity.userChatLog, botChatLog],
+      });
+
+      this.domainEventQueue.jobProcessAiUsage({
+        owner: 'project',
+        aiUsage,
       });
     });
   }
@@ -115,6 +144,7 @@ export class ProjectChatCommand implements CommandInterface {
     }
 
     const project = projectFromPgWithState(chatSession.project);
+    const aiConfig = await this.appConfigurationService.findConfig('AI');
 
     const userChatLog = newProjectChatLog({
       chatSender: 'USER',
@@ -124,6 +154,7 @@ export class ProjectChatCommand implements CommandInterface {
     });
 
     return {
+      aiConfig,
       projectChatSession: projectChatSessionFromPgWithState(chatSession),
       project,
       userChatLog,
@@ -132,35 +163,48 @@ export class ProjectChatCommand implements CommandInterface {
 
   async processAiChat(
     text: string,
-    { project, projectChatSession, userChatLog }: Entity,
-  ): Promise<ProjectChatLog> {
-    const errorReplyChat = newProjectChatLog({
+    { project, projectChatSession, userChatLog, aiConfig }: Entity,
+  ) {
+    const botChatLog = newProjectChatLog({
       chatSender: 'BOT',
       message: LINE_AI_ERROR_REPLY,
       parentId: userChatLog.id,
       projectChatSessionId: projectChatSession.id,
     });
 
+    const aiUsage = newAiUsage({
+      actorId: projectChatSession.userId,
+      data: {
+        projectId: project.id,
+        aiUsageAction: 'CHAT_PROJECT',
+        refId: botChatLog.id,
+        refTable: AI_USAGE_REF_TABLE.PROJECT_CHAT_LOG,
+        aiModelName: aiConfig.configData.model,
+      },
+    }).record();
+
     try {
       const res = await this.aiApiService.chat({
         text,
         project: project,
         sessionId: projectChatSession.id,
+        aiConfig,
       });
 
-      if (!res.isSuccess) {
-        return errorReplyChat;
+      if (res.isSuccess) {
+        botChatLog.edit({
+          message: res.data.text,
+        });
+        aiUsage.stopRecord({
+          tokenUsed: res.data.tokenUsed,
+          confidence: res.data.confidence,
+        });
       }
-
-      return newProjectChatLog({
-        chatSender: 'BOT',
-        message: res.data.text,
-        parentId: userChatLog.id,
-        projectChatSessionId: projectChatSession.id,
-      });
     } catch (error) {
       this.loggerService.error(error);
-      return errorReplyChat;
+      aiUsage.stopRecordError();
     }
+
+    return { botChatLog, aiUsage };
   }
 }

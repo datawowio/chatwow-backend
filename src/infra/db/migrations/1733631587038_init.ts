@@ -504,6 +504,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .column('token_hash')
     .execute();
 
+  // message tasks
   await db.schema
     .createTable('message_tasks')
     .addColumn('id', 'uuid', (col) => col.primaryKey())

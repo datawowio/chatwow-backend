@@ -19,11 +19,6 @@ export class AppCron extends BaseAmqpExchange {
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  sample() {
-    this.addJob(CRON_QUEUES.SAMPLE.name);
-  }
-
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   cleanup() {
     this.addJob(CRON_QUEUES.CLEAN_UP.name);
   }

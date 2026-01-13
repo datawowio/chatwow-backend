@@ -14,7 +14,7 @@ export function newStoredFile(data: StoredFileNewData) {
     filename: data.filename,
     filesizeByte: data.filesizeByte || 0,
     storageName: data.storageName || 's3',
-    isPublic: data.isPublic || false,
+    fileExposeType: data.fileExposeType || 'PRESIGN',
     createdAt: new Date(),
     updatedAt: new Date(),
     extension: getFileExtension(data.filename),
@@ -23,7 +23,6 @@ export function newStoredFile(data: StoredFileNewData) {
     keyPath: getStoredFileKey({
       id: data.id,
       ownerTable: data.ownerTable,
-      isPublic: data.isPublic || false,
     }),
     presignUrl: null,
     mimeType: null,

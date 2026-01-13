@@ -9,9 +9,15 @@ export type ActionType = "CREATE" | "DELETE" | "UPDATE";
 
 export type ActorType = "SYSTEM" | "USER";
 
+export type AiModelName = "GPT_DW";
+
+export type AiUsageAction = "CHAT_LINE" | "CHAT_PROJECT" | "GENERATE_PROJECT_DOCUMENT_SUMMARY" | "GENERATE_PROJECT_SUMMARY";
+
 export type ChatSender = "BOT" | "USER";
 
 export type DocumentStatus = "ACTIVE" | "INACTIVE" | "PROCESSING";
+
+export type FileExposeType = "NONE" | "PRESIGN" | "PUBLIC";
 
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
@@ -33,11 +39,56 @@ export type LineSessionStatus = "ACTIVE" | "INACTIVE";
 
 export type MessageStatus = "DEAD" | "FAIL" | "INVALID_PAYLOAD" | "SUCCESS";
 
+export type Numeric = ColumnType<string, number | string, number | string>;
+
 export type ProjectStatus = "ACTIVE" | "INACTIVE" | "PROCESSING";
 
 export type UserRole = "ADMIN" | "MANAGER" | "USER";
 
 export type UserStatus = "ACTIVE" | "INACTIVE" | "PENDING_REGISTRATION";
+
+export interface AiModels {
+  ai_model_name: AiModelName;
+  created_at: Generated<string>;
+  price_per_token: Numeric;
+  updated_at: Generated<string>;
+}
+
+export interface AiUsages {
+  ai_model_name: AiModelName;
+  ai_reply_at: string | null;
+  ai_request_at: string;
+  ai_usage_action: AiUsageAction;
+  confidence: number;
+  created_at: Generated<string>;
+  created_by_id: string | null;
+  id: string;
+  project_id: string;
+  ref_id: string;
+  ref_table: string;
+  reply_time_ms: number | null;
+  token_info: Json;
+  token_price: Numeric;
+  token_used: number;
+}
+
+export interface AiUsageUserGroups {
+  ai_usage_id: string;
+  chat_count: number;
+  created_at: Generated<string>;
+  id: string;
+  token_price: Numeric;
+  token_used: number;
+  user_group_id: string | null;
+}
+
+export interface AppConfigurations {
+  config_data: Json;
+  config_key: string;
+  created_at: Generated<string>;
+  id: string;
+  updated_at: Generated<string>;
+}
 
 export interface AuditLogs {
   action_detail: Generated<string>;
@@ -168,10 +219,10 @@ export interface StoredFiles {
   created_at: Generated<string>;
   expire_at: string | null;
   extension: string;
+  file_expose_type: Generated<FileExposeType>;
   filename: string;
   filesize_byte: string;
   id: string;
-  is_public: Generated<boolean>;
   key_path: string;
   mime_type: string;
   owner_id: string;
@@ -239,6 +290,10 @@ export interface UserVerifications {
 }
 
 export interface DB {
+  ai_models: AiModels;
+  ai_usage_user_groups: AiUsageUserGroups;
+  ai_usages: AiUsages;
+  app_configurations: AppConfigurations;
   audit_logs: AuditLogs;
   line_accounts: LineAccounts;
   line_bots: LineBots;

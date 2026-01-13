@@ -1,7 +1,8 @@
+import { AppConfigurationService } from '@domain/base/app-configuration/app-configuration.service';
 import { Project } from '@domain/base/project/project.domain';
 import { projectToResponse } from '@domain/base/project/project.mapper';
 import { ProjectService } from '@domain/base/project/project.service';
-import { AiEventQueue } from '@domain/queue/ai-event/ai-event.queue';
+import { QueueDispatchService } from '@domain/logic/queue-dispatch/queue-dispatch.service';
 import { Injectable } from '@nestjs/common';
 
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
@@ -16,21 +17,25 @@ import { RegenerateProjectSummaryResponse } from './regenerate-project-summary.d
 export class RegenerateProjectSummaryCommand implements CommandInterface {
   constructor(
     private projectService: ProjectService,
-    private aiEventQueue: AiEventQueue,
+    private appConfigurationService: AppConfigurationService,
+    private queueDispatchService: QueueDispatchService,
   ) {}
 
   async exec(
     claims: UserClaims,
     id: string,
   ): Promise<RegenerateProjectSummaryResponse> {
-    const project = await this.find(claims, id);
+    const { project, aiConfig } = await this.find(claims, id);
     project.edit({
+      actorId: claims.userId,
       data: {
         projectStatus: 'PROCESSING',
       },
     });
 
     await this.save(project);
+
+    this.queueDispatchService.projectMdGenerate(project, aiConfig);
 
     return toHttpSuccess({
       data: {
@@ -41,18 +46,18 @@ export class RegenerateProjectSummaryCommand implements CommandInterface {
     });
   }
 
-  async find(claims: UserClaims, id: string): Promise<Project> {
+  async find(claims: UserClaims, id: string) {
     const project = await this.projectService.findOne(id, claims);
-
     if (!project) {
       throw new ApiException(400, 'projectNotFound');
     }
 
-    return project;
+    const aiConfig = await this.appConfigurationService.findConfig('AI');
+
+    return { project, aiConfig };
   }
 
   async save(project: Project) {
     await this.projectService.save(project);
-    this.aiEventQueue.jobProjectMdGenerate(project);
   }
 }

@@ -41,8 +41,9 @@ export function toDate(date: ConfigType | null) {
   return myDayjs(date).toDate();
 }
 
-export function toISO(date: ConfigType): string;
-export function toISO(date: ConfigType | null) {
+export function toISO(date: Exclude<ConfigType, null>): string;
+export function toISO(date: Exclude<ConfigType, null> | null): string | null;
+export function toISO(date: Exclude<ConfigType, null> | null) {
   if (!date) {
     return null;
   }
@@ -110,4 +111,8 @@ export function toOptionalNumber(v?: string) {
   }
 
   return toNumber(v);
+}
+
+export function toCurrencyDisplay(big: Big) {
+  return big.toString();
 }

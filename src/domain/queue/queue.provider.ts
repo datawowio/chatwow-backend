@@ -1,3 +1,4 @@
+import { QueueDispatchService } from '@domain/logic/queue-dispatch/queue-dispatch.service';
 import { Provider } from '@nestjs/common';
 
 import { AiEventQueue } from './ai-event/ai-event.queue';
@@ -9,4 +10,5 @@ export const QUEUE_PROVIDER: Provider[] = [
   DomainEventQueue,
   LineEventQueue,
   AiEventQueue,
+  QueueDispatchService,
 ];

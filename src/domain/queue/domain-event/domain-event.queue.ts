@@ -1,3 +1,4 @@
+import { aiUsageToJsonState } from '@domain/base/ai-usage/ai-usage.mapper';
 import { passwordResetTokenToJsonState } from '@domain/base/password-reset-token/password-reset-token.mapper';
 import { projectDocumentToJsonState } from '@domain/base/project-document/project-document.mapper';
 import { projectToJsonState } from '@domain/base/project/project.mapper';
@@ -8,8 +9,14 @@ import { Injectable } from '@nestjs/common';
 import { BaseAmqpExchange } from '@infra/global/amqp/amqp.abstract';
 import { wrapJobMeta } from '@infra/global/amqp/amqp.common';
 
-import { ForgotPasswordJobData } from '@app/worker/domain-event/forgot-password/forgot-password.type';
-import { ForgotPasswordJobInput } from '@app/worker/domain-event/forgot-password/forgot-password.type';
+import {
+  ForgotPasswordJobData,
+  ForgotPasswordJobInput,
+} from '@app/worker/domain-event/forgot-password/forgot-password.type';
+import {
+  ProcessAiUsageJobData,
+  ProcessAiUsageJobInput,
+} from '@app/worker/domain-event/process-ai-usage/process-ai-usage.type';
 import {
   SavedProjectDocumentData,
   SavedProjectDocumentJobInput,
@@ -56,5 +63,14 @@ export class DomainEventQueue extends BaseAmqpExchange {
     const input: SavedProjectJobInput = wrapJobMeta(projectToJsonState(data));
 
     this.addJob(DOMAIN_EVENT_QUEUES.SAVED_PROJECT.name, input);
+  }
+
+  jobProcessAiUsage(data: ProcessAiUsageJobData) {
+    const input: ProcessAiUsageJobInput = wrapJobMeta({
+      owner: data.owner,
+      aiUsage: aiUsageToJsonState(data.aiUsage),
+    });
+
+    this.addJob(DOMAIN_EVENT_QUEUES.PROCESS_AI_USAGE.name, input);
   }
 }

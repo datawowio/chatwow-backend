@@ -1,8 +1,8 @@
+export const STORED_FILE_STORAGE_KEY_PREFIX = 'stored_files';
+
 export function getStoredFileKey(opts: {
   id: string;
   ownerTable: string;
-  isPublic: boolean;
 }): string {
-  const folder = opts.isPublic ? 'stored_files_public' : 'stored_files';
-  return `${folder}/${opts.ownerTable}/${opts.id}`;
+  return `${STORED_FILE_STORAGE_KEY_PREFIX}/${opts.ownerTable}/${opts.id}`;
 }

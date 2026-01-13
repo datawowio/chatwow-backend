@@ -16,8 +16,10 @@ export function newTaskMeta(): TaskMeta {
   };
 }
 export function wrapJobMeta<T>(data: T): JobInput<T> {
+  const meta = newTaskMeta();
+
   return {
-    meta: newTaskMeta(),
+    meta,
     data,
   };
 }

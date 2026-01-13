@@ -123,7 +123,6 @@ export class StoredFileService {
     const key = getStoredFileKey({
       id,
       ownerTable: opts.ownerTable,
-      isPublic: opts.isPublic,
     });
     const presignUrl = await this.storageService.createUploadPresign(key);
 
