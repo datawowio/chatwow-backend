@@ -7,7 +7,11 @@ import { MainDb } from '@infra/db/db.main';
 import { filterQbIds } from '@infra/db/db.util';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
-import { getPagination } from '@shared/common/common.pagination';
+import { decodeCursor } from '@shared/common/common.crypto';
+import {
+  buildNextCursor,
+  overrideQueryWithCursor,
+} from '@shared/common/common.cursor';
 import { QueryInterface } from '@shared/common/common.type';
 import { toHttpSuccess } from '@shared/http/http.mapper';
 
@@ -26,19 +30,23 @@ export class ListProjectChatSessionsQuery implements QueryInterface {
 
   async exec(
     claims: UserClaims,
+    projectId: string,
     query: ListProjectChatSessionsDto,
   ): Promise<ListProjectChatSessionsResponse> {
     // default filter userId
     query.filter ??= {};
-    query.filter.userId = claims.userId;
-    query.countFilter ??= {};
-    query.countFilter.userId = claims.userId;
+    query.sort ??= [['id', 'desc']];
 
-    const { result, totalCount } = await this.getRaw(query);
+    query.filter.userId = claims.userId;
+    query.filter.projectId = projectId;
+
+    overrideQueryWithCursor(query, decodeCursor(query.pagination?.cursor));
+
+    const { result, nextCursor } = await this.getRaw(query);
 
     return toHttpSuccess({
       meta: {
-        pagination: getPagination(result, totalCount, query.pagination),
+        nextCursor,
       },
       data: {
         projectChatSessions: result.map((projectChatSession) => ({
@@ -67,13 +75,12 @@ export class ListProjectChatSessionsQuery implements QueryInterface {
   async getRaw(query: ListProjectChatSessionsDto) {
     const ids = await this.projectChatSessionService.getIds({
       filter: query.filter,
-      sort: query.sort,
       pagination: query.pagination,
     });
     if (!ids) {
       return {
         result: [],
-        totalCount: 0,
+        nextCursor: null,
       };
     }
 
@@ -84,13 +91,17 @@ export class ListProjectChatSessionsQuery implements QueryInterface {
       .$call((q) => filterQbIds(ids, q, 'project_chat_sessions.id'))
       .execute();
 
-    const totalCount = await this.projectChatSessionService.getCount(
-      query.countFilter,
-    );
+    const nextCursor = buildNextCursor(result, query.sort, {
+      id: {
+        get: (d) => d.id,
+        asc: 'idGt',
+        desc: 'idLt',
+      },
+    });
 
     return {
       result,
-      totalCount,
+      nextCursor,
     };
   }
 }

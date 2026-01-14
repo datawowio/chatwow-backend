@@ -20,6 +20,7 @@ export type ProjectChatSessionJsonState = WithPgState<
 export type ProjectChatSessionNewData = {
   userId: string;
   projectId: string;
+  initChatLogId?: string;
   latestChatLogId?: string;
 };
 

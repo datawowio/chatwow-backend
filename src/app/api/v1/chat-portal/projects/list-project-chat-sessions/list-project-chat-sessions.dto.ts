@@ -1,18 +1,15 @@
 import { ProjectChatLogResponse } from '@domain/base/project-chat-log/project-chat-log.response';
 import { ProjectChatSessionResponse } from '@domain/base/project-chat-session/project-chat-session.response';
-import {
-  projectChatSessionFilterZod,
-  projectChatSessionSortZod,
-} from '@domain/base/project-chat-session/project-chat-session.zod';
+import { projectChatSessionFilterZod } from '@domain/base/project-chat-session/project-chat-session.zod';
 import { ApiProperty } from '@nestjs/swagger';
 import z from 'zod';
 
 import type { IDomainData } from '@shared/common/common.type';
 import {
-  PaginationMetaResponse,
+  CursorMetaResponse,
   StandardResponse,
 } from '@shared/http/http.response.dto';
-import { paginationZod, zodDto } from '@shared/zod/zod.util';
+import { getSortZod, paginationCursorZod, zodDto } from '@shared/zod/zod.util';
 
 import { listProjectChatSessionIncludesZod } from './list-project-chat-sessions.util';
 
@@ -20,10 +17,9 @@ import { listProjectChatSessionIncludesZod } from './list-project-chat-sessions.
 
 const zod = z.object({
   includes: listProjectChatSessionIncludesZod,
-  sort: projectChatSessionSortZod,
   filter: projectChatSessionFilterZod.optional(),
-  countFilter: projectChatSessionFilterZod.optional(),
-  pagination: paginationZod,
+  pagination: paginationCursorZod,
+  sort: getSortZod(['id']).optional(),
 });
 
 export class ListProjectChatSessionsDto extends zodDto(zod) {}
@@ -63,6 +59,6 @@ export class ListProjectChatSessionsResponse extends StandardResponse {
   @ApiProperty({ type: () => ListProjectChatSessionsData })
   data: ListProjectChatSessionsData;
 
-  @ApiProperty({ type: () => PaginationMetaResponse })
-  meta: PaginationMetaResponse;
+  @ApiProperty({ type: () => CursorMetaResponse })
+  meta: CursorMetaResponse;
 }

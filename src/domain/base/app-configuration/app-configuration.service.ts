@@ -142,11 +142,14 @@ export class AppConfigurationService {
 
   private async _getFromCache<K extends AppConfigKey>(
     configKey: K,
-  ): Promise<AppConfiguration<K>> {
+  ): Promise<AppConfiguration<K> | null> {
     const key = this._generateCacheKey(configKey);
     const json = (await this.cacheService.get(
       key,
     )) as AppConfigurationJsonState<K>;
+    if (!json) {
+      return null;
+    }
 
     return appConfigurationFromJsonState(json) as AppConfiguration<K>;
   }

@@ -54,7 +54,7 @@ export class ProjectsV1Controller {
     return this.listMyProjectsQuery.exec(claims, query);
   }
 
-  @Post(':id/chat-session')
+  @Post(':id/chat-sessions')
   @ApiResponse({
     type: () => CreateChatSessionResponse,
   })
@@ -67,14 +67,14 @@ export class ProjectsV1Controller {
     return this.createChatSessionCommand.exec(idemCtx, claims, id);
   }
 
-  @Get(':id/chat-session')
+  @Get(':id/chat-session/cursor')
   @ApiResponse({ type: () => ListProjectChatSessionsResponse })
   async getProjectChatSessions(
     @Param('id', ParseUUIDPipe) id: string,
     @UserClaims() claims: UserClaims,
     @Query() query: ListProjectChatSessionsDto,
   ): Promise<ListProjectChatSessionsResponse> {
-    return this.listProjectChatSessionsQuery.exec(claims, query);
+    return this.listProjectChatSessionsQuery.exec(claims, id, query);
   }
 
   @Get(':id/chat-bookmarks')

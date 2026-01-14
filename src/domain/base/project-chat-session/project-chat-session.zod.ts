@@ -9,6 +9,8 @@ export const projectChatSessionFilterZod = z.object({
   projectIds: parmUuidsZod.optional(),
   userId: z.string().uuid().optional(),
   userIds: parmUuidsZod.optional(),
+  idGt: z.string().uuid().optional(),
+  idLt: z.string().uuid().optional(),
 });
 
 export const projectChatSessionSortZod = getSortZod(['id', 'createdAt']);
