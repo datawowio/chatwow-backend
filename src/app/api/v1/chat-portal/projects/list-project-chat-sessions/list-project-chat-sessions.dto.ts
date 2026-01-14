@@ -1,8 +1,9 @@
-import { ProjectResponse } from '@domain/base/project/project.response';
+import { ProjectChatLogResponse } from '@domain/base/project-chat-log/project-chat-log.response';
+import { ProjectChatSessionResponse } from '@domain/base/project-chat-session/project-chat-session.response';
 import {
-  projectFilterZod,
-  projectSortZod,
-} from '@domain/base/project/project.zod';
+  projectChatSessionFilterZod,
+  projectChatSessionSortZod,
+} from '@domain/base/project-chat-session/project-chat-session.zod';
 import { ApiProperty } from '@nestjs/swagger';
 import z from 'zod';
 
@@ -13,12 +14,15 @@ import {
 } from '@shared/http/http.response.dto';
 import { paginationZod, zodDto } from '@shared/zod/zod.util';
 
+import { listProjectChatSessionIncludesZod } from './list-project-chat-sessions.util';
+
 // ================ Request ================
 
 const zod = z.object({
-  sort: projectSortZod,
-  filter: projectFilterZod,
-  countFilter: projectFilterZod,
+  includes: listProjectChatSessionIncludesZod,
+  sort: projectChatSessionSortZod,
+  filter: projectChatSessionFilterZod.optional(),
+  countFilter: projectChatSessionFilterZod.optional(),
   pagination: paginationZod,
 });
 
@@ -26,12 +30,25 @@ export class ListProjectChatSessionsDto extends zodDto(zod) {}
 
 // ================ Response ================
 
-export class ListProjectChatSessionsProjectsData implements IDomainData {
-  @ApiProperty({ type: () => ProjectResponse })
-  attributes: ProjectResponse;
+export class ListProjectChatSessionsChatLog implements IDomainData {
+  @ApiProperty({ type: () => ProjectChatLogResponse })
+  attributes: ProjectChatLogResponse;
+}
 
-  @ApiProperty()
-  relations: object;
+export class ListProjectChatSessionsProjectsDataRelations {
+  @ApiProperty({ type: () => ListProjectChatSessionsChatLog, required: false })
+  initChatLog?: ListProjectChatSessionsChatLog;
+
+  @ApiProperty({ type: () => ListProjectChatSessionsChatLog, required: false })
+  latestChatLog?: ListProjectChatSessionsChatLog;
+}
+
+export class ListProjectChatSessionsProjectsData implements IDomainData {
+  @ApiProperty({ type: () => ProjectChatSessionResponse })
+  attributes: ProjectChatSessionResponse;
+
+  @ApiProperty({ type: () => ListProjectChatSessionsProjectsDataRelations })
+  relations: ListProjectChatSessionsProjectsDataRelations;
 }
 
 export class ListProjectChatSessionsData {
@@ -39,7 +56,7 @@ export class ListProjectChatSessionsData {
     type: () => ListProjectChatSessionsProjectsData,
     isArray: true,
   })
-  projects: ListProjectChatSessionsProjectsData[];
+  projectChatSessions: ListProjectChatSessionsProjectsData[];
 }
 
 export class ListProjectChatSessionsResponse extends StandardResponse {

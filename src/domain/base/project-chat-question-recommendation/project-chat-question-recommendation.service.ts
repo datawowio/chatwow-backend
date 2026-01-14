@@ -195,6 +195,13 @@ export class ProjectChatQuestionRecommendationService {
           filter!.projectId!,
         ),
       )
+      .$if(!!filter?.projectIds?.length, (q) =>
+        q.where(
+          'project_chat_question_recommendations.project_id',
+          'in',
+          filter!.projectIds!,
+        ),
+      )
       .$if(isDefined(filter?.search), (q) => {
         const search = `%${filter!.search!}%`;
 

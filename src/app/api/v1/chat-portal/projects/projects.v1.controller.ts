@@ -19,12 +19,30 @@ import {
   ListMyProjectsResponse,
 } from './list-my-projects/list-my-projects.dto';
 import { ListMyProjectsQuery } from './list-my-projects/list-my-projects.query';
+import {
+  ListProjectBookmarksDto,
+  ListProjectBookmarksResponse,
+} from './list-project-bookmarks/list-project-bookmarks.dto';
+import { ListProjectBookmarksQuery } from './list-project-bookmarks/list-project-bookmarks.query';
+import {
+  ListProjectChatQuestionRecommendationsDto,
+  ListProjectChatQuestionRecommendationsResponse,
+} from './list-project-chat-question-recommendations/list-project-chat-question-recommendations.dto';
+import { ListProjectChatQuestionRecommendationsQuery } from './list-project-chat-question-recommendations/list-project-chat-question-recommendations.query';
+import {
+  ListProjectChatSessionsDto,
+  ListProjectChatSessionsResponse,
+} from './list-project-chat-sessions/list-project-chat-sessions.dto';
+import { ListProjectChatSessionsQuery } from './list-project-chat-sessions/list-project-chat-sessions.query';
 
 @Controller({ path: 'chat-portal/projects', version: '1' })
 export class ProjectsV1Controller {
   constructor(
     private listMyProjectsQuery: ListMyProjectsQuery,
     private createChatSessionCommand: CreateChatSessionCommand,
+    private listProjectChatSessionsQuery: ListProjectChatSessionsQuery,
+    private listProjectBookmarksQuery: ListProjectBookmarksQuery,
+    private listProjectChatQuestionRecommendationsQuery: ListProjectChatQuestionRecommendationsQuery,
   ) {}
 
   @Get()
@@ -47,5 +65,35 @@ export class ProjectsV1Controller {
     @Param('id', ParseUUIDPipe) id: string,
   ) {
     return this.createChatSessionCommand.exec(idemCtx, claims, id);
+  }
+
+  @Get(':id/chat-session')
+  @ApiResponse({ type: () => ListProjectChatSessionsResponse })
+  async getProjectChatSessions(
+    @Param('id', ParseUUIDPipe) id: string,
+    @UserClaims() claims: UserClaims,
+    @Query() query: ListProjectChatSessionsDto,
+  ): Promise<ListProjectChatSessionsResponse> {
+    return this.listProjectChatSessionsQuery.exec(claims, query);
+  }
+
+  @Get(':id/chat-bookmarks')
+  @ApiResponse({ type: () => ListProjectBookmarksResponse })
+  async getProjectChatBookmarks(
+    @Param('id', ParseUUIDPipe) id: string,
+    @UserClaims() claims: UserClaims,
+    @Query() query: ListProjectBookmarksDto,
+  ): Promise<ListProjectBookmarksResponse> {
+    return this.listProjectBookmarksQuery.exec(claims, query);
+  }
+
+  @Get(':id/chat-question-recommendations')
+  @ApiResponse({ type: () => ListProjectChatQuestionRecommendationsResponse })
+  async getProjectChatQuestionRecommendations(
+    @Param('id', ParseUUIDPipe) id: string,
+    @UserClaims() claims: UserClaims,
+    @Query() query: ListProjectChatQuestionRecommendationsDto,
+  ): Promise<ListProjectChatQuestionRecommendationsResponse> {
+    return this.listProjectChatQuestionRecommendationsQuery.exec(query);
   }
 }

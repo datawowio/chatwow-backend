@@ -1,8 +1,8 @@
+import { ProjectChatBookmarkResponse } from '@domain/base/project-chat-bookmark/project-chat-bookmark.response';
 import {
   projectChatBookmarkFilterZod,
   projectChatBookmarkSortZod,
 } from '@domain/base/project-chat-bookmark/project-chat-bookmark.zod';
-import { ProjectResponse } from '@domain/base/project/project.response';
 import { ApiProperty } from '@nestjs/swagger';
 import z from 'zod';
 
@@ -27,8 +27,8 @@ export class ListProjectBookmarksDto extends zodDto(zod) {}
 // ================ Response ================
 
 export class ListProjectBookmarksProjectsData implements IDomainData {
-  @ApiProperty({ type: () => ProjectResponse })
-  attributes: ProjectResponse;
+  @ApiProperty({ type: () => ProjectChatBookmarkResponse })
+  attributes: ProjectChatBookmarkResponse;
 
   @ApiProperty()
   relations: object;
@@ -36,7 +36,7 @@ export class ListProjectBookmarksProjectsData implements IDomainData {
 
 export class ListProjectBookmarksData {
   @ApiProperty({ type: () => ListProjectBookmarksProjectsData, isArray: true })
-  projects: ListProjectBookmarksProjectsData[];
+  projectChatBookmarks: ListProjectBookmarksProjectsData[];
 }
 
 export class ListProjectBookmarksResponse extends StandardResponse {

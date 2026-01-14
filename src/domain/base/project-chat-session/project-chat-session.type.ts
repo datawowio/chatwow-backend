@@ -25,4 +25,5 @@ export type ProjectChatSessionNewData = {
 
 export type ProjectChatSessionUpdateData = {
   latestChatLogId?: string;
+  initChatLogId?: string;
 };

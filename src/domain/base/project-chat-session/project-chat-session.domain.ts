@@ -13,6 +13,7 @@ export class ProjectChatSession extends DomainEntity<ProjectChatSessionPg> {
   readonly userId: string;
   readonly projectId: string;
   readonly latestChatLogId: string | null;
+  readonly initChatLogId: string | null;
 
   constructor(plain: ProjectChatSessionPlain) {
     super();
@@ -27,6 +28,9 @@ export class ProjectChatSession extends DomainEntity<ProjectChatSessionPg> {
       projectId: this.projectId,
 
       latestChatLogId: valueOr(data.latestChatLogId, this.latestChatLogId),
+      initChatLogId: this.initChatLogId
+        ? this.initChatLogId
+        : valueOr(data.initChatLogId, this.initChatLogId),
     };
 
     Object.assign(this, plain);

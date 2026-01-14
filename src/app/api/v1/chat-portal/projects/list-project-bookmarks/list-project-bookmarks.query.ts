@@ -1,5 +1,5 @@
+import { projectChatBookmarkPgToResponse } from '@domain/base/project-chat-bookmark/project-chat-bookmark.mapper';
 import { ProjectChatBookmarkService } from '@domain/base/project-chat-bookmark/project-chat-bookmark.service';
-import { projectPgToResponse } from '@domain/base/project/project.mapper';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
@@ -39,8 +39,8 @@ export class ListProjectBookmarksQuery implements QueryInterface {
         pagination: getPagination(result, totalCount, query.pagination),
       },
       data: {
-        projects: result.map((project) => ({
-          attributes: projectPgToResponse(project),
+        projectChatBookmarks: result.map((projectChatBookmark) => ({
+          attributes: projectChatBookmarkPgToResponse(projectChatBookmark),
           relations: {},
         })),
       },
@@ -61,9 +61,9 @@ export class ListProjectBookmarksQuery implements QueryInterface {
     }
 
     const result = await this.db.read
-      .selectFrom('projects')
+      .selectFrom('project_chat_bookmarks')
       .selectAll()
-      .$call((q) => filterQbIds(ids, q, 'projects.id'))
+      .$call((q) => filterQbIds(ids, q, 'project_chat_bookmarks.id'))
       .execute();
 
     const totalCount = await this.projectChatBookmarkService.getCount(

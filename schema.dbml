@@ -243,6 +243,7 @@ Table "project_chat_sessions" {
   "user_id" uuid [not null]
   "project_id" uuid [not null]
   "latest_chat_log_id" uuid
+  "init_chat_log_id" uuid
 }
 
 Table "project_chat_logs" {

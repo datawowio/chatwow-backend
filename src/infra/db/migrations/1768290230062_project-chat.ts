@@ -45,6 +45,14 @@ export async function up(db: Kysely<any>): Promise<void> {
     .on('project_chat_question_recommendations')
     .column('project_id')
     .execute();
+
+  //
+  // PROJECT CHAT SESSION ALTER
+  //
+  await db.schema
+    .alterTable('project_chat_sessions')
+    .addColumn('init_chat_log_id', 'uuid')
+    .execute();
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
@@ -55,4 +63,9 @@ export async function down(db: Kysely<any>): Promise<void> {
 
   await db.schema.dropTable('project_chat_bookmarks').execute();
   await db.schema.dropIndex('project_chat_bookmarks_project_id_idx').execute();
+
+  await db.schema
+    .alterTable('project_chat_sessions')
+    .dropColumn('init_chat_log_id')
+    .execute();
 }

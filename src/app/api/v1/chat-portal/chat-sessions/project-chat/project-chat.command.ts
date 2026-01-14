@@ -67,6 +67,7 @@ export class ProjectChatCommand implements CommandInterface {
 
     entity.projectChatSession.edit({
       latestChatLogId: botChatLog.id,
+      initChatLogId: entity.userChatLog.id,
     });
 
     await this.save(entity);

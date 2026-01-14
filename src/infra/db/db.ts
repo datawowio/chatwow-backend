@@ -186,6 +186,7 @@ export interface ProjectChatQuestionRecommendations {
 export interface ProjectChatSessions {
   created_at: Generated<string>;
   id: string;
+  init_chat_log_id: string | null;
   latest_chat_log_id: string | null;
   project_id: string;
   user_id: string;

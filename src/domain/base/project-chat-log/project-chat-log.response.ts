@@ -8,4 +8,7 @@ export class ProjectChatLogResponse {
 
   @ApiProperty({ example: DATE_EXAMPLE })
   createdAt: string;
+
+  @ApiProperty({ example: 'message' })
+  message: string;
 }

@@ -120,5 +120,16 @@ export function projectChatLogToResponse(
   return {
     id: projectChatLog.id,
     createdAt: toISO(projectChatLog.createdAt),
+    message: projectChatLog.message,
+  };
+}
+
+export function projectChatLogPgToResponse(
+  pg: ProjectChatLogPg,
+): ProjectChatLogResponse {
+  return {
+    id: pg.id,
+    createdAt: pg.created_at,
+    message: decryptMessage(pg.message),
   };
 }

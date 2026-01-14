@@ -1,5 +1,6 @@
-import { projectPgToResponse } from '@domain/base/project/project.mapper';
-import { ProjectService } from '@domain/base/project/project.service';
+import { projectChatLogPgToResponse } from '@domain/base/project-chat-log/project-chat-log.mapper';
+import { projectChatSessionPgToResponse } from '@domain/base/project-chat-session/project-chat-session.mapper';
+import { ProjectChatSessionService } from '@domain/base/project-chat-session/project-chat-session.service';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
@@ -14,12 +15,13 @@ import {
   ListProjectChatSessionsDto,
   ListProjectChatSessionsResponse,
 } from './list-project-chat-sessions.dto';
+import { listProjectChatSessionInclusionQb } from './list-project-chat-sessions.util';
 
 @Injectable()
 export class ListProjectChatSessionsQuery implements QueryInterface {
   constructor(
     private db: MainDb,
-    private projectsService: ProjectService,
+    private projectChatSessionService: ProjectChatSessionService,
   ) {}
 
   async exec(
@@ -39,21 +41,34 @@ export class ListProjectChatSessionsQuery implements QueryInterface {
         pagination: getPagination(result, totalCount, query.pagination),
       },
       data: {
-        projects: result.map((project) => ({
-          attributes: projectPgToResponse(project),
-          relations: {},
+        projectChatSessions: result.map((projectChatSession) => ({
+          attributes: projectChatSessionPgToResponse(projectChatSession),
+          relations: {
+            initChatLog: projectChatSession.initChatLog
+              ? {
+                  attributes: projectChatLogPgToResponse(
+                    projectChatSession.initChatLog,
+                  ),
+                }
+              : undefined,
+            latestChatLog: projectChatSession.latestChatLog
+              ? {
+                  attributes: projectChatLogPgToResponse(
+                    projectChatSession.latestChatLog,
+                  ),
+                }
+              : undefined,
+          },
         })),
       },
     });
   }
 
   async getRaw(query: ListProjectChatSessionsDto) {
-    const ids = await this.projectsService.getIds({
-      options: {
-        filter: query.filter,
-        sort: query.sort,
-        pagination: query.pagination,
-      },
+    const ids = await this.projectChatSessionService.getIds({
+      filter: query.filter,
+      sort: query.sort,
+      pagination: query.pagination,
     });
     if (!ids) {
       return {
@@ -63,14 +78,15 @@ export class ListProjectChatSessionsQuery implements QueryInterface {
     }
 
     const result = await this.db.read
-      .selectFrom('projects')
+      .selectFrom('project_chat_sessions')
+      .$call((q) => listProjectChatSessionInclusionQb(q, query.includes))
       .selectAll()
-      .$call((q) => filterQbIds(ids, q, 'projects.id'))
+      .$call((q) => filterQbIds(ids, q, 'project_chat_sessions.id'))
       .execute();
 
-    const totalCount = await this.projectsService.getCount({
-      filter: query.countFilter,
-    });
+    const totalCount = await this.projectChatSessionService.getCount(
+      query.countFilter,
+    );
 
     return {
       result,
