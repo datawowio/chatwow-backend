@@ -1,9 +1,18 @@
-import { Body, Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Query,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
-import { UsePublic } from '@infra/middleware/jwt/jwt.common';
+import { UsePublic, UserClaims } from '@infra/middleware/jwt/jwt.common';
 
 import {
   getRefreshCookie,
@@ -12,6 +21,11 @@ import {
 import myDayjs from '@shared/common/common.dayjs';
 import { ApiException } from '@shared/http/http.exception';
 
+import {
+  CheckProfileDto,
+  CheckProfileResponse,
+} from './check-profile/check-profile.dto';
+import { CheckProfileQuery } from './check-profile/check-profile.query';
 import { CheckResetPasswordQuery } from './check-reset-password/check-reset-password.command';
 import {
   CheckResetPasswordDto,
@@ -22,6 +36,11 @@ import {
   ForgotPasswordDto,
   ForgotPasswordResponse,
 } from './forgot-password/forgot-password.dto';
+import {
+  GetProfileDto,
+  GetProfileResponse,
+} from './get-profile/get-profile.dto';
+import { GetProfileQuery } from './get-profile/get-profile.query';
 import { RefreshCommand } from './refresh/refresh.command';
 import { RefreshResponse } from './refresh/refresh.dto';
 import { ResetPasswordCommand } from './reset-password/reset-password.command';
@@ -33,6 +52,11 @@ import { SignInCommand } from './sign-in/sign-in.command';
 import { SignInDto, SignInResponse } from './sign-in/sign-in.dto';
 import { SignOutCommand } from './sign-out/sign-out.command';
 import { SignOutResponse } from './sign-out/sign-out.dto';
+import { UpdateProfileCommand } from './update-profile/update-profile.command';
+import {
+  UpdateProfileDto,
+  UpdateProfileResponse,
+} from './update-profile/update-profile.dto';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthV1Controller {
@@ -43,6 +67,9 @@ export class AuthV1Controller {
     private resetPasswordCommand: ResetPasswordCommand,
     private checkResetPasswordCommand: CheckResetPasswordQuery,
     private signOutCommand: SignOutCommand,
+    private checkProfileQuery: CheckProfileQuery,
+    private getProfileQuery: GetProfileQuery,
+    private updateProfileCommand: UpdateProfileCommand,
   ) {}
 
   @Post('sign-in')
@@ -68,6 +95,33 @@ export class AuthV1Controller {
     }
 
     return this.signOutCommand.exec(reqToken);
+  }
+
+  @Get('profile')
+  @ApiResponse({ type: () => GetProfileResponse })
+  async getSelf(
+    @UserClaims() claims: UserClaims,
+    @Query() query: GetProfileDto,
+  ): Promise<GetProfileResponse> {
+    return this.getProfileQuery.exec(claims.userId, query);
+  }
+
+  @Patch('profile')
+  @ApiResponse({ type: () => UpdateProfileResponse })
+  async updateSelf(
+    @UserClaims() claims: UserClaims,
+    @Body() body: UpdateProfileDto,
+  ): Promise<UpdateProfileResponse> {
+    return this.updateProfileCommand.exec(claims.userId, body);
+  }
+
+  @Post('profile/check')
+  @ApiResponse({ type: () => CheckProfileResponse })
+  async checkProfile(
+    @UserClaims() claims: UserClaims,
+    @Body() body: CheckProfileDto,
+  ): Promise<CheckProfileResponse> {
+    return this.checkProfileQuery.exec(claims.userId, body);
   }
 
   @Post('refresh')

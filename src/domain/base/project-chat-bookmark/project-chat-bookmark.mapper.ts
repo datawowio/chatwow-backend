@@ -122,8 +122,6 @@ export function projectChatBookmarkToResponse(
     id: domain.id,
     createdAt: toResponseDate(domain.createdAt),
     bookmarkText: domain.bookmarkText,
-    createdById: domain.createdById,
-    projectId: domain.projectId,
   };
 }
 
@@ -134,7 +132,5 @@ export function projectChatBookmarkPgToResponse(
     id: pg.id,
     createdAt: toResponseDate(pg.created_at),
     bookmarkText: pg.bookmark_text,
-    createdById: pg.created_by_id,
-    projectId: pg.project_id,
   };
 }

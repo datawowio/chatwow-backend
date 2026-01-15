@@ -16,21 +16,21 @@ export const zod = z.object({
   }),
 });
 
-export class UpdateMeDto extends zodDto(zod) {}
+export class UpdateProfileDto extends zodDto(zod) {}
 
 // ==================== Response ====================
 
-export class UpdateMeUserResource {
+export class UpdateProfileUserResource {
   @ApiProperty({ type: () => UserResponse })
   attributes: UserResponse;
 }
 
-export class UpdateMeData {
-  @ApiProperty({ type: () => UpdateMeUserResource })
-  user: UpdateMeUserResource;
+export class UpdateProfileData {
+  @ApiProperty({ type: () => UpdateProfileUserResource })
+  user: UpdateProfileUserResource;
 }
 
-export class UpdateMeResponse extends StandardResponse {
-  @ApiProperty({ type: () => UpdateMeData })
-  data: UpdateMeData;
+export class UpdateProfileResponse extends StandardResponse {
+  @ApiProperty({ type: () => UpdateProfileData })
+  data: UpdateProfileData;
 }

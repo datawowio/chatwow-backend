@@ -4,13 +4,13 @@ import { Injectable } from '@nestjs/common';
 import { ApiException } from '@shared/http/http.exception';
 import { toHttpSuccess } from '@shared/http/http.mapper';
 
-import { CheckMeDto, CheckMeResponse } from './check-me.dto';
+import { CheckProfileDto, CheckProfileResponse } from './check-profile.dto';
 
 @Injectable()
-export class CheckMeQuery {
+export class CheckProfileQuery {
   constructor(private userService: UserService) {}
 
-  async exec(userId: string, body: CheckMeDto): Promise<CheckMeResponse> {
+  async exec(userId: string, body: CheckProfileDto): Promise<CheckProfileResponse> {
     const user = await this.userService.findOne(userId);
     if (!user) {
       throw new ApiException(400, 'usersNotFound');

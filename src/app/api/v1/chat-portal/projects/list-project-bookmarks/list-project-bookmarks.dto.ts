@@ -3,6 +3,7 @@ import {
   projectChatBookmarkFilterZod,
   projectChatBookmarkSortZod,
 } from '@domain/base/project-chat-bookmark/project-chat-bookmark.zod';
+import { ProjectResponse } from '@domain/base/project/project.response';
 import { ApiProperty } from '@nestjs/swagger';
 import z from 'zod';
 
@@ -13,9 +14,12 @@ import {
 } from '@shared/http/http.response.dto';
 import { paginationZod, zodDto } from '@shared/zod/zod.util';
 
+import { listProjectChatBookmarkIncludesZod } from './list-project-bookmarks.util';
+
 // ================ Request ================
 
 const zod = z.object({
+  includes: listProjectChatBookmarkIncludesZod,
   sort: projectChatBookmarkSortZod,
   filter: projectChatBookmarkFilterZod.optional(),
   countFilter: projectChatBookmarkFilterZod.optional(),
@@ -26,17 +30,27 @@ export class ListProjectBookmarksDto extends zodDto(zod) {}
 
 // ================ Response ================
 
-export class ListProjectBookmarksProjectsData implements IDomainData {
+class ListProjectBookmarksProjectsData implements IDomainData {
+  @ApiProperty({ type: () => ProjectResponse })
+  attributes: ProjectResponse;
+}
+
+class ListProjectBookmarksProjectsRelations {
+  @ApiProperty({ type: () => Object, nullable: true })
+  project?: ListProjectBookmarksProjectsData;
+}
+
+export class ListProjectBookmarksBookmarkData implements IDomainData {
   @ApiProperty({ type: () => ProjectChatBookmarkResponse })
   attributes: ProjectChatBookmarkResponse;
 
-  @ApiProperty()
-  relations: object;
+  @ApiProperty({ type: () => ListProjectBookmarksProjectsRelations })
+  relations: ListProjectBookmarksProjectsRelations;
 }
 
 export class ListProjectBookmarksData {
-  @ApiProperty({ type: () => ListProjectBookmarksProjectsData, isArray: true })
-  projectChatBookmarks: ListProjectBookmarksProjectsData[];
+  @ApiProperty({ type: () => ListProjectBookmarksBookmarkData, isArray: true })
+  projectChatBookmarks: ListProjectBookmarksBookmarkData[];
 }
 
 export class ListProjectBookmarksResponse extends StandardResponse {

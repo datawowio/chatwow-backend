@@ -8,14 +8,14 @@ const zod = z.object({
   password: z.string().optional(),
 });
 
-export class CheckMeDto extends zodDto(zod) {}
+export class CheckProfileDto extends zodDto(zod) {}
 
 // ==================== Response ====================
 
-export class CheckMeData {
+export class CheckProfileData {
   isPasswordValid?: boolean;
 }
-export class CheckMeResponse extends StandardResponse {
-  @ApiProperty({ type: () => CheckMeData })
-  data: CheckMeData;
+export class CheckProfileResponse extends StandardResponse {
+  @ApiProperty({ type: () => CheckProfileData })
+  data: CheckProfileData;
 }

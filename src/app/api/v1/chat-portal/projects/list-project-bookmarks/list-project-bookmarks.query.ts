@@ -1,5 +1,6 @@
 import { projectChatBookmarkPgToResponse } from '@domain/base/project-chat-bookmark/project-chat-bookmark.mapper';
 import { ProjectChatBookmarkService } from '@domain/base/project-chat-bookmark/project-chat-bookmark.service';
+import { projectPgToResponse } from '@domain/base/project/project.mapper';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
@@ -14,6 +15,7 @@ import {
   ListProjectBookmarksDto,
   ListProjectBookmarksResponse,
 } from './list-project-bookmarks.dto';
+import { listProjectChatBookmarkInclusionQb } from './list-project-bookmarks.util';
 
 @Injectable()
 export class ListProjectBookmarksQuery implements QueryInterface {
@@ -41,7 +43,13 @@ export class ListProjectBookmarksQuery implements QueryInterface {
       data: {
         projectChatBookmarks: result.map((projectChatBookmark) => ({
           attributes: projectChatBookmarkPgToResponse(projectChatBookmark),
-          relations: {},
+          relations: {
+            project: projectChatBookmark.project
+              ? {
+                  attributes: projectPgToResponse(projectChatBookmark.project),
+                }
+              : undefined,
+          },
         })),
       },
     });
@@ -62,6 +70,7 @@ export class ListProjectBookmarksQuery implements QueryInterface {
 
     const result = await this.db.read
       .selectFrom('project_chat_bookmarks')
+      .$call((q) => listProjectChatBookmarkInclusionQb(q, query.includes))
       .selectAll()
       .$call((q) => filterQbIds(ids, q, 'project_chat_bookmarks.id'))
       .execute();

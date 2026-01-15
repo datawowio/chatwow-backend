@@ -17,8 +17,6 @@ import { BackOfficeController } from '@shared/common/common.decorator';
 
 import { AddUserCommand } from './add-user/add-user.command';
 import { AddUserDto, AddUserResponse } from './add-user/add-user.dto';
-import { CheckMeDto, CheckMeResponse } from './check-me/check-me.dto';
-import { CheckMeQuery } from './check-me/check-me.query';
 import { CheckUserDto, CheckUserResponse } from './check-user/check-user.dto';
 import { CheckUserQuery } from './check-user/check-user.query';
 import { DeleteUserCommand } from './delete-user/delete-user.command';
@@ -31,8 +29,6 @@ import { ListUsersDto, ListUsersResponse } from './list-users/list-users.dto';
 import { ListUsersQuery } from './list-users/list-users.query';
 import { ResendInviteCommand } from './resend-invite/resend-invite.command';
 import { ResendInviteResponse } from './resend-invite/resend-invite.dto';
-import { UpdateMeCommand } from './update-me/update-me.command';
-import { UpdateMeDto, UpdateMeResponse } from './update-me/update-me.dto';
 import {
   UserSummaryDto,
   UserSummaryResponse,
@@ -44,26 +40,22 @@ export class UsersV1Controller {
   constructor(
     //
     private addUserCommand: AddUserCommand,
-    private checkMeQuery: CheckMeQuery,
     private checkUserQuery: CheckUserQuery,
     private deleteUserCommand: DeleteUserCommand,
     private editUserCommand: EditUserCommand,
     private getUserQuery: GetUserQuery,
     private listUsersQuery: ListUsersQuery,
     private resendInviteCommand: ResendInviteCommand,
-    private updateMeCommand: UpdateMeCommand,
     private userSummaryQuery: UserSummaryQuery,
   ) {}
 
   @Get()
-  @UseRoleGuard(['ADMIN', 'MANAGER'])
   @ApiResponse({ type: () => ListUsersResponse })
   async getUsers(@Query() query: ListUsersDto) {
     return this.listUsersQuery.exec(query);
   }
 
   @Post()
-  @UseRoleGuard(['ADMIN', 'MANAGER'])
   @ApiResponse({ type: () => AddUserResponse })
   async addUser(
     @UserClaims() claims: UserClaims,
@@ -73,7 +65,6 @@ export class UsersV1Controller {
   }
 
   @Get('summary')
-  @UseRoleGuard(['ADMIN', 'MANAGER'])
   @ApiResponse({ type: () => UserSummaryResponse })
   async getUserSummary(
     @Query() query: UserSummaryDto,
@@ -82,37 +73,9 @@ export class UsersV1Controller {
   }
 
   @Get('check')
-  @UseRoleGuard(['ADMIN', 'MANAGER'])
   @ApiResponse({ type: () => CheckUserResponse })
   async checkUser(@Query() query: CheckUserDto): Promise<CheckUserResponse> {
     return this.checkUserQuery.exec(query);
-  }
-
-  @Get('me')
-  @ApiResponse({ type: () => GetUserResponse })
-  async getSelf(
-    @UserClaims() claims: UserClaims,
-    @Query() query: GetUserDto,
-  ): Promise<GetUserResponse> {
-    return this.getUserQuery.exec(claims.userId, query);
-  }
-
-  @Patch('me')
-  @ApiResponse({ type: () => UpdateMeResponse })
-  async updateSelf(
-    @UserClaims() claims: UserClaims,
-    @Body() body: UpdateMeDto,
-  ): Promise<UpdateMeResponse> {
-    return this.updateMeCommand.exec(claims.userId, body);
-  }
-
-  @Post('me/check')
-  @ApiResponse({ type: () => CheckMeResponse })
-  async checkMe(
-    @UserClaims() claims: UserClaims,
-    @Body() body: CheckMeDto,
-  ): Promise<CheckMeResponse> {
-    return this.checkMeQuery.exec(claims.userId, body);
   }
 
   @Get(':id')

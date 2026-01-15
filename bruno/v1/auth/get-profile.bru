@@ -1,11 +1,11 @@
 meta {
-  name: get-me
+  name: get-profile
   type: http
   seq: 1
 }
 
 get {
-  url: {{url}}/v1/backoffice/users/me?includes=manageProjects,userGroups,lineAccount
+  url: {{url}}/v1/auth/profile?includes=manageProjects,userGroups,lineAccount
   body: none
   auth: inherit
 }

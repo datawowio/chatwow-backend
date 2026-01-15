@@ -5,13 +5,18 @@ meta {
 }
 
 get {
-  url: {{url}}/v1/chat-portal/chat-sessions/:id/chat-logs
+  url: {{url}}/v1/chat-portal/chat-sessions/:id/chat-log/cursor?pagination[perPage]=1
   body: none
   auth: inherit
 }
 
+params:query {
+  pagination[perPage]: 1
+  ~pagination[cursor]: 
+}
+
 params:path {
-  id: 019bbb7e-4c11-7378-b993-f2cb9f14a5fb
+  id: 019bbfde-e0f5-764b-8dc1-c88e9d2865e1
 }
 
 body:json {

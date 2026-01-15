@@ -195,6 +195,25 @@ export class ProjectChatQuestionRecommendationService {
           filter!.projectId!,
         ),
       )
+      .$if(isDefined(filter?.userId), (q) =>
+        q
+          .innerJoin(
+            'projects',
+            'projects.id',
+            'project_chat_question_recommendations.project_id',
+          )
+          .innerJoin(
+            'user_group_projects',
+            'user_group_projects.project_id',
+            'projects.id',
+          )
+          .innerJoin(
+            'user_group_users',
+            'user_group_users.user_group_id',
+            'user_group_projects.user_group_id',
+          )
+          .where('user_group_users.user_id', '=', filter!.userId!),
+      )
       .$if(!!filter?.projectIds?.length, (q) =>
         q.where(
           'project_chat_question_recommendations.project_id',

@@ -7,6 +7,7 @@ import { getSortZod } from '@shared/zod/zod.util';
 export const projectChatQuestionRecommendationFilterZod = z.object({
   projectIds: parmUuidsZod.optional(),
   projectId: z.string().uuid().optional(),
+  userId: z.string().uuid().optional(),
   search: z.string().optional(),
 });
 

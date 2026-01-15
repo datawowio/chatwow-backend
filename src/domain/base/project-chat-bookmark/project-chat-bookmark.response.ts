@@ -11,10 +11,4 @@ export class ProjectChatBookmarkResponse {
 
   @ApiProperty({ example: 'This is a bookmark text' })
   bookmarkText: string;
-
-  @ApiProperty({ example: UUID_EXAMPLE })
-  createdById: string;
-
-  @ApiProperty({ example: UUID_EXAMPLE })
-  projectId: string;
 }
