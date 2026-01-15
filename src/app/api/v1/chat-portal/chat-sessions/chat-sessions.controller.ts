@@ -1,15 +1,9 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Get, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
+
+import { ChatPortalController } from '@shared/common/common.decorator';
 
 import {
   ListSessionChatLogsDto,
@@ -22,7 +16,7 @@ import {
   ProjectChatResponse,
 } from './project-chat/project-chat.dto';
 
-@Controller({ path: 'chat-portal/chat-sessions', version: '1' })
+@ChatPortalController({ path: 'chat-sessions', version: '1' })
 export class ChatSessionsV1Controller {
   constructor(
     //

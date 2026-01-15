@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{url}}/v1/backoffice/auth/sign-in
+  url: {{url}}/v1/auth/sign-in
   body: json
   auth: inherit
 }
@@ -17,7 +17,8 @@ headers {
 body:json {
   {
     "email": "superadmin@example.com",
-    "password": "password"
+    "password": "password",
+    "mode": "backoffice"
   }
 }
 

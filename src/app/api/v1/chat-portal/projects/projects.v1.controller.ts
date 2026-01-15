@@ -1,16 +1,11 @@
-import {
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Get, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 
 import { IdempotentContext } from '@infra/middleware/idempotent/idempotent.common';
 import { UseIdempotent } from '@infra/middleware/idempotent/idempotent.interceptor';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
+
+import { ChatPortalController } from '@shared/common/common.decorator';
 
 import { CreateChatSessionCommand } from './create-chat-session/create-chat-session.command';
 import { CreateChatSessionResponse } from './create-chat-session/create-chat-session.dto';
@@ -35,7 +30,7 @@ import {
 } from './list-project-chat-sessions/list-project-chat-sessions.dto';
 import { ListProjectChatSessionsQuery } from './list-project-chat-sessions/list-project-chat-sessions.query';
 
-@Controller({ path: 'chat-portal/projects', version: '1' })
+@ChatPortalController({ path: 'projects', version: '1' })
 export class ProjectsV1Controller {
   constructor(
     private listMyProjectsQuery: ListMyProjectsQuery,

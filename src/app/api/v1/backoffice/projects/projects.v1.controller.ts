@@ -4,7 +4,6 @@ import { StoredFileService } from '@domain/base/stored-file/stored-file.service'
 import { GetPresignUploadUrlDto } from '@domain/base/stored-file/stored-file.zod';
 import {
   Body,
-  Controller,
   Delete,
   Get,
   Param,
@@ -16,6 +15,8 @@ import {
 import { ApiResponse } from '@nestjs/swagger';
 
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
+
+import { BackOfficeController } from '@shared/common/common.decorator';
 
 import { CreateProjectCommand } from './create-project/create-project.command';
 import {
@@ -42,7 +43,7 @@ import { ListProjectsQuery } from './list-projects/list-projects.query';
 import { RegenerateProjectSummaryCommand } from './regenerate-project-summary/regenerate-project-summary.command';
 import { RegenerateProjectSummaryResponse } from './regenerate-project-summary/regenerate-project-summary.dto';
 
-@Controller({ path: 'backoffice/projects', version: '1' })
+@BackOfficeController({ path: 'projects', version: '1' })
 export class ProjectsV1Controller {
   constructor(
     private listProjectsQuery: ListProjectsQuery,

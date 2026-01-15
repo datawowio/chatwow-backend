@@ -1,6 +1,5 @@
 import {
   Body,
-  Controller,
   Delete,
   Get,
   Param,
@@ -13,6 +12,8 @@ import { ApiResponse } from '@nestjs/swagger';
 
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 import { UseRoleGuard } from '@infra/middleware/role-guard/role.guard';
+
+import { BackOfficeController } from '@shared/common/common.decorator';
 
 import { AddUserCommand } from './add-user/add-user.command';
 import { AddUserDto, AddUserResponse } from './add-user/add-user.dto';
@@ -38,7 +39,7 @@ import {
 } from './user-summary/user-summary.dto';
 import { UserSummaryQuery } from './user-summary/user-summary.query';
 
-@Controller({ path: 'backoffice/users', version: '1' })
+@BackOfficeController({ path: 'users', version: '1' })
 export class UsersV1Controller {
   constructor(
     //

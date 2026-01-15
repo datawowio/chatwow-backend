@@ -1,6 +1,5 @@
 import {
   Body,
-  Controller,
   Delete,
   Get,
   Param,
@@ -12,6 +11,8 @@ import {
 import { ApiResponse } from '@nestjs/swagger';
 
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
+
+import { BackOfficeController } from '@shared/common/common.decorator';
 
 import { CreateUserGroupCommand } from './create-user-group/create-user-group.command';
 import {
@@ -36,7 +37,7 @@ import {
 } from './list-user-groups/list-user-groups.dto';
 import { ListUserGroupsQuery } from './list-user-groups/list-user-groups.query';
 
-@Controller({ path: 'backoffice/user-groups', version: '1' })
+@BackOfficeController({ path: 'user-groups', version: '1' })
 export class UserGroupsV1Controller {
   constructor(
     private createUserGroupCommand: CreateUserGroupCommand,

@@ -6,6 +6,7 @@ import type { FastifyRequest } from 'fastify';
 import { AppConfig } from '@infra/config';
 
 import { decodeUserJwt } from '@shared/common/common.crypto';
+import { PORTAL_KEY } from '@shared/common/common.decorator';
 import { ApiException } from '@shared/http/http.exception';
 import { AUTH_HEADER } from '@shared/http/http.headers';
 
@@ -37,6 +38,20 @@ export class JwtGuard implements CanActivate {
 
     const claims = decodeUserJwt(token, jwtConfig.salt);
     request[USER_CONTEXT] = claims?.message;
+
+    const requiredPortal = this.reflector.getAllAndOverride<string>(
+      PORTAL_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+    if (requiredPortal) {
+      if (
+        // don't check if mode is 'all'
+        claims?.message.mode !== 'all' &&
+        claims?.message.mode !== requiredPortal
+      ) {
+        throw new ApiException(403, 'forbiddenAccess');
+      }
+    }
 
     return true;
   }

@@ -1,3 +1,4 @@
+import { ISignInModeWithAll } from '@domain/logic/auth/auth.constant';
 import type { ExecutionContext } from '@nestjs/common';
 import { SetMetadata, createParamDecorator } from '@nestjs/common';
 
@@ -8,6 +9,7 @@ export const USER_CONTEXT = 'user';
 export type UserJwtEncoded = {
   userId: string;
   role: UserRole;
+  mode: ISignInModeWithAll;
 };
 
 export type UserClaims = {

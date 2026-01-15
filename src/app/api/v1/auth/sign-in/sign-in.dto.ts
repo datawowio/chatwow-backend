@@ -1,4 +1,5 @@
 import { UserResponse } from '@domain/base/user/user.response';
+import { SIGN_IN_MODE } from '@domain/logic/auth/auth.constant';
 import { ApiProperty } from '@nestjs/swagger';
 import z from 'zod';
 
@@ -10,6 +11,7 @@ import { zodDto } from '@shared/zod/zod.util';
 const zod = z.object({
   email: z.string().email(),
   password: z.string(),
+  mode: z.enum(SIGN_IN_MODE),
 });
 
 export class SignInDto extends zodDto(zod) {}

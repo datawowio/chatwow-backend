@@ -34,7 +34,7 @@ import { SignInDto, SignInResponse } from './sign-in/sign-in.dto';
 import { SignOutCommand } from './sign-out/sign-out.command';
 import { SignOutResponse } from './sign-out/sign-out.dto';
 
-@Controller({ path: 'backoffice/auth', version: '1' })
+@Controller({ path: 'auth', version: '1' })
 export class AuthV1Controller {
   constructor(
     private signInCommand: SignInCommand,
