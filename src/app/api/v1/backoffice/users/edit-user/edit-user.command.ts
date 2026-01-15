@@ -1,6 +1,3 @@
-import { PasswordResetToken } from '@domain/base/password-reset-token/password-reset-token.domain';
-import { newPasswordResetToken } from '@domain/base/password-reset-token/password-reset-token.factory';
-import { PasswordResetTokenService } from '@domain/base/password-reset-token/password-reset-token.service';
 import { Project } from '@domain/base/project/project.domain';
 import { projectFromPgWithState } from '@domain/base/project/project.mapper';
 import { projectsTableFilter } from '@domain/base/project/project.util';
@@ -15,14 +12,12 @@ import { UserManageProjectService } from '@domain/base/user-manage-project/user-
 import { User } from '@domain/base/user/user.domain';
 import { userToResponse } from '@domain/base/user/user.mapper';
 import { UserService } from '@domain/base/user/user.service';
-import { DomainEventQueue } from '@domain/queue/domain-event/domain-event.queue';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
 import { TransactionService } from '@infra/db/transaction/transaction.service';
 import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 
-import { shaHashstring } from '@shared/common/common.crypto';
 import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
 import { toHttpSuccess } from '@shared/http/http.mapper';
@@ -33,7 +28,6 @@ type Entity = {
   user: User;
   userGroups?: UserGroup[];
   manageProjects?: Project[];
-  passwordResetToken?: PasswordResetToken;
 };
 
 @Injectable()
@@ -44,8 +38,6 @@ export class EditUserCommand implements CommandInterface {
     private userService: UserService,
     private userGroupUserService: UserGroupUserService,
     private userManageProjectService: UserManageProjectService,
-    private passwordResetTokenService: PasswordResetTokenService,
-    private domainEventQueue: DomainEventQueue,
   ) {}
 
   async exec(
@@ -63,28 +55,8 @@ export class EditUserCommand implements CommandInterface {
       });
     }
 
-    if (entity.user.role === 'USER') {
-      entity.user.edit({
-        data: {
-          password: null,
-        },
-      });
-    }
-
-    const token = shaHashstring();
-    const roleAction = this.getUserRoleAction(entity.user, clonedUser);
-    if (roleAction === 'PROMOTED') {
-      entity.user.edit({
-        data: {
-          userStatus: 'PENDING_REGISTRATION',
-        },
-      });
-
-      entity.passwordResetToken = newPasswordResetToken({
-        userId: entity.user.id,
-        token,
-      });
-    }
+    // TODO: perform role change action
+    const _roleAction = this.getUserRoleAction(entity.user, clonedUser);
 
     if (body.userGroupIds) {
       entity.userGroups = await this.getUserGroups(body.userGroupIds);
@@ -95,7 +67,6 @@ export class EditUserCommand implements CommandInterface {
     }
 
     await this.save(entity);
-    this.sendResetPasswordEmail(entity, token);
 
     return toHttpSuccess({
       data: {
@@ -117,7 +88,6 @@ export class EditUserCommand implements CommandInterface {
     const user = entity.user;
     const userGroups = entity.userGroups;
     const manageProjects = entity.manageProjects;
-    const passwordResetToken = entity.passwordResetToken;
 
     await this.transactionService.transaction(async () => {
       await this.userService.save(user);
@@ -134,10 +104,6 @@ export class EditUserCommand implements CommandInterface {
           user.id,
           manageProjects.map((p) => p.id),
         );
-      }
-
-      if (passwordResetToken) {
-        await this.passwordResetTokenService.save(passwordResetToken);
       }
     });
   }
@@ -193,28 +159,14 @@ export class EditUserCommand implements CommandInterface {
   }
 
   getUserRoleAction(user: User, oldVersionUser: User) {
-    if (!oldVersionUser.isAllowLoginAccess() && user.isAllowLoginAccess()) {
+    if (!oldVersionUser.isAdminAccess() && user.isAdminAccess()) {
       return 'PROMOTED';
     }
 
-    if (oldVersionUser.isAllowLoginAccess() && !user.isAllowLoginAccess()) {
+    if (oldVersionUser.isAdminAccess() && !user.isAdminAccess()) {
       return 'DEMOTED';
     }
 
     return 'NONE';
-  }
-
-  sendResetPasswordEmail(entity: Entity, token: string) {
-    if (!entity.passwordResetToken) {
-      return;
-    }
-
-    // send reset email
-    this.domainEventQueue.jobResetPassword({
-      user: entity.user,
-      plainToken: token,
-      passwordResetToken: entity.passwordResetToken,
-      action: 'newUser',
-    });
   }
 }

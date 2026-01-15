@@ -70,17 +70,15 @@ export class AddUserCommand implements CommandInterface {
     };
 
     const token = shaHashstring();
-    if (user.isAllowLoginAccess()) {
-      entity.user.edit({
-        data: {
-          userStatus: 'PENDING_REGISTRATION',
-        },
-      });
-      entity.passwordResetToken = newPasswordResetToken({
-        userId: user.id,
-        token,
-      });
-    }
+    entity.user.edit({
+      data: {
+        userStatus: 'PENDING_REGISTRATION',
+      },
+    });
+    entity.passwordResetToken = newPasswordResetToken({
+      userId: user.id,
+      token,
+    });
 
     await this.save(entity);
     this.domainEventQueue.jobSendVerification(user);
