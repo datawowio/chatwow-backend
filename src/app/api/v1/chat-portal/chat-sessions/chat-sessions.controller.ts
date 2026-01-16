@@ -6,6 +6,11 @@ import { UserClaims } from '@infra/middleware/jwt/jwt.common';
 import { ChatPortalController } from '@shared/common/common.decorator';
 
 import {
+  GetSessionDto,
+  GetSessionResponse,
+} from './get-session/get-session.dto';
+import { GetSessionQuery } from './get-session/get-session.query';
+import {
   ListSessionChatLogsDto,
   ListSessionChatLogsResponse,
 } from './list-session-chat-logs/list-session-chat-logs.dto';
@@ -22,6 +27,7 @@ export class ChatSessionsV1Controller {
     //
     private projectChatCommand: ProjectChatCommand,
     private listSessionChatLogsQuery: ListSessionChatLogsQuery,
+    private getSessionQuery: GetSessionQuery,
   ) {}
 
   @Post(':sessionId/chat')
@@ -34,6 +40,18 @@ export class ChatSessionsV1Controller {
     @Body() body: ProjectChatDto,
   ) {
     return this.projectChatCommand.exec(claims, sessionId, body);
+  }
+
+  @Get(':sessionId')
+  @ApiResponse({
+    type: () => GetSessionResponse,
+  })
+  async getSession(
+    @Param('sessionId', ParseUUIDPipe) sessionId: string,
+    @UserClaims() claims: UserClaims,
+    @Query() query: GetSessionDto,
+  ): Promise<GetSessionResponse> {
+    return this.getSessionQuery.exec(claims, sessionId, query);
   }
 
   @Get(':sessionId/chat-log/cursor')
