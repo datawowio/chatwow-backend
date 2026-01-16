@@ -1,5 +1,6 @@
 import { projectChatSessionPgToResponse } from '@domain/base/project-chat-session/project-chat-session.mapper';
 import { projectPgToResponse } from '@domain/base/project/project.mapper';
+import { userPgToResponse } from '@domain/base/user/user.mapper';
 import { Injectable } from '@nestjs/common';
 
 import { MainDb } from '@infra/db/db.main';
@@ -31,6 +32,11 @@ export class GetSessionQuery implements QueryInterface {
             project: projectChatSession.project
               ? {
                   attributes: projectPgToResponse(projectChatSession.project),
+                }
+              : undefined,
+            user: projectChatSession.user
+              ? {
+                  attributes: userPgToResponse(projectChatSession.user),
                 }
               : undefined,
           },
