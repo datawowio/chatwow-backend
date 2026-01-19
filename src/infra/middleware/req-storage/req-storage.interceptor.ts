@@ -13,6 +13,7 @@ import { ReqStorage } from '@infra/global/req-storage/req-storage.service';
 
 import { generateUID } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
+import { getIp } from '@shared/common/common.func';
 import { LANG_HEADER } from '@shared/http/http.headers';
 
 @Injectable()
@@ -35,7 +36,7 @@ export class ReqStorageInterceptor implements NestInterceptor {
       device: uaData.device,
       deviceUid: deviceUid || null,
       os: uaData.os?.name || '',
-      ip: (request.headers['x-forwarded-for'] as string) || request.ip || '',
+      ip: getIp(request),
       browser: uaData.browser?.name || '',
       lang: (request.headers[LANG_HEADER] as any) || null,
     };
