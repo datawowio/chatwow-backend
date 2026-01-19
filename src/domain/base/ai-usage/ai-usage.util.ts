@@ -14,7 +14,7 @@ export function aiUsagesTableFilter(eb: EB<'ai_usages'>) {
 export function calcTokenPrice(aiUsage: AiUsage) {
   return match(aiUsage.aiModelName)
     .returnType<Big>()
-    .with('GPT_DW', () => newBig(aiUsage.tokenUsed * 10))
+    .with('GPT_DW', () => newBig(aiUsage.tokenUsed * 0.01))
     .exhaustive();
 }
 
