@@ -82,15 +82,17 @@ export function createMqWorker(
             await mqService.handleSuccess(message);
             task.markAsSuccess();
           } catch (err: any) {
+            const displayError = err.stack;
+
             if (task.isMaxAttemptsReached()) {
               await mqService.handleDead(message);
-              task.markAsDead(err['message']);
+              task.markAsDead(displayError);
             } else if (err instanceof InvalidJobPayloadParseException) {
               await mqService.handleDead(message);
-              task.markAsInvalid(err['message']);
+              task.markAsInvalid(displayError);
             } else {
               await mqService.handleFail(message);
-              task.markAsFailed(err['message']);
+              task.markAsFailed(displayError);
             }
           }
 
