@@ -25,7 +25,7 @@ import { CoreZodValidationPipe } from './validation/zod-validation.pipe';
             ? [
                 {
                   ttl: myDayjs.duration({ seconds: 60 }).asMilliseconds(),
-                  limit: 20,
+                  limit: 500,
                 },
               ]
             : [],
