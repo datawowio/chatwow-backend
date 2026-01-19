@@ -121,6 +121,7 @@ export function projectChatLogToResponse(
     id: projectChatLog.id,
     createdAt: toISO(projectChatLog.createdAt),
     message: projectChatLog.message,
+    chatSender: projectChatLog.chatSender,
   };
 }
 
@@ -131,5 +132,6 @@ export function projectChatLogPgToResponse(
     id: pg.id,
     createdAt: pg.created_at,
     message: decryptMessage(pg.message),
+    chatSender: pg.chat_sender,
   };
 }
