@@ -14,7 +14,7 @@ import {
 } from '@shared/http/http.response.dto';
 import { paginationZod, zodDto } from '@shared/zod/zod.util';
 
-import { listProjectChatBookmarkIncludesZod } from './list-project-bookmarks.util';
+import { listProjectChatBookmarkIncludesZod } from './list-project-chat-bookmarks.util';
 
 // ================ Request ================
 
@@ -26,36 +26,39 @@ const zod = z.object({
   pagination: paginationZod,
 });
 
-export class ListProjectBookmarksDto extends zodDto(zod) {}
+export class ListProjectChatBookmarksDto extends zodDto(zod) {}
 
 // ================ Response ================
 
-class ListProjectBookmarksProjectsData implements IDomainData {
+class ListProjectChatBookmarksProjectsData implements IDomainData {
   @ApiProperty({ type: () => ProjectResponse })
   attributes: ProjectResponse;
 }
 
-class ListProjectBookmarksProjectsRelations {
+class ListProjectChatBookmarksProjectsRelations {
   @ApiProperty({ type: () => Object, nullable: true })
-  project?: ListProjectBookmarksProjectsData;
+  project?: ListProjectChatBookmarksProjectsData;
 }
 
-export class ListProjectBookmarksBookmarkData implements IDomainData {
+export class ListProjectChatBookmarksBookmarkData implements IDomainData {
   @ApiProperty({ type: () => ProjectChatBookmarkResponse })
   attributes: ProjectChatBookmarkResponse;
 
-  @ApiProperty({ type: () => ListProjectBookmarksProjectsRelations })
-  relations: ListProjectBookmarksProjectsRelations;
+  @ApiProperty({ type: () => ListProjectChatBookmarksProjectsRelations })
+  relations: ListProjectChatBookmarksProjectsRelations;
 }
 
-export class ListProjectBookmarksData {
-  @ApiProperty({ type: () => ListProjectBookmarksBookmarkData, isArray: true })
-  projectChatBookmarks: ListProjectBookmarksBookmarkData[];
+export class ListProjectChatBookmarksData {
+  @ApiProperty({
+    type: () => ListProjectChatBookmarksBookmarkData,
+    isArray: true,
+  })
+  projectChatBookmarks: ListProjectChatBookmarksBookmarkData[];
 }
 
-export class ListProjectBookmarksResponse extends StandardResponse {
-  @ApiProperty({ type: () => ListProjectBookmarksData })
-  data: ListProjectBookmarksData;
+export class ListProjectChatBookmarksResponse extends StandardResponse {
+  @ApiProperty({ type: () => ListProjectChatBookmarksData })
+  data: ListProjectChatBookmarksData;
 
   @ApiProperty({ type: () => PaginationMetaResponse })
   meta: PaginationMetaResponse;

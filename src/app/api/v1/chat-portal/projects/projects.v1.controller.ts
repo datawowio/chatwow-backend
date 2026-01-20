@@ -1,4 +1,12 @@
-import { Body, Get, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 
 import { IdempotentContext } from '@infra/middleware/idempotent/idempotent.common';
@@ -9,21 +17,23 @@ import { ChatPortalController } from '@shared/common/common.decorator';
 
 import { CreateChatSessionCommand } from './create-chat-session/create-chat-session.command';
 import { CreateChatSessionResponse } from './create-chat-session/create-chat-session.dto';
-import { CreateProjectBookmarkCommand } from './create-project-bookmark/create-project-bookmark.command';
+import { CreateProjectChatBookmarkCommand } from './create-project-chat-bookmark/create-project-chat-bookmark.command';
 import {
-  CreateProjectBookmarkDto,
-  CreateProjectBookmarkResponse,
-} from './create-project-bookmark/create-project-bookmark.dto';
+  CreateProjectChatBookmarkDto,
+  CreateProjectChatBookmarkResponse,
+} from './create-project-chat-bookmark/create-project-chat-bookmark.dto';
+import { DeleteProjectChatBookmarkCommand } from './delete-project-chat-bookmark/delete-project-chat-bookmark.command';
+import { DeleteProjectChatBookmarkResponse } from './delete-project-chat-bookmark/delete-project-chat-bookmark.dto';
 import {
   ListMyProjectsDto,
   ListMyProjectsResponse,
 } from './list-my-projects/list-my-projects.dto';
 import { ListMyProjectsQuery } from './list-my-projects/list-my-projects.query';
 import {
-  ListProjectBookmarksDto,
-  ListProjectBookmarksResponse,
-} from './list-project-bookmarks/list-project-bookmarks.dto';
-import { ListProjectBookmarksQuery } from './list-project-bookmarks/list-project-bookmarks.query';
+  ListProjectChatBookmarksDto,
+  ListProjectChatBookmarksResponse,
+} from './list-project-chat-bookmarks/list-project-chat-bookmarks.dto';
+import { ListProjectChatBookmarksQuery } from './list-project-chat-bookmarks/list-project-chat-bookmarks.query';
 import {
   ListProjectChatQuestionRecommendationsDto,
   ListProjectChatQuestionRecommendationsResponse,
@@ -41,9 +51,10 @@ export class ProjectsV1Controller {
     private listMyProjectsQuery: ListMyProjectsQuery,
     private createChatSessionCommand: CreateChatSessionCommand,
     private listProjectChatSessionsQuery: ListProjectChatSessionsQuery,
-    private listProjectBookmarksQuery: ListProjectBookmarksQuery,
+    private listProjectChatBookmarksQuery: ListProjectChatBookmarksQuery,
     private listProjectChatQuestionRecommendationsQuery: ListProjectChatQuestionRecommendationsQuery,
-    private createProjectBookmarkCommand: CreateProjectBookmarkCommand,
+    private createProjectChatBookmarkCommand: CreateProjectChatBookmarkCommand,
+    private deleteProjectChatBookmarkCommand: DeleteProjectChatBookmarkCommand,
   ) {}
 
   @Get()
@@ -56,12 +67,12 @@ export class ProjectsV1Controller {
   }
 
   @Get('project-chat-bookmarks')
-  @ApiResponse({ type: () => ListProjectBookmarksResponse })
+  @ApiResponse({ type: () => ListProjectChatBookmarksResponse })
   async getProjectChatBookmarks(
     @UserClaims() claims: UserClaims,
-    @Query() query: ListProjectBookmarksDto,
-  ): Promise<ListProjectBookmarksResponse> {
-    return this.listProjectBookmarksQuery.exec(claims, query);
+    @Query() query: ListProjectChatBookmarksDto,
+  ): Promise<ListProjectChatBookmarksResponse> {
+    return this.listProjectChatBookmarksQuery.exec(claims, query);
   }
 
   @Get('project-chat-question-recommendations')
@@ -97,12 +108,22 @@ export class ProjectsV1Controller {
   }
 
   @Post(':id/project-chat-bookmarks')
-  @ApiResponse({ type: () => CreateProjectBookmarkResponse })
+  @ApiResponse({ type: () => CreateProjectChatBookmarkResponse })
   async createProjectChatBookmarks(
     @Param('id', ParseUUIDPipe) id: string,
     @UserClaims() claims: UserClaims,
-    @Body() body: CreateProjectBookmarkDto,
-  ): Promise<CreateProjectBookmarkResponse> {
-    return this.createProjectBookmarkCommand.exec(claims, id, body);
+    @Body() body: CreateProjectChatBookmarkDto,
+  ): Promise<CreateProjectChatBookmarkResponse> {
+    return this.createProjectChatBookmarkCommand.exec(claims, id, body);
+  }
+
+  @Delete(':projectId/project-chat-bookmarks/:id')
+  @ApiResponse({ type: () => DeleteProjectChatBookmarkResponse })
+  async deleteProjectChatBookmarks(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @UserClaims() claims: UserClaims,
+  ): Promise<DeleteProjectChatBookmarkResponse> {
+    return this.deleteProjectChatBookmarkCommand.exec(claims, projectId, id);
   }
 }

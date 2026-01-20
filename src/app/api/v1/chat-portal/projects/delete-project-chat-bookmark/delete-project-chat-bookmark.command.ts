@@ -20,33 +20,33 @@ import { CommandInterface } from '@shared/common/common.type';
 import { ApiException } from '@shared/http/http.exception';
 import { toHttpSuccess } from '@shared/http/http.mapper';
 
-import { DeleteProjectBookmarkResponse } from './delete-project-bookmark.dto';
+import { DeleteProjectChatBookmarkResponse } from './delete-project-chat-bookmark.dto';
 
 type Entity = {
-  projectBookmark: ProjectChatBookmark;
+  projectChatBookmark: ProjectChatBookmark;
   project: Project;
 };
 
 @Injectable()
-export class DeleteProjectBookmarkCommand implements CommandInterface {
+export class DeleteProjectChatBookmarkCommand implements CommandInterface {
   constructor(
-    private projectBookmarkService: ProjectChatBookmarkService,
+    private projectChatBookmarkService: ProjectChatBookmarkService,
     private db: MainDb,
   ) {}
 
   async exec(
     claims: UserClaims,
     projectId: string,
-    projectBookmarkId: string,
-  ): Promise<DeleteProjectBookmarkResponse> {
-    const entity = await this.find(claims, projectId, projectBookmarkId);
+    projectChatBookmarkId: string,
+  ): Promise<DeleteProjectChatBookmarkResponse> {
+    const entity = await this.find(claims, projectId, projectChatBookmarkId);
 
-    await this.projectBookmarkService.delete(entity.projectBookmark.id);
+    await this.projectChatBookmarkService.delete(entity.projectChatBookmark.id);
 
     return toHttpSuccess({
       data: {
-        projectBookmark: {
-          attributes: projectChatBookmarkToResponse(entity.projectBookmark),
+        projectChatBookmark: {
+          attributes: projectChatBookmarkToResponse(entity.projectChatBookmark),
           relations: {
             project: { attributes: projectToResponse(entity.project) },
           },
@@ -55,14 +55,14 @@ export class DeleteProjectBookmarkCommand implements CommandInterface {
     });
   }
 
-  async save(projectBookmark: ProjectChatBookmark): Promise<void> {
-    await this.projectBookmarkService.save(projectBookmark);
+  async save(projectChatBookmark: ProjectChatBookmark): Promise<void> {
+    await this.projectChatBookmarkService.save(projectChatBookmark);
   }
 
   async find(
     claims: UserClaims,
     projectId: string,
-    projectBookmarkId: string,
+    projectChatBookmarkId: string,
   ): Promise<Entity> {
     const bookmark = await this.db.read
       .selectFrom('project_chat_bookmarks')
@@ -75,18 +75,18 @@ export class DeleteProjectBookmarkCommand implements CommandInterface {
             .whereRef('projects.id', '=', 'project_chat_bookmarks.project_id'),
         ).as('project'),
       )
-      .where('id', '=', projectBookmarkId)
+      .where('id', '=', projectChatBookmarkId)
       .where('project_id', '=', projectId)
       .where('created_by_id', '=', claims.userId)
       .where(projectChatBookmarksTableFilter)
       .executeTakeFirst();
 
     if (!bookmark || !bookmark.project) {
-      throw new ApiException(404, 'projectBookmarkNotFound');
+      throw new ApiException(404, 'projectChatBookmarkNotFound');
     }
 
     return {
-      projectBookmark: projectChatBookmarkFromPgWithState(bookmark),
+      projectChatBookmark: projectChatBookmarkFromPgWithState(bookmark),
       project: projectFromPgWithState(bookmark.project),
     };
   }

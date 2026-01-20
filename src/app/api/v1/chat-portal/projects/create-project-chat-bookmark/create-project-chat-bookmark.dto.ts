@@ -10,21 +10,21 @@ const zod = z.object({
   bookmarkText: z.string().min(1).max(500),
 });
 
-export class CreateProjectBookmarkDto extends zodDto(zod) {}
+export class CreateProjectChatBookmarkDto extends zodDto(zod) {}
 
 // =============== Response ================
 
-class CreateProjectBookmarkProjectBookmark implements IDomainData {
+class CreateProjectChatBookmarkProjectChatBookmark implements IDomainData {
   @ApiProperty({ type: () => ProjectChatBookmarkResponse })
   attributes: ProjectChatBookmarkResponse;
 }
 
-class CreateProjectBookmarkData {
-  @ApiProperty({ type: () => CreateProjectBookmarkProjectBookmark })
-  projectBookmark: CreateProjectBookmarkProjectBookmark;
+class CreateProjectChatBookmarkData {
+  @ApiProperty({ type: () => CreateProjectChatBookmarkProjectChatBookmark })
+  projectChatBookmark: CreateProjectChatBookmarkProjectChatBookmark;
 }
 
-export class CreateProjectBookmarkResponse extends StandardResponse {
-  @ApiProperty({ type: () => CreateProjectBookmarkData })
-  data: CreateProjectBookmarkData;
+export class CreateProjectChatBookmarkResponse extends StandardResponse {
+  @ApiProperty({ type: () => CreateProjectChatBookmarkData })
+  data: CreateProjectChatBookmarkData;
 }

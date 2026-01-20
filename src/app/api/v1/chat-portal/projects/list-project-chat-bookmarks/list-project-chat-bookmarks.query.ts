@@ -12,13 +12,13 @@ import { QueryInterface } from '@shared/common/common.type';
 import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import {
-  ListProjectBookmarksDto,
-  ListProjectBookmarksResponse,
-} from './list-project-bookmarks.dto';
-import { listProjectChatBookmarkInclusionQb } from './list-project-bookmarks.util';
+  ListProjectChatBookmarksDto,
+  ListProjectChatBookmarksResponse,
+} from './list-project-chat-bookmarks.dto';
+import { listProjectChatBookmarkInclusionQb } from './list-project-chat-bookmarks.util';
 
 @Injectable()
-export class ListProjectBookmarksQuery implements QueryInterface {
+export class ListProjectChatBookmarksQuery implements QueryInterface {
   constructor(
     private db: MainDb,
     private projectChatBookmarkService: ProjectChatBookmarkService,
@@ -26,8 +26,8 @@ export class ListProjectBookmarksQuery implements QueryInterface {
 
   async exec(
     claims: UserClaims,
-    query: ListProjectBookmarksDto,
-  ): Promise<ListProjectBookmarksResponse> {
+    query: ListProjectChatBookmarksDto,
+  ): Promise<ListProjectChatBookmarksResponse> {
     // default filter userId
     query.filter ??= {};
     query.countFilter ??= {};
@@ -55,7 +55,7 @@ export class ListProjectBookmarksQuery implements QueryInterface {
     });
   }
 
-  async getRaw(query: ListProjectBookmarksDto) {
+  async getRaw(query: ListProjectChatBookmarksDto) {
     const ids = await this.projectChatBookmarkService.getIds({
       filter: query.filter,
       sort: query.sort,

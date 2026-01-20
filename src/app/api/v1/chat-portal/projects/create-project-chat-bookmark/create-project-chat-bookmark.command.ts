@@ -10,20 +10,20 @@ import { CommandInterface } from '@shared/common/common.type';
 import { toHttpSuccess } from '@shared/http/http.mapper';
 
 import {
-  CreateProjectBookmarkDto,
-  CreateProjectBookmarkResponse,
-} from './create-project-bookmark.dto';
+  CreateProjectChatBookmarkDto,
+  CreateProjectChatBookmarkResponse,
+} from './create-project-chat-bookmark.dto';
 
 @Injectable()
-export class CreateProjectBookmarkCommand implements CommandInterface {
-  constructor(private projectBookmarkService: ProjectChatBookmarkService) {}
+export class CreateProjectChatBookmarkCommand implements CommandInterface {
+  constructor(private projectChatBookmarkService: ProjectChatBookmarkService) {}
 
   async exec(
     claims: UserClaims,
     projectId: string,
-    body: CreateProjectBookmarkDto,
-  ): Promise<CreateProjectBookmarkResponse> {
-    const projectBookmark = newProjectChatBookmark({
+    body: CreateProjectChatBookmarkDto,
+  ): Promise<CreateProjectChatBookmarkResponse> {
+    const projectChatBookmark = newProjectChatBookmark({
       actorId: claims.userId,
       data: {
         projectId,
@@ -31,18 +31,18 @@ export class CreateProjectBookmarkCommand implements CommandInterface {
       },
     });
 
-    await this.save(projectBookmark);
+    await this.save(projectChatBookmark);
 
     return toHttpSuccess({
       data: {
-        projectBookmark: {
-          attributes: projectChatBookmarkToResponse(projectBookmark),
+        projectChatBookmark: {
+          attributes: projectChatBookmarkToResponse(projectChatBookmark),
         },
       },
     });
   }
 
-  async save(projectBookmark: ProjectChatBookmark): Promise<void> {
-    await this.projectBookmarkService.save(projectBookmark);
+  async save(projectChatBookmark: ProjectChatBookmark): Promise<void> {
+    await this.projectChatBookmarkService.save(projectChatBookmark);
   }
 }
