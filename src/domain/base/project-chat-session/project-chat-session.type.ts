@@ -1,4 +1,4 @@
-import type { ProjectChatSessions } from '@infra/db/db';
+import type { ProjectChatSessions, SessionStatus } from '@infra/db/db';
 import type { DBModel } from '@infra/db/db.common';
 
 import type {
@@ -27,4 +27,5 @@ export type ProjectChatSessionNewData = {
 export type ProjectChatSessionUpdateData = {
   latestChatLogId?: string;
   initChatLogId?: string;
+  sessionStatus?: SessionStatus;
 };

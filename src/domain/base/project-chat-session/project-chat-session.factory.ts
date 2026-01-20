@@ -13,6 +13,7 @@ export function newProjectChatSession(data: ProjectChatSessionNewData) {
     projectId: data.projectId,
     latestChatLogId: valueOr(data.latestChatLogId, null),
     initChatLogId: valueOr(data.initChatLogId, null),
+    sessionStatus: 'ACTIVE',
   });
 }
 

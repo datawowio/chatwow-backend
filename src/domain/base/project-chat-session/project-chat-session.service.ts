@@ -137,6 +137,13 @@ export class ProjectChatSessionService {
       )
       .$if(isDefined(filter?.idLt), (q) =>
         q.where('project_chat_sessions.id', '<', filter!.idLt!),
+      )
+      .$if(!!filter?.sessionStatuses?.length, (q) =>
+        q.where(
+          'project_chat_sessions.session_status',
+          'in',
+          filter!.sessionStatuses!,
+        ),
       );
   }
 

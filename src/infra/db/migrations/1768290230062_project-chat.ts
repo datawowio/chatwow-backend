@@ -50,8 +50,16 @@ export async function up(db: Kysely<any>): Promise<void> {
   // PROJECT CHAT SESSION ALTER
   //
   await db.schema
+    .createType('session_status')
+    .asEnum(['ACTIVE', 'DEPRECATED'])
+    .execute();
+
+  await db.schema
     .alterTable('project_chat_sessions')
     .addColumn('init_chat_log_id', 'uuid')
+    .addColumn('session_status', sql`session_status`, (col) =>
+      col.notNull().defaultTo('ACTIVE'),
+    )
     .execute();
 }
 

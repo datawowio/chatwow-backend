@@ -55,6 +55,11 @@ Enum "project_status" {
   "PROCESSING"
 }
 
+Enum "session_status" {
+  "ACTIVE"
+  "DEPRECATED"
+}
+
 Enum "user_role" {
   "ADMIN"
   "MANAGER"
@@ -244,6 +249,7 @@ Table "project_chat_sessions" {
   "project_id" uuid [not null]
   "latest_chat_log_id" uuid
   "init_chat_log_id" uuid
+  "session_status" session_status [not null, default: 'ACTIVE']
 }
 
 Table "project_chat_logs" {

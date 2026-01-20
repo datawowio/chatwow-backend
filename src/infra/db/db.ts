@@ -43,6 +43,8 @@ export type Numeric = ColumnType<string, number | string, number | string>;
 
 export type ProjectStatus = "ACTIVE" | "INACTIVE" | "PROCESSING";
 
+export type SessionStatus = "ACTIVE" | "DEPRECATED";
+
 export type UserRole = "ADMIN" | "MANAGER" | "USER";
 
 export type UserStatus = "ACTIVE" | "INACTIVE" | "PENDING_REGISTRATION";
@@ -189,6 +191,7 @@ export interface ProjectChatSessions {
   init_chat_log_id: string | null;
   latest_chat_log_id: string | null;
   project_id: string;
+  session_status: Generated<SessionStatus>;
   user_id: string;
 }
 

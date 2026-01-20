@@ -19,6 +19,7 @@ export function projectChatSessionFromPg(
     projectId: pg.project_id,
     latestChatLogId: pg.latest_chat_log_id,
     initChatLogId: pg.init_chat_log_id,
+    sessionStatus: pg.session_status,
   };
 
   return new ProjectChatSession(plain);
@@ -40,6 +41,7 @@ export function projectChatSessionFromPlain(
     projectId: plain.projectId,
     latestChatLogId: plain.latestChatLogId,
     initChatLogId: plain.initChatLogId,
+    sessionStatus: plain.sessionStatus,
   });
 }
 
@@ -53,6 +55,7 @@ export function projectChatSessionFromJson(
     projectId: json.projectId,
     latestChatLogId: json.latestChatLogId,
     initChatLogId: json.initChatLogId,
+    sessionStatus: json.sessionStatus,
   };
 
   return new ProjectChatSession(plain);
@@ -77,6 +80,7 @@ export function projectChatSessionToPg(
     project_id: projectChatSession.projectId,
     latest_chat_log_id: projectChatSession.latestChatLogId,
     init_chat_log_id: projectChatSession.initChatLogId,
+    session_status: projectChatSession.sessionStatus,
   };
 }
 
@@ -90,6 +94,7 @@ export function projectChatSessionToPlain(
     projectId: projectChatSession.projectId,
     latestChatLogId: projectChatSession.latestChatLogId,
     initChatLogId: projectChatSession.initChatLogId,
+    sessionStatus: projectChatSession.sessionStatus,
   };
 }
 
@@ -103,6 +108,7 @@ export function projectChatSessionToJson(
     projectId: projectChatSession.projectId,
     latestChatLogId: projectChatSession.latestChatLogId,
     initChatLogId: projectChatSession.initChatLogId,
+    sessionStatus: projectChatSession.sessionStatus,
   };
 }
 
@@ -121,6 +127,7 @@ export function projectChatSessionToResponse(
   return {
     id: projectChatSession.id,
     createdAt: toISO(projectChatSession.createdAt),
+    sessionStatus: projectChatSession.sessionStatus,
   };
 }
 
@@ -130,5 +137,6 @@ export function projectChatSessionPgToResponse(
   return {
     id: pg.id,
     createdAt: toISO(pg.created_at),
+    sessionStatus: pg.session_status,
   };
 }

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { CreateChatSessionCommand } from './create-chat-session/create-chat-session.command';
 import { CreateProjectBookmarkCommand } from './create-project-bookmark/create-project-bookmark.command';
+import { DeleteProjectBookmarkCommand } from './delete-project-bookmark/delete-project-bookmark.command';
 import { ListMyProjectsQuery } from './list-my-projects/list-my-projects.query';
 import { ListProjectBookmarksQuery } from './list-project-bookmarks/list-project-bookmarks.query';
 import { ListProjectChatQuestionRecommendationsQuery } from './list-project-chat-question-recommendations/list-project-chat-question-recommendations.query';
@@ -17,6 +18,7 @@ import { ProjectsV1Controller } from './projects.v1.controller';
     ListProjectChatQuestionRecommendationsQuery,
     ListProjectChatSessionsQuery,
     CreateProjectBookmarkCommand,
+    DeleteProjectBookmarkCommand,
   ],
   controllers: [ProjectsV1Controller],
 })
