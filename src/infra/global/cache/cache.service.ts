@@ -13,7 +13,7 @@ export class CacheService {
     private redisClient: RedisClientType,
   ) {}
 
-  async get<T>(key: string): Promise<string | T | null> {
+  async get<T>(key: string): Promise<T | null> {
     if (!this._isEnable()) {
       return null;
     }

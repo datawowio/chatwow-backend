@@ -1,5 +1,6 @@
 import { render } from '@react-email/render';
 import Big from 'big.js';
+import type { FastifyRequest } from 'fastify';
 import * as path from 'path';
 import type React from 'react';
 import * as R from 'remeda';
@@ -174,4 +175,8 @@ export function orUndefined<T, V>(
 
 export function newBig(num: Big.BigSource) {
   return new Big(num);
+}
+
+export function getIp(req: FastifyRequest | Record<string, any>) {
+  return (req.headers?.['x-forwarded-for'] as string) || req.ip || '';
 }

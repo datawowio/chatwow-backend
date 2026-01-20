@@ -7,7 +7,9 @@ import { AppConfig } from '@infra/config';
 import { HttpExceptionFilter } from '@infra/middleware/filter/http-exception.filter';
 
 import myDayjs from '@shared/common/common.dayjs';
+import { getIp } from '@shared/common/common.func';
 
+import { USER_CONTEXT } from './jwt/jwt.common';
 import { JwtGuard } from './jwt/jwt.guard';
 import { ReqStorageInterceptor } from './req-storage/req-storage.interceptor';
 import { CoreZodValidationPipe } from './validation/zod-validation.pipe';
@@ -21,11 +23,12 @@ import { CoreZodValidationPipe } from './validation/zod-validation.pipe';
           configService.getOrThrow<AppConfig['app']>('app');
 
         return {
+          getTracker: (req) => req?.[USER_CONTEXT]?.userId ?? getIp(req),
           throttlers: enableThrottle
             ? [
                 {
                   ttl: myDayjs.duration({ seconds: 60 }).asMilliseconds(),
-                  limit: 20,
+                  limit: 500,
                 },
               ]
             : [],

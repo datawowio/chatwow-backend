@@ -144,9 +144,7 @@ export class AppConfigurationService {
     configKey: K,
   ): Promise<AppConfiguration<K> | null> {
     const key = this._generateCacheKey(configKey);
-    const json = (await this.cacheService.get(
-      key,
-    )) as AppConfigurationJsonState<K>;
+    const json = await this.cacheService.get<AppConfigurationJsonState<K>>(key);
     if (!json) {
       return null;
     }

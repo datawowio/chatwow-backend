@@ -232,7 +232,7 @@ export class AiUsageSummaryQuery implements QueryInterface {
       .orderBy(({ fn }) => fn.min('ai_usages.ai_reply_at'), 'asc');
 
     let initSelectQb = baseQuery.select(({ fn }) => [
-      fn.count<string>('ai_usages.token_used').as('totalTokenUsed'),
+      fn.sum<string>('ai_usages.token_used').as('totalTokenUsed'),
       fn.sum<string>('ai_usages.token_price').as('totalPrice'),
       fn.avg<string>('ai_usages.reply_time_ms').as('avgReplyTimeMs'),
       fn.count<string>('ai_usages.id').as('totalChatUsages'),
@@ -253,12 +253,12 @@ export class AiUsageSummaryQuery implements QueryInterface {
           'ai_usages.id',
         )
         .select(({ fn }) => [
-          fn.count('ai_usage_user_groups.token_used').as('totalTokenUsed'),
+          fn.sum('ai_usage_user_groups.token_used').as('totalTokenUsed'),
           fn.sum('ai_usage_user_groups.token_price').as('totalPrice'),
           fn.avg('ai_usages.reply_time_ms').as('avgReplyTimeMs'),
           fn.sum('ai_usage_user_groups.chat_count').as('totalChatUsages'),
           fn
-            .count<string>('ai_usage_user_groups.chat_count')
+            .sum<string>('ai_usage_user_groups.chat_count')
             .filterWhere('ai_usages.confidence', '>=', 50)
             .as('totalAnswerable'),
           fn.avg('ai_usages.confidence').as('avgConfidence'),
