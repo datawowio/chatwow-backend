@@ -24,7 +24,7 @@ export function newAiUsageToken(data: AiUsageTokenNewData): AiUsageToken {
     cacheCreationInputTokens: data.cacheCreationInputTokens,
     cacheReadInputTokens: data.cacheReadInputTokens,
     totalPrice: valueOr(data.totalPrice, newBig(0)),
-    initialTotalPrice: valueOr(data.initialTotalPrice, newBig(0)),
+    initialTotalPrice: valueOr(data.initialTotalPrice, null),
   });
 }
 

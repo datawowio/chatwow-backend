@@ -25,7 +25,7 @@ export class AiUsageToken extends DomainEntity<AiUsageTokenPg> {
   readonly cacheCreationInputTokens: number;
   readonly cacheReadInputTokens: number;
   readonly totalPrice: Big;
-  readonly initialTotalPrice: Big;
+  readonly initialTotalPrice: Big | null;
 
   constructor(plain: AiUsageTokenPlain) {
     super();

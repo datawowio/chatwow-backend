@@ -70,7 +70,9 @@ export function aiUsageTokenFromJson(json: AiUsageTokenJson): AiUsageToken {
     cacheCreationInputTokens: json.cacheCreationInputTokens,
     cacheReadInputTokens: json.cacheReadInputTokens,
     totalPrice: newBig(json.totalPrice),
-    initialTotalPrice: newBig(json.initialTotalPrice),
+    initialTotalPrice: json.initialTotalPrice
+      ? newBig(json.initialTotalPrice)
+      : null,
   };
 
   return new AiUsageToken(plain);
@@ -97,7 +99,7 @@ export function aiUsageTokenToPg(domain: AiUsageToken): AiUsageTokenPg {
     cache_creation_input_tokens: domain.cacheCreationInputTokens,
     cache_read_input_tokens: domain.cacheReadInputTokens,
     total_price: domain.totalPrice.toString(),
-    initial_total_price: domain.initialTotalPrice.toString(),
+    initial_total_price: domain.initialTotalPrice?.toString() || '0',
   };
 }
 
@@ -129,7 +131,7 @@ export function aiUsageTokenToJson(domain: AiUsageToken): AiUsageTokenJson {
     cacheCreationInputTokens: domain.cacheCreationInputTokens,
     cacheReadInputTokens: domain.cacheReadInputTokens,
     totalPrice: domain.totalPrice.toString(),
-    initialTotalPrice: domain.initialTotalPrice.toString(),
+    initialTotalPrice: domain.initialTotalPrice?.toString() || null,
   };
 }
 
@@ -156,7 +158,7 @@ export function aiUsageTokenToResponse(
     cacheCreationInputTokens: domain.cacheCreationInputTokens,
     cacheReadInputTokens: domain.cacheReadInputTokens,
     totalPrice: domain.totalPrice.toString(),
-    initialTotalPrice: domain.initialTotalPrice.toString(),
+    initialTotalPrice: domain.initialTotalPrice?.toString() || '0.00',
   };
 }
 

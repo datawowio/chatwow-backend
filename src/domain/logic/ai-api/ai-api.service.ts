@@ -39,7 +39,16 @@ export class AiApiService {
           text: 'ตอบสำเร็จ',
           tokenUsed: 10,
           confidence: 100,
-          tokenUsage: [],
+          tokenUsage: [
+            {
+              inputTokens: 200,
+              outputTokens: 120,
+              totalTokens: 520,
+              cacheCreationInputTokens: 100,
+              cacheReadInputTokens: 100,
+              modelName: 'gpt-4.1',
+            },
+          ],
         },
       };
     }
