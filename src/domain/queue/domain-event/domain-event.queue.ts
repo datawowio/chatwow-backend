@@ -67,7 +67,6 @@ export class DomainEventQueue extends BaseAmqpExchange {
 
   jobProcessAiUsage(data: ProcessAiUsageJobData) {
     const input: ProcessAiUsageJobInput = wrapJobMeta({
-      owner: data.owner,
       aiUsage: aiUsageToJsonState(data.aiUsage),
     });
 

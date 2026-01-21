@@ -317,36 +317,17 @@ Table "ai_usages" {
   "id" uuid [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "created_by_id" uuid
-  "ai_model_name" ai_model_name [not null]
   "ai_usage_action" ai_usage_action [not null]
   "project_id" uuid [not null]
   "ai_request_at" timestamptz [not null]
   "ai_reply_at" timestamptz
   "reply_time_ms" int4
-  "token_used" float8 [not null]
-  "token_price" numeric(20,10) [not null]
-  "token_info" jsonb [not null]
   "confidence" int2 [not null]
   "ref_table" text [not null]
   "ref_id" uuid [not null]
 
   Indexes {
     project_id [type: btree, name: "ai_usages_project_id_idx"]
-  }
-}
-
-Table "ai_usage_user_groups" {
-  "id" uuid [pk, not null]
-  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "user_group_id" uuid
-  "token_price" numeric(20,10) [not null]
-  "token_used" float8 [not null]
-  "chat_count" float8 [not null]
-  "ai_usage_id" uuid [not null]
-
-  Indexes {
-    ai_usage_id [type: btree, name: "ai_usage_user_groups_ai_usage_id_idx"]
-    user_group_id [type: btree, name: "ai_usage_user_groups_user_group_id_idx"]
   }
 }
 
@@ -372,7 +353,21 @@ Table "departments" {
   "department_name" text [not null]
 }
 
-Ref "ai_usage_user_groups_ai_usage_id_fkey":"ai_usages"."id" < "ai_usage_user_groups"."ai_usage_id" [delete: cascade]
+Table "ai_usage_tokens" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "ai_model_name" ai_model_name [not null]
+  "total_price" numeric(20,10) [not null]
+  "initial_total_price" numeric(20,10) [not null]
+  "input_tokens" int4 [not null, default: 0]
+  "output_tokens" int4 [not null, default: 0]
+  "total_tokens" int4 [not null, default: 0]
+  "cache_creation_input_tokens" int4 [not null, default: 0]
+  "cache_read_input_tokens" int4 [not null, default: 0]
+  "ai_usage_id" uuid [not null]
+}
+
+Ref "ai_usage_tokens_ai_usage_id_fkey":"ai_usages"."id" < "ai_usage_tokens"."ai_usage_id"
 
 Ref "audit_logs_created_by_id_fkey":"users"."id" < "audit_logs"."created_by_id"
 

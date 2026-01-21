@@ -106,7 +106,6 @@ export class LineProcessAiChatCommand {
 
     const aiUsage = entity.aiUsage;
     this.domainEventQueue.jobProcessAiUsage({
-      owner: 'userGroup',
       aiUsage,
     });
 

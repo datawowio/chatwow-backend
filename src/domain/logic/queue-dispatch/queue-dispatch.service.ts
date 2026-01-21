@@ -27,7 +27,6 @@ export class QueueDispatchService {
     });
 
     this.domainEventQueue.jobProcessAiUsage({
-      owner: 'project',
       aiUsage,
     });
     this.aiEventQueue.jobProjectMdGenerate(project, aiUsage.id);
@@ -49,7 +48,6 @@ export class QueueDispatchService {
     });
 
     this.domainEventQueue.jobProcessAiUsage({
-      owner: 'project',
       aiUsage,
     });
     this.aiEventQueue.jobProjectDocumentMdGenerate(projectDocument, aiUsage.id);

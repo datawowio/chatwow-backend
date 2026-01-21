@@ -80,7 +80,6 @@ export class DomainEventAmqp extends BaseAmqpHandler {
   @QueueTask(DOMAIN_EVENT_QUEUES.PROCESS_AI_USAGE.name)
   async processAiUsage(input: OmitJobMeta<ProcessAiUsageJobInput>) {
     const data: ProcessAiUsageJobData = {
-      owner: input.owner,
       aiUsage: aiUsageFromJsonState(input.aiUsage),
     };
 

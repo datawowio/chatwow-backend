@@ -106,7 +106,6 @@ export class ProjectChatCommand implements CommandInterface {
       });
 
       this.domainEventQueue.jobProcessAiUsage({
-        owner: 'project',
         aiUsage,
       });
     });

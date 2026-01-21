@@ -4,3 +4,4 @@ please study the pattern from my src/domain/base/**. Make sure you understand th
 ## Additional Note
 - Make sure to add the created domain module into src/domain/domain.provider.ts
 - Make sure *.zod file has as many filter and sort for the given table as possible.
+- some domain have incomplete service implementation but src/domain/base/user/user.service.ts has a complete .service implementation reference from that

@@ -1,5 +1,3 @@
-import { mockAiUsageUserGroup } from '@domain/base/ai-usage-user-group/ai-usage-user-group.factory';
-import { AiUsageUserGroupService } from '@domain/base/ai-usage-user-group/ai-usage-user-group.service';
 import { mockAiUsages } from '@domain/base/ai-usage/ai-usage.factory';
 import { AiUsageService } from '@domain/base/ai-usage/ai-usage.service';
 import { mockDepartments } from '@domain/base/department/department.factory';
@@ -33,7 +31,6 @@ export class SeedDataCli extends CommandRunner {
     private userGroupUserService: UserGroupUserService,
     private userGroupProjectService: UserGroupProjectService,
     private aiUsageService: AiUsageService,
-    private aiUsageUserGroupService: AiUsageUserGroupService,
     private departmentService: DepartmentService,
   ) {
     super();
@@ -111,15 +108,7 @@ export class SeedDataCli extends CommandRunner {
           createdById: getRandomId(randomUsers),
         });
 
-        const aiUsageUserGroups = aiUsages.map((aiUsage) =>
-          mockAiUsageUserGroup({
-            aiUsageId: aiUsage.id,
-            userGroupId: group.id,
-          }),
-        );
-
         const prom1 = this.aiUsageService.saveBulk(aiUsages);
-        const prom2 = this.aiUsageUserGroupService.saveBulk(aiUsageUserGroups);
 
         process.push(prom1);
         process.push(prom2);

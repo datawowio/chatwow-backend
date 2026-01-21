@@ -198,6 +198,11 @@ export class AiUsageSummaryQuery implements QueryInterface {
     const baseQuery = this.db.read
       .selectFrom('ai_usages')
       .leftJoin('users', 'users.id', 'ai_usages.created_by_id')
+      .leftJoin(
+        'ai_usage_tokens',
+        'ai_usage_tokens.ai_usage_id',
+        'ai_usages.id',
+      )
       .where(aiUsagesTableFilter)
       .$if(!!filter?.aiUsageActions?.length, (q) =>
         q.where('ai_usages.ai_usage_action', 'in', filter!.aiUsageActions!),
@@ -226,8 +231,8 @@ export class AiUsageSummaryQuery implements QueryInterface {
 
     const qb = baseQuery
       .select(({ fn }) => [
-        fn.sum<string>('ai_usages.token_used').as('totalTokenUsed'),
-        fn.sum<string>('ai_usages.token_price').as('totalPrice'),
+        fn.sum<string>('ai_usage_tokens.total_tokens').as('totalTokenUsed'),
+        fn.sum<string>('ai_usage_tokens.total_price').as('totalPrice'),
         fn.avg<string>('ai_usages.reply_time_ms').as('avgReplyTimeMs'),
         fn.count<string>('ai_usages.id').as('totalChatUsages'),
         fn

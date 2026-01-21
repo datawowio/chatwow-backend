@@ -19,7 +19,6 @@ export const aiUsageSortZod = getSortZod([
   'createdAt',
   'aiRequestAt',
   'aiReplyAt',
-  'tokenUsed',
   'confidence',
 ]);
 

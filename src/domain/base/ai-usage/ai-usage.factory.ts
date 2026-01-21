@@ -4,7 +4,7 @@ import { Writable } from 'type-fest';
 
 import { uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
-import { newBig, valueOr } from '@shared/common/common.func';
+import { valueOr } from '@shared/common/common.func';
 import { isDefined } from '@shared/common/common.validator';
 
 import { AiUsage } from './ai-usage.domain';
@@ -19,15 +19,11 @@ export function newAiUsage({ actorId, data }: AiUsageNewData): AiUsage {
     projectId: data.projectId,
     aiRequestAt: myDayjs().toDate(),
     aiReplyAt: null,
-    tokenUsed: 0,
     confidence: 0,
     refTable: data.refTable,
     refId: data.refId,
     replyTimeMs: null,
     aiUsageAction: data.aiUsageAction,
-    tokenPrice: newBig(0),
-    aiModelName: data.aiModelName,
-    tokenInfo: {},
   });
 }
 
@@ -58,15 +54,9 @@ export function mockAiUsage(
       : myDayjs(requestAt)
           .add(faker.number.int({ min: 10, max: 100 }), 'second')
           .toDate(),
-    tokenUsed: isDefined(data.tokenUsed)
-      ? data.tokenUsed
-      : faker.number.int({ min: 10, max: 100 }),
-    tokenPrice: newBig(faker.number.int({ min: 1, max: 100 })),
     confidence: isDefined(data.confidence)
       ? data.confidence
       : faker.number.int({ min: 1, max: 100 }),
-    aiModelName: valueOr(data.aiModelName, 'GPT_DW'),
-    tokenInfo: {},
     refTable: valueOr(data.refTable, 'line_chat_logs'),
     refId: valueOr(data.refId, uuidV7()),
     replyTimeMs: isDefined(data.replyTimeMs) ? data.replyTimeMs : 0,

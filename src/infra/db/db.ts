@@ -55,7 +55,6 @@ export interface AiModels {
 }
 
 export interface AiUsages {
-  ai_model_name: AiModelName;
   ai_reply_at: string | null;
   ai_request_at: string;
   ai_usage_action: AiUsageAction;
@@ -67,19 +66,20 @@ export interface AiUsages {
   ref_id: string;
   ref_table: string;
   reply_time_ms: number | null;
-  token_info: Json;
-  token_price: Numeric;
-  token_used: number;
 }
 
-export interface AiUsageUserGroups {
+export interface AiUsageTokens {
+  ai_model_name: AiModelName;
   ai_usage_id: string;
-  chat_count: number;
+  cache_creation_input_tokens: Generated<number>;
+  cache_read_input_tokens: Generated<number>;
   created_at: Generated<string>;
   id: string;
-  token_price: Numeric;
-  token_used: number;
-  user_group_id: string | null;
+  initial_total_price: Numeric;
+  input_tokens: Generated<number>;
+  output_tokens: Generated<number>;
+  total_price: Numeric;
+  total_tokens: Generated<number>;
 }
 
 export interface AppConfigurations {
@@ -299,7 +299,7 @@ export interface UserVerifications {
 
 export interface DB {
   ai_models: AiModels;
-  ai_usage_user_groups: AiUsageUserGroups;
+  ai_usage_tokens: AiUsageTokens;
   ai_usages: AiUsages;
   app_configurations: AppConfigurations;
   audit_logs: AuditLogs;

@@ -1,5 +1,5 @@
 import { AiModelModule } from './base/ai-model/ai-model.module';
-import { AiUsageUserGroupModule } from './base/ai-usage-user-group/ai-usage-user-group.module';
+import { AiUsageTokenModule } from './base/ai-usage-token/ai-usage-token.module';
 import { AiUsageModule } from './base/ai-usage/ai-usage.module';
 import { AppConfigurationModule } from './base/app-configuration/app-configuration.module';
 import { AuditLogModule } from './base/audit-log/audit-log.module';
@@ -31,8 +31,8 @@ import { QueueModule } from './queue/queue.module';
 export const DOMAIN_PROVIDER = [
   //
   AiModelModule,
+  AiUsageTokenModule,
   AiUsageModule,
-  AiUsageUserGroupModule,
   AppConfigurationModule,
   AuditLogModule,
   DepartmentModule,

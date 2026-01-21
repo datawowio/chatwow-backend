@@ -1,7 +1,6 @@
-import Big from 'big.js';
 import { Writable } from 'type-fest';
 
-import { AiModelName, AiUsageAction } from '@infra/db/db';
+import { AiUsageAction } from '@infra/db/db';
 
 import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
@@ -12,19 +11,14 @@ import type {
   AiUsagePlain,
   AiUsageStopRecordData,
 } from './ai-usage.type';
-import { calcTokenPrice } from './ai-usage.util';
 
 export class AiUsage extends DomainEntity<AiUsagePg> {
   readonly id: string;
   readonly createdById: string | null;
-  readonly aiModelName: AiModelName;
   readonly projectId: string;
   readonly createdAt: Date;
   readonly aiRequestAt: Date;
   readonly aiReplyAt: Date | null;
-  readonly tokenUsed: number;
-  readonly tokenPrice: Big;
-  readonly tokenInfo: object;
   readonly confidence: number;
   readonly refTable: AiUsageRefTable;
   readonly aiUsageAction: AiUsageAction;
@@ -50,13 +44,11 @@ export class AiUsage extends DomainEntity<AiUsagePg> {
 
     const writable = this as Writable<typeof this>;
     writable.aiReplyAt = myDayjs().toDate();
-    writable.tokenUsed = data.tokenUsed;
     writable.confidence = data.confidence;
     writable.replyTimeMs = myDayjs(writable.aiReplyAt).diff(
       writable.aiRequestAt,
       'milliseconds',
     );
-    writable.tokenPrice = calcTokenPrice(this);
 
     return this;
   }
