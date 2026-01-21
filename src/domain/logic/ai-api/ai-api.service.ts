@@ -37,7 +37,6 @@ export class AiApiService {
         isSuccess: true,
         data: {
           text: 'ตอบสำเร็จ',
-          tokenUsed: 10,
           confidence: 100,
           tokenUsage: [
             {
@@ -76,7 +75,6 @@ export class AiApiService {
           isSuccess: true,
           data: {
             text: d.data.text,
-            tokenUsed: d.data.token_used,
             // TODO: implement real after ds done
             confidence: 100,
             tokenUsage:

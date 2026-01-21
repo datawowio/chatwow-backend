@@ -16,30 +16,31 @@ export type AiRequest = {
   session_id: string;
 };
 
+export type RawTokenUsage = {
+  input_tokens: number;
+  output_tokens: number;
+  total_tokens: number;
+  cache_creation_input_tokens: number;
+  cache_read_input_tokens: number;
+  model_name: string;
+};
 export type AiRawResponse = {
   text: string;
-  token_used: number;
-  token_usage: {
-    input_tokens: number;
-    output_tokens: number;
-    total_tokens: number;
-    cache_creation_input_tokens: number;
-    cache_read_input_tokens: number;
-    model_name: string;
-  }[];
+  token_usage: RawTokenUsage[];
+};
+
+export type TokenUsage = {
+  inputTokens: number;
+  outputTokens: number;
+  totalTokens: number;
+  cacheCreationInputTokens: number;
+  cacheReadInputTokens: number;
+  modelName: AiModelName;
 };
 export type AiResponse = {
   text: string;
-  tokenUsed: number;
   confidence: number;
-  tokenUsage: {
-    inputTokens: number;
-    outputTokens: number;
-    totalTokens: number;
-    cacheCreationInputTokens: number;
-    cacheReadInputTokens: number;
-    modelName: AiModelName;
-  }[];
+  tokenUsage: TokenUsage[];
 };
 
 export type AiChat =

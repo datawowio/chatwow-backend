@@ -85,7 +85,6 @@ export class LineProcessAiChatCommand {
     } else {
       botMessage = res.data.text;
       aiUsage.stopRecord({
-        tokenUsed: res.data.tokenUsed,
         confidence: res.data.confidence,
       });
 

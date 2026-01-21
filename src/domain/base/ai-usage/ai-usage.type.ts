@@ -34,7 +34,6 @@ export type AiUsageUpdateData = {
 };
 
 export type AiUsageStopRecordData = {
-  tokenUsed: number;
   confidence: number;
 };
 

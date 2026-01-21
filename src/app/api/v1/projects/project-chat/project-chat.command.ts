@@ -197,7 +197,6 @@ export class ProjectChatCommand implements CommandInterface {
           message: res.data.text,
         });
         aiUsage.stopRecord({
-          tokenUsed: res.data.tokenUsed,
           confidence: res.data.confidence,
         });
 
