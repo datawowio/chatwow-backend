@@ -1,3 +1,5 @@
+import { AiUsageToken } from '@domain/base/ai-usage-token/ai-usage-token.domain';
+import { newAiUsageToken } from '@domain/base/ai-usage-token/ai-usage-token.factory';
 import { AI_USAGE_REF_TABLE } from '@domain/base/ai-usage/ai-usage.constant';
 import { AiUsage } from '@domain/base/ai-usage/ai-usage.domain';
 import { newAiUsage } from '@domain/base/ai-usage/ai-usage.factory';
@@ -38,6 +40,7 @@ type Entity = {
   userChatLog: ProjectChatLog;
   botChatLog?: ProjectChatLog;
   aiUsage?: AiUsage;
+  aiUsageTokens: AiUsageToken[];
 };
 
 @Injectable()
@@ -107,6 +110,7 @@ export class ProjectChatCommand implements CommandInterface {
 
       this.domainEventQueue.jobProcessAiUsage({
         aiUsage,
+        aiUsageTokens: entity.aiUsageTokens,
       });
     });
   }
@@ -157,37 +161,35 @@ export class ProjectChatCommand implements CommandInterface {
       projectChatSession: projectChatSessionFromPgWithState(chatSession),
       project,
       userChatLog,
+      aiUsageTokens: [],
     };
   }
 
-  async processAiChat(
-    text: string,
-    { project, projectChatSession, userChatLog, aiConfig }: Entity,
-  ) {
+  async processAiChat(text: string, entity: Entity) {
     const botChatLog = newProjectChatLog({
       chatSender: 'BOT',
       message: LINE_AI_ERROR_REPLY,
-      parentId: userChatLog.id,
-      projectChatSessionId: projectChatSession.id,
+      parentId: entity.userChatLog.id,
+      projectChatSessionId: entity.projectChatSession.id,
     });
 
     const aiUsage = newAiUsage({
-      actorId: projectChatSession.userId,
+      actorId: entity.projectChatSession.userId,
       data: {
-        projectId: project.id,
+        projectId: entity.project.id,
         aiUsageAction: 'CHAT_PROJECT',
         refId: botChatLog.id,
         refTable: AI_USAGE_REF_TABLE.PROJECT_CHAT_LOG,
-        aiModelName: aiConfig.configData.model,
+        aiModelName: entity.aiConfig.configData.model,
       },
     }).record();
 
     try {
       const res = await this.aiApiService.chat({
         text,
-        project: project,
-        sessionId: projectChatSession.id,
-        aiConfig,
+        project: entity.project,
+        sessionId: entity.projectChatSession.id,
+        aiConfig: entity.aiConfig,
       });
 
       if (res.isSuccess) {
@@ -198,6 +200,18 @@ export class ProjectChatCommand implements CommandInterface {
           tokenUsed: res.data.tokenUsed,
           confidence: res.data.confidence,
         });
+
+        entity.aiUsageTokens = res.data.tokenUsage.map((tu) =>
+          newAiUsageToken({
+            aiModelName: tu.modelName,
+            inputTokens: tu.inputTokens,
+            outputTokens: tu.outputTokens,
+            totalTokens: tu.totalTokens,
+            cacheCreationInputTokens: tu.cacheCreationInputTokens,
+            cacheReadInputTokens: tu.cacheReadInputTokens,
+            aiUsageId: aiUsage.id,
+          }),
+        );
       }
     } catch (error) {
       this.loggerService.error(error);

@@ -1,4 +1,4 @@
-import type { AiModelName, AppConfigurations } from '@infra/db/db';
+import type { AppConfigurations } from '@infra/db/db';
 import type { DBModel } from '@infra/db/db.common';
 
 import type {
@@ -7,6 +7,7 @@ import type {
   WithPgState,
 } from '@shared/common/common.type';
 
+import { AiModelName } from '../ai-model/ai-model.type';
 import type { AppConfiguration } from './app-configuration.domain';
 
 export type AppConfigurationPg = DBModel<AppConfigurations>;

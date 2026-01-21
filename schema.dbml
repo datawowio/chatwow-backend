@@ -9,10 +9,6 @@ Enum "actor_type" {
   "SYSTEM"
 }
 
-Enum "ai_model_name" {
-  "GPT_DW"
-}
-
 Enum "ai_usage_action" {
   "CHAT_LINE"
   "CHAT_PROJECT"
@@ -332,10 +328,11 @@ Table "ai_usages" {
 }
 
 Table "ai_models" {
-  "ai_model_name" ai_model_name [pk, not null]
+  "ai_model_name" text [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
   "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "price_per_token" numeric(20,10) [not null]
+  "config" jsonb [not null]
+  "provider" text [not null]
 }
 
 Table "app_configurations" {
@@ -356,7 +353,7 @@ Table "departments" {
 Table "ai_usage_tokens" {
   "id" uuid [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
-  "ai_model_name" ai_model_name [not null]
+  "ai_model_name" text [not null]
   "total_price" numeric(20,10) [not null]
   "initial_total_price" numeric(20,10) [not null]
   "input_tokens" int4 [not null, default: 0]

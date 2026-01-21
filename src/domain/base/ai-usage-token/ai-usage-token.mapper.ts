@@ -1,3 +1,4 @@
+import { newBig } from '@shared/common/common.func';
 import {
   toDate,
   toISO,
@@ -5,10 +6,12 @@ import {
 } from '@shared/common/common.transformer';
 import type { WithPgState } from '@shared/common/common.type';
 
+import { AiModelName } from '../ai-model/ai-model.type';
 import { AiUsageToken } from './ai-usage-token.domain';
 import type { AiUsageTokenResponse } from './ai-usage-token.response';
 import type {
   AiUsageTokenJson,
+  AiUsageTokenJsonState,
   AiUsageTokenPg,
   AiUsageTokenPlain,
 } from './ai-usage-token.type';
@@ -18,14 +21,14 @@ export function aiUsageTokenFromPg(pg: AiUsageTokenPg): AiUsageToken {
     id: pg.id,
     createdAt: toDate(pg.created_at),
     aiUsageId: pg.ai_usage_id,
-    aiModelName: pg.ai_model_name,
+    aiModelName: pg.ai_model_name as AiModelName,
     inputTokens: pg.input_tokens,
     outputTokens: pg.output_tokens,
     totalTokens: pg.total_tokens,
     cacheCreationInputTokens: pg.cache_creation_input_tokens,
     cacheReadInputTokens: pg.cache_read_input_tokens,
-    totalPrice: parseFloat(pg.total_price),
-    initialTotalPrice: parseFloat(pg.initial_total_price),
+    totalPrice: newBig(pg.total_price),
+    initialTotalPrice: newBig(pg.initial_total_price),
   };
 
   return new AiUsageToken(plain);
@@ -66,8 +69,8 @@ export function aiUsageTokenFromJson(json: AiUsageTokenJson): AiUsageToken {
     totalTokens: json.totalTokens,
     cacheCreationInputTokens: json.cacheCreationInputTokens,
     cacheReadInputTokens: json.cacheReadInputTokens,
-    totalPrice: json.totalPrice,
-    initialTotalPrice: json.initialTotalPrice,
+    totalPrice: newBig(json.totalPrice),
+    initialTotalPrice: newBig(json.initialTotalPrice),
   };
 
   return new AiUsageToken(plain);
@@ -125,14 +128,14 @@ export function aiUsageTokenToJson(domain: AiUsageToken): AiUsageTokenJson {
     totalTokens: domain.totalTokens,
     cacheCreationInputTokens: domain.cacheCreationInputTokens,
     cacheReadInputTokens: domain.cacheReadInputTokens,
-    totalPrice: domain.totalPrice,
-    initialTotalPrice: domain.initialTotalPrice,
+    totalPrice: domain.totalPrice.toString(),
+    initialTotalPrice: domain.initialTotalPrice.toString(),
   };
 }
 
 export function aiUsageTokenToJsonState(
   domain: AiUsageToken,
-): WithPgState<AiUsageTokenJson, AiUsageTokenPg> {
+): AiUsageTokenJsonState {
   return {
     state: domain.pgState,
     data: aiUsageTokenToJson(domain),
@@ -152,8 +155,8 @@ export function aiUsageTokenToResponse(
     totalTokens: domain.totalTokens,
     cacheCreationInputTokens: domain.cacheCreationInputTokens,
     cacheReadInputTokens: domain.cacheReadInputTokens,
-    totalPrice: domain.totalPrice,
-    initialTotalPrice: domain.initialTotalPrice,
+    totalPrice: domain.totalPrice.toString(),
+    initialTotalPrice: domain.initialTotalPrice.toString(),
   };
 }
 
@@ -170,7 +173,7 @@ export function aiUsageTokenPgToResponse(
     totalTokens: pg.total_tokens,
     cacheCreationInputTokens: pg.cache_creation_input_tokens,
     cacheReadInputTokens: pg.cache_read_input_tokens,
-    totalPrice: parseFloat(pg.total_price),
-    initialTotalPrice: parseFloat(pg.initial_total_price),
+    totalPrice: pg.total_price,
+    initialTotalPrice: pg.initial_total_price,
   };
 }

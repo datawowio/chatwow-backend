@@ -181,5 +181,5 @@ export async function down(db: Kysely<any>): Promise<void> {
   await db.schema.dropIndex('ai_usages_project_id_idx').ifExists().execute();
   await db.schema.dropTable('ai_usages').ifExists().execute();
   await db.schema.dropType('ai_usage_action').ifExists().execute();
-  await db.schema.dropType('ai_model').ifExists().execute();
+  await db.schema.dropType('ai_model_name').ifExists().execute();
 }

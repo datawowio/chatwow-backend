@@ -25,6 +25,7 @@ import { UserVerificationModule } from './base/user-verification/user-verificati
 import { UserModule } from './base/user/user.module';
 import { AiApiModule } from './logic/ai-api/api-api.module';
 import { AiFileModule } from './logic/ai-file/ai-file.module';
+import { AiPricingModule } from './logic/ai-pricing/ai-pricing.module';
 import { PgModule } from './logic/pg/pg.module';
 import { QueueModule } from './queue/queue.module';
 
@@ -60,4 +61,5 @@ export const DOMAIN_PROVIDER = [
   PgModule,
   AiApiModule,
   AiFileModule,
+  AiPricingModule,
 ];

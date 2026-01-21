@@ -1,6 +1,4 @@
-import { newBig } from '@shared/common/common.func';
 import {
-  toCurrencyDisplay,
   toDate,
   toISO,
   toResponseDate,
@@ -9,14 +7,22 @@ import type { WithPgState } from '@shared/common/common.type';
 
 import { AiModel } from './ai-model.domain';
 import type { AiModelResponse } from './ai-model.response';
-import type { AiModelJson, AiModelPg, AiModelPlain } from './ai-model.type';
+import type {
+  AiModelConfig,
+  AiModelJson,
+  AiModelName,
+  AiModelPg,
+  AiModelPlain,
+  AiModelProvider,
+} from './ai-model.type';
 
 export function aiModelFromPg(pg: AiModelPg): AiModel {
   const plain: AiModelPlain = {
-    aiModelName: pg.ai_model_name,
+    aiModelName: pg.ai_model_name as AiModelName,
     createdAt: toDate(pg.created_at),
     updatedAt: toDate(pg.updated_at),
-    pricePerToken: newBig(pg.price_per_token),
+    provider: pg.provider as AiModelProvider,
+    config: pg.config as AiModelConfig,
   };
 
   return aiModelFromPlain(plain);
@@ -33,9 +39,10 @@ export function aiModelFromPlain(plainData: AiModelPlain): AiModel {
 export function aiModelFromJson(json: AiModelJson): AiModel {
   const plain: AiModelPlain = {
     aiModelName: json.aiModelName,
-    pricePerToken: newBig(json.pricePerToken),
     createdAt: toDate(json.createdAt),
     updatedAt: toDate(json.updatedAt),
+    provider: json.provider,
+    config: json.config,
   };
 
   return new AiModel(plain);
@@ -54,7 +61,8 @@ export function aiModelToPg(domain: AiModel): AiModelPg {
     ai_model_name: domain.aiModelName,
     created_at: toISO(domain.createdAt),
     updated_at: toISO(domain.updatedAt),
-    price_per_token: domain.pricePerToken.toString(),
+    provider: domain.provider,
+    config: domain.config,
   };
 }
 
@@ -63,7 +71,8 @@ export function aiModelToPlain(domain: AiModel): AiModelPlain {
     aiModelName: domain.aiModelName,
     createdAt: domain.createdAt,
     updatedAt: domain.updatedAt,
-    pricePerToken: domain.pricePerToken,
+    provider: domain.provider,
+    config: domain.config,
   };
 }
 
@@ -72,7 +81,8 @@ export function aiModelToJson(domain: AiModel): AiModelJson {
     aiModelName: domain.aiModelName,
     createdAt: toISO(domain.createdAt),
     updatedAt: toISO(domain.updatedAt),
-    pricePerToken: domain.pricePerToken.toString(),
+    provider: domain.provider,
+    config: domain.config,
   };
 }
 export function aiModelToJsonState(
@@ -89,7 +99,7 @@ export function aiModelToResponse(domain: AiModel): AiModelResponse {
     aiModel: domain.aiModelName,
     createdAt: toResponseDate(domain.createdAt),
     updatedAt: toResponseDate(domain.updatedAt),
-    pricePerToken: toCurrencyDisplay(domain.pricePerToken),
+    provider: domain.provider,
   };
 }
 

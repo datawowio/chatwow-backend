@@ -1,3 +1,4 @@
+import { aiUsageTokenToJsonState } from '@domain/base/ai-usage-token/ai-usage-token.mapper';
 import { aiUsageToJsonState } from '@domain/base/ai-usage/ai-usage.mapper';
 import { passwordResetTokenToJsonState } from '@domain/base/password-reset-token/password-reset-token.mapper';
 import { projectDocumentToJsonState } from '@domain/base/project-document/project-document.mapper';
@@ -68,6 +69,7 @@ export class DomainEventQueue extends BaseAmqpExchange {
   jobProcessAiUsage(data: ProcessAiUsageJobData) {
     const input: ProcessAiUsageJobInput = wrapJobMeta({
       aiUsage: aiUsageToJsonState(data.aiUsage),
+      aiUsageTokens: data.aiUsageTokens.map((t) => aiUsageTokenToJsonState(t)),
     });
 
     this.addJob(DOMAIN_EVENT_QUEUES.PROCESS_AI_USAGE.name, input);

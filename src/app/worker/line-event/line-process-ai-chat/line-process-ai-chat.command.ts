@@ -1,3 +1,5 @@
+import { AiUsageToken } from '@domain/base/ai-usage-token/ai-usage-token.domain';
+import { newAiUsageToken } from '@domain/base/ai-usage-token/ai-usage-token.factory';
 import { AI_USAGE_REF_TABLE } from '@domain/base/ai-usage/ai-usage.constant';
 import { AiUsage } from '@domain/base/ai-usage/ai-usage.domain';
 import { newAiUsage } from '@domain/base/ai-usage/ai-usage.factory';
@@ -31,6 +33,7 @@ type Entity = {
   lineSession: LineSession;
   lineChatLogs: LineChatLog[];
   aiUsage?: AiUsage;
+  aiUsageTokens: AiUsageToken[];
 };
 
 @Injectable()
@@ -85,6 +88,18 @@ export class LineProcessAiChatCommand {
         tokenUsed: res.data.tokenUsed,
         confidence: res.data.confidence,
       });
+
+      entity.aiUsageTokens = res.data.tokenUsage.map((tu) =>
+        newAiUsageToken({
+          aiModelName: tu.modelName,
+          inputTokens: tu.inputTokens,
+          outputTokens: tu.outputTokens,
+          totalTokens: tu.totalTokens,
+          cacheCreationInputTokens: tu.cacheCreationInputTokens,
+          cacheReadInputTokens: tu.cacheReadInputTokens,
+          aiUsageId: aiUsage.id,
+        }),
+      );
     }
 
     botChatLog.edit({
@@ -107,6 +122,7 @@ export class LineProcessAiChatCommand {
     const aiUsage = entity.aiUsage;
     this.domainEventQueue.jobProcessAiUsage({
       aiUsage,
+      aiUsageTokens: entity.aiUsageTokens,
     });
 
     this.lineEventQueue.jobProcessChatLog(entity.lineChatLogs);
@@ -149,6 +165,7 @@ export class LineProcessAiChatCommand {
       user,
       lineSession,
       lineChatLogs: body.lineChatLogs,
+      aiUsageTokens: [],
     };
   }
 }

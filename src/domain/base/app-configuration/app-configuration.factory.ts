@@ -49,7 +49,7 @@ export function mockAppConfiguration<K extends AppConfigKey>(
           () =>
             ({
               apiKey: 'test-key',
-              model: 'GPT_DW',
+              model: 'gpt-4.1',
             }) satisfies AppConfigData['AI'],
         )
         .exhaustive(),

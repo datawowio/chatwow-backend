@@ -1,3 +1,4 @@
+import { aiUsageTokenFromJsonState } from '@domain/base/ai-usage-token/ai-usage-token.mapper';
 import { aiUsageFromJsonState } from '@domain/base/ai-usage/ai-usage.mapper';
 import { passwordResetTokenFromJsonState } from '@domain/base/password-reset-token/password-reset-token.mapper';
 import { projectDocumentFromJsonState } from '@domain/base/project-document/project-document.mapper';
@@ -81,6 +82,9 @@ export class DomainEventAmqp extends BaseAmqpHandler {
   async processAiUsage(input: OmitJobMeta<ProcessAiUsageJobInput>) {
     const data: ProcessAiUsageJobData = {
       aiUsage: aiUsageFromJsonState(input.aiUsage),
+      aiUsageTokens: input.aiUsageTokens.map((token) =>
+        aiUsageTokenFromJsonState(token),
+      ),
     };
 
     return this.processAiUsageCommand.exec(data);

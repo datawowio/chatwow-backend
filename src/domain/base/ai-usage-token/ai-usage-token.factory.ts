@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 
 import { uuidV7 } from '@shared/common/common.crypto';
 import myDayjs from '@shared/common/common.dayjs';
-import { valueOr } from '@shared/common/common.func';
+import { newBig, valueOr } from '@shared/common/common.func';
 
 import { AI_MODEL_NAME } from '../ai-model/ai-model.constant';
 import type { AiUsageToken } from './ai-usage-token.domain';
@@ -12,7 +12,7 @@ import type {
   AiUsageTokenPlain,
 } from './ai-usage-token.type';
 
-export function newAiUsageToken({ data }: AiUsageTokenNewData): AiUsageToken {
+export function newAiUsageToken(data: AiUsageTokenNewData): AiUsageToken {
   return aiUsageTokenFromPlain({
     id: uuidV7(),
     createdAt: myDayjs().toDate(),
@@ -23,8 +23,8 @@ export function newAiUsageToken({ data }: AiUsageTokenNewData): AiUsageToken {
     totalTokens: data.totalTokens,
     cacheCreationInputTokens: data.cacheCreationInputTokens,
     cacheReadInputTokens: data.cacheReadInputTokens,
-    totalPrice: data.totalPrice,
-    initialTotalPrice: data.initialTotalPrice,
+    totalPrice: valueOr(data.totalPrice, newBig(0)),
+    initialTotalPrice: valueOr(data.initialTotalPrice, newBig(0)),
   });
 }
 
@@ -63,11 +63,11 @@ export function mockAiUsageToken(data: Partial<AiUsageTokenPlain>) {
     ),
     totalPrice: valueOr(
       data.totalPrice,
-      faker.number.float({ min: 0, max: 1, fractionDigits: 10 }),
+      newBig(faker.number.float({ min: 0, max: 1, fractionDigits: 10 })),
     ),
     initialTotalPrice: valueOr(
       data.initialTotalPrice,
-      faker.number.float({ min: 0, max: 1, fractionDigits: 10 }),
+      newBig(faker.number.float({ min: 0, max: 1, fractionDigits: 10 })),
     ),
   });
 }

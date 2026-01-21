@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import type { AiModelName } from '@infra/db/db';
-
 import { DATE_EXAMPLE, UUID_EXAMPLE } from '@shared/common/common.constant';
+
+import { AiModelName } from '../ai-model/ai-model.type';
 
 export class AiUsageTokenResponse {
   @ApiProperty({ example: UUID_EXAMPLE })
@@ -14,8 +14,8 @@ export class AiUsageTokenResponse {
   @ApiProperty({ example: UUID_EXAMPLE })
   aiUsageId: string;
 
-  @ApiProperty({ example: 'GPT_DW' satisfies AiModelName })
-  aiModelName: AiModelName;
+  @ApiProperty({ example: 'gpt-4.1' satisfies AiModelName })
+  aiModelName: string;
 
   @ApiProperty({ example: 1000 })
   inputTokens: number;
@@ -32,9 +32,9 @@ export class AiUsageTokenResponse {
   @ApiProperty({ example: 200 })
   cacheReadInputTokens: number;
 
-  @ApiProperty({ example: 0.0123456789 })
-  totalPrice: number;
+  @ApiProperty({ example: '0.0123456789' })
+  totalPrice: string;
 
-  @ApiProperty({ example: 0.0123456789 })
-  initialTotalPrice: number;
+  @ApiProperty({ example: '0.0123456789' })
+  initialTotalPrice: string;
 }

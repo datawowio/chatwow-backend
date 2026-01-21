@@ -1,8 +1,9 @@
-import type { AiModelName } from '@infra/db/db';
+import Big from 'big.js';
 
 import { DomainEntity } from '@shared/common/common.domain';
-import { isDefined } from '@shared/common/common.validator';
+import { valueOr } from '@shared/common/common.func';
 
+import { AiModelName } from '../ai-model/ai-model.type';
 import {
   aiUsageTokenFromPlain,
   aiUsageTokenToPlain,
@@ -23,41 +24,31 @@ export class AiUsageToken extends DomainEntity<AiUsageTokenPg> {
   readonly totalTokens: number;
   readonly cacheCreationInputTokens: number;
   readonly cacheReadInputTokens: number;
-  readonly totalPrice: number;
-  readonly initialTotalPrice: number;
+  readonly totalPrice: Big;
+  readonly initialTotalPrice: Big;
 
   constructor(plain: AiUsageTokenPlain) {
     super();
     Object.assign(this, plain);
   }
 
-  edit({ data }: AiUsageTokenUpdateData) {
+  edit(data: AiUsageTokenUpdateData) {
     const plain: AiUsageTokenPlain = {
       id: this.id,
       createdAt: this.createdAt,
       aiUsageId: this.aiUsageId,
       aiModelName: this.aiModelName,
-      inputTokens: isDefined(data.inputTokens)
-        ? data.inputTokens
-        : this.inputTokens,
-      outputTokens: isDefined(data.outputTokens)
-        ? data.outputTokens
-        : this.outputTokens,
-      totalTokens: isDefined(data.totalTokens)
-        ? data.totalTokens
-        : this.totalTokens,
-      cacheCreationInputTokens: isDefined(data.cacheCreationInputTokens)
-        ? data.cacheCreationInputTokens
-        : this.cacheCreationInputTokens,
-      cacheReadInputTokens: isDefined(data.cacheReadInputTokens)
-        ? data.cacheReadInputTokens
-        : this.cacheReadInputTokens,
-      totalPrice: isDefined(data.totalPrice)
-        ? data.totalPrice
-        : this.totalPrice,
-      initialTotalPrice: isDefined(data.initialTotalPrice)
-        ? data.initialTotalPrice
-        : this.initialTotalPrice,
+      inputTokens: this.inputTokens,
+      outputTokens: this.outputTokens,
+      totalTokens: this.totalTokens,
+      cacheCreationInputTokens: this.cacheCreationInputTokens,
+      cacheReadInputTokens: this.cacheReadInputTokens,
+
+      //
+      totalPrice: valueOr(data.price, this.totalPrice),
+      initialTotalPrice: this.initialTotalPrice
+        ? this.initialTotalPrice
+        : valueOr(data.price, this.initialTotalPrice),
     };
 
     Object.assign(this, plain);
