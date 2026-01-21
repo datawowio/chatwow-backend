@@ -19,6 +19,7 @@ const zod = z.object({
   }),
   userGroupIds: z.array(z.string().uuid()).optional(),
   manageProjectIds: z.array(z.string().uuid()).optional(),
+  departmentId: z.string().uuid().optional(),
 });
 
 export class AddUserDto extends zodDto(zod) {}

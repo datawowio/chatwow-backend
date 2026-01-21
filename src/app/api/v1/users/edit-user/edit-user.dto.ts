@@ -17,6 +17,7 @@ const zod = z.object({
       lastName: z.string().optional(),
       role: z.enum(USER_ROLE).optional(),
       userStatus: z.enum(USER_STATUS).optional(),
+      departmentId: z.string().uuid().optional(),
     })
     .optional(),
   userGroupIds: z.array(z.string().uuid()).optional(),

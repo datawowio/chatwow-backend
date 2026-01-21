@@ -3,6 +3,7 @@ import { AiUsageUserGroupModule } from './base/ai-usage-user-group/ai-usage-user
 import { AiUsageModule } from './base/ai-usage/ai-usage.module';
 import { AppConfigurationModule } from './base/app-configuration/app-configuration.module';
 import { AuditLogModule } from './base/audit-log/audit-log.module';
+import { DepartmentModule } from './base/department/department.module';
 import { LineAccountModule } from './base/line-account/line-account.module';
 import { LineBotModule } from './base/line-bot/line-bot.module';
 import { LineChatLogModule } from './base/line-chat-log/line-chat-log.module';
@@ -34,6 +35,7 @@ export const DOMAIN_PROVIDER = [
   AiUsageUserGroupModule,
   AppConfigurationModule,
   AuditLogModule,
+  DepartmentModule,
   LineAccountModule,
   LineChatLogModule,
   LineSessionModule,

@@ -102,6 +102,13 @@ export interface AuditLogs {
   raw_data: Json;
 }
 
+export interface Departments {
+  created_at: Generated<string>;
+  department_name: string;
+  id: string;
+  updated_at: Generated<string>;
+}
+
 export interface LineAccounts {
   created_at: Generated<string>;
   id: string;
@@ -267,6 +274,7 @@ export interface UserManageProjects {
 export interface Users {
   created_at: Generated<string>;
   created_by_id: string | null;
+  department_id: string | null;
   email: string;
   first_name: string;
   id: string;
@@ -295,6 +303,7 @@ export interface DB {
   ai_usages: AiUsages;
   app_configurations: AppConfigurations;
   audit_logs: AuditLogs;
+  departments: Departments;
   line_accounts: LineAccounts;
   line_bots: LineBots;
   line_chat_logs: LineChatLogs;

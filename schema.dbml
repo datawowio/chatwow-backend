@@ -96,6 +96,7 @@ Table "users" {
   "role" user_role [not null]
   "user_status" user_status [not null]
   "line_account_id" text [unique]
+  "department_id" uuid
 }
 
 Table "user_verifications" {
@@ -364,6 +365,13 @@ Table "app_configurations" {
   "config_data" jsonb [not null]
 }
 
+Table "departments" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "department_name" text [not null]
+}
+
 Ref "ai_usage_user_groups_ai_usage_id_fkey":"ai_usages"."id" < "ai_usage_user_groups"."ai_usage_id" [delete: cascade]
 
 Ref "audit_logs_created_by_id_fkey":"users"."id" < "audit_logs"."created_by_id"
@@ -419,6 +427,8 @@ Ref "user_manage_projects_user_id_fkey":"users"."id" < "user_manage_projects"."u
 Ref "user_verifications_user_id_fkey":"users"."id" < "user_verifications"."user_id" [delete: cascade]
 
 Ref "users_created_by_id_fkey":"users"."id" < "users"."created_by_id" [delete: set null]
+
+Ref "users_department_id_fkey":"departments"."id" < "users"."department_id"
 
 Ref "users_line_account_id_fkey":"line_accounts"."id" < "users"."line_account_id" [delete: set null]
 

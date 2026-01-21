@@ -15,6 +15,7 @@ import { isDefined } from '@shared/common/common.validator';
 import { getIncludesZod } from '@shared/zod/zod.util';
 
 export const usersV1IncludesZod = getIncludesZod([
+  'department',
   'manageProjects',
   'userGroups',
   'lineAccount',
@@ -28,6 +29,16 @@ export function usersV1InclusionQb(
   actor?: UserClaims,
 ) {
   return qb
+    .$if(includes.has('department'), (q) =>
+      q.select((eb) =>
+        jsonObjectFrom(
+          eb
+            .selectFrom('departments')
+            .whereRef('departments.id', '=', 'users.department_id')
+            .selectAll('departments'),
+        ).as('department'),
+      ),
+    )
     .$if(includes.has('manageProjects'), (q) =>
       q.select((eb) =>
         jsonArrayFrom(

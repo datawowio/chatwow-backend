@@ -24,6 +24,7 @@ export function userFromPg(pg: UserPg): User {
     role: pg.role,
     lineAccountId: pg.line_account_id,
     userStatus: pg.user_status,
+    departmentId: pg.department_id,
   };
 
   return new User(plain);
@@ -48,6 +49,7 @@ export function userFromPlain(plainData: UserPlain): User {
     role: plainData.role,
     userStatus: plainData.userStatus,
     lineAccountId: plainData.lineAccountId,
+    departmentId: plainData.departmentId,
   };
 
   return new User(plain);
@@ -68,6 +70,7 @@ export function userFromJson(json: UserJson): User {
     role: json.role,
     userStatus: json.userStatus,
     lineAccountId: json.lineAccountId,
+    departmentId: json.departmentId,
   };
 
   return new User(plain);
@@ -94,6 +97,7 @@ export function userToPg(domain: User): UserPg {
     role: domain.role,
     user_status: domain.userStatus,
     line_account_id: domain.lineAccountId,
+    department_id: domain.departmentId,
   };
 }
 
@@ -112,6 +116,7 @@ export function userToPlain(domain: User): UserPlain {
     role: domain.role,
     userStatus: domain.userStatus,
     lineAccountId: domain.lineAccountId,
+    departmentId: domain.departmentId,
   };
 }
 
@@ -130,6 +135,7 @@ export function userToJson(domain: User): UserJson {
     role: domain.role,
     userStatus: domain.userStatus,
     lineAccountId: domain.lineAccountId,
+    departmentId: domain.departmentId,
   };
 }
 export function userToJsonState(domain: User): WithPgState<UserJson, UserPg> {

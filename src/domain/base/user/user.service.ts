@@ -180,6 +180,9 @@ export class UserService {
           .innerJoin('user_group_users', 'user_group_users.user_id', 'users.id')
           .where('user_group_users.user_group_id', 'in', filter!.userGroupIds!),
       )
+      .$if(!!filter?.departmentIds?.length, (q) =>
+        q.where('users.department_id', 'in', filter!.departmentIds!),
+      )
       .$if(isDefined(filter?.search), (q) => {
         const search = `%${filter!.search!}%`;
 
