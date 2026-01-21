@@ -29,3 +29,12 @@ export function mockDepartment(overrides?: Partial<Department>): Department {
     ...overrides,
   });
 }
+
+export function mockDepartments(
+  amount: number,
+  data: Partial<Department>,
+): Department[] {
+  return Array(amount)
+    .fill(0)
+    .map(() => mockDepartment(data));
+}

@@ -16,10 +16,10 @@ const zod = z.object({
     lastName: z.string(),
     email: z.string().email(),
     role: z.enum(USER_ROLE),
+    departmentId: z.string().uuid().optional(),
   }),
   userGroupIds: z.array(z.string().uuid()).optional(),
   manageProjectIds: z.array(z.string().uuid()).optional(),
-  departmentId: z.string().uuid().optional(),
 });
 
 export class AddUserDto extends zodDto(zod) {}

@@ -2,6 +2,8 @@ import { mockAiUsageUserGroup } from '@domain/base/ai-usage-user-group/ai-usage-
 import { AiUsageUserGroupService } from '@domain/base/ai-usage-user-group/ai-usage-user-group.service';
 import { mockAiUsages } from '@domain/base/ai-usage/ai-usage.factory';
 import { AiUsageService } from '@domain/base/ai-usage/ai-usage.service';
+import { mockDepartments } from '@domain/base/department/department.factory';
+import { DepartmentService } from '@domain/base/department/department.service';
 import { mockProjects } from '@domain/base/project/project.factory';
 import { ProjectService } from '@domain/base/project/project.service';
 import { UserGroupProjectService } from '@domain/base/user-group-project/user-group-project.service';
@@ -32,6 +34,7 @@ export class SeedDataCli extends CommandRunner {
     private userGroupProjectService: UserGroupProjectService,
     private aiUsageService: AiUsageService,
     private aiUsageUserGroupService: AiUsageUserGroupService,
+    private departmentService: DepartmentService,
   ) {
     super();
   }
@@ -51,10 +54,21 @@ export class SeedDataCli extends CommandRunner {
     const superAdminId = SUPERADMIN_UUID;
 
     // temp mock
+    const sampleDepartments = mockDepartments(Math.floor(amountEach / 3), {});
+
     const sampleUsers = mockUsers(amountEach, {
       createdById: superAdminId,
       role: 'USER',
     });
+    sampleUsers.forEach((user) => {
+      const randomDepartment = faker.helpers.arrayElement(sampleDepartments);
+      user.edit({
+        data: {
+          departmentId: randomDepartment.id,
+        },
+      });
+    });
+
     const sampleProjects = mockProjects(amountEach, {
       createdById: superAdminId,
     });
@@ -62,6 +76,7 @@ export class SeedDataCli extends CommandRunner {
       createdById: superAdminId,
     });
 
+    await this.departmentService.saveBulk(sampleDepartments);
     await this.userService.saveBulk(sampleUsers);
     await this.projectService.saveBulk(sampleProjects, { disableEvent: true });
     await this.userGroupService.saveBulk(sampleUserGroups);

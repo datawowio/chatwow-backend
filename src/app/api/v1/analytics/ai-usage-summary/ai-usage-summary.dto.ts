@@ -1,6 +1,6 @@
 import { AI_USAGE_ACTION } from '@domain/base/ai-usage/ai-usage.constant';
+import { DepartmentResponse } from '@domain/base/department/department.response';
 import { ProjectResponse } from '@domain/base/project/project.response';
-import { UserGroupResponse } from '@domain/base/user-group/user-group.response';
 import { UserResponse } from '@domain/base/user/user.response';
 import { ApiProperty } from '@nestjs/swagger';
 import { anyPass } from 'remeda';
@@ -21,7 +21,7 @@ const zod = z.object({
   period: z.enum(['hour', 'day', 'week', 'month', 'year']).optional(),
   group: z
     .object({
-      by: z.enum(['project', 'userGroup', 'user']),
+      by: z.enum(['project', 'department', 'user']),
       pagination: paginationZod,
       sort: getSortZod([
         'totalTokenUsed',
@@ -52,7 +52,7 @@ const zod = z.object({
       userIds: z
         .preprocess(toSplitCommaArray, z.array(z.string().uuid()))
         .optional(),
-      userGroupIds: z
+      departmentIds: z
         .preprocess(toSplitCommaArray, z.array(z.string().uuid()))
         .optional(),
     })
@@ -63,9 +63,9 @@ export class AiUsageSummaryDto extends zodDto(zod) {}
 
 // ========== Response ================
 
-class AiUsageSummaryAnalyticRelationsUserGroup implements IDomainData {
-  @ApiProperty({ type: () => UserGroupResponse })
-  attributes: UserGroupResponse;
+class AiUsageSummaryAnalyticRelationsDepartment implements IDomainData {
+  @ApiProperty({ type: () => DepartmentResponse })
+  attributes: DepartmentResponse;
 }
 
 class AiUsageSummaryAnalyticRelationsProject implements IDomainData {
@@ -79,7 +79,7 @@ class AiUsageSummaryAnalyticRelationsUser implements IDomainData {
 }
 
 class AiUsageSummaryAnalyticRelations {
-  userGroup?: AiUsageSummaryAnalyticRelationsUserGroup;
+  department?: AiUsageSummaryAnalyticRelationsDepartment;
   project?: AiUsageSummaryAnalyticRelationsProject;
   user?: AiUsageSummaryAnalyticRelationsUser;
 }
