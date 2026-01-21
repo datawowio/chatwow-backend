@@ -167,6 +167,31 @@ export async function up(db: Kysely<any>): Promise<void> {
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
+  // Restore stored_files.is_public column
+  await db.schema
+    .alterTable('stored_files')
+    .addColumn('is_public', 'boolean', (col) => col.notNull().defaultTo(false))
+    .execute();
+
+  await db
+    .updateTable('stored_files')
+    .set((eb) => ({
+      is_public: eb
+        .case()
+        .when('file_expose_type', '=', sql`'PUBLIC'::file_expose_type`)
+        .then(true)
+        .else(false)
+        .end(),
+    }))
+    .execute();
+
+  await db.schema
+    .alterTable('stored_files')
+    .dropColumn('file_expose_type')
+    .execute();
+
+  await db.schema.dropType('file_expose_type').ifExists().execute();
+
   await db.schema.dropTable('app_configurations').ifExists().execute();
   await db.schema.dropTable('ai_models').ifExists().execute();
   await db.schema

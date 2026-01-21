@@ -134,6 +134,13 @@ export async function up(db: Kysely<any>): Promise<void> {
 
 // `any` is required here since migrations should be frozen in time. alternatively, keep a "snapshot" db interface.
 export async function down(db: Kysely<any>): Promise<void> {
+  // Delete the inserted ai_models data
+  await db.deleteFrom('ai_models').execute();
+
+  // Recreate ai_model_name enum
+  await db.schema.createType('ai_model_name').asEnum(['GPT_DW']).execute();
+
+  // Restore ai_models columns and convert ai_model_name back to enum
   await db.schema
     .alterTable('ai_models')
     .addColumn('price_per_token', 'decimal(20, 10)', (col) => col.notNull())
@@ -145,6 +152,13 @@ export async function down(db: Kysely<any>): Promise<void> {
     .dropColumn('provider')
     .execute();
 
+  await sql`
+    ALTER TABLE ai_models 
+    ALTER COLUMN ai_model_name TYPE ai_model_name 
+    USING ai_model_name::ai_model_name
+  `.execute(db);
+
+  // Restore ai_usages columns
   await db.schema
     .alterTable('ai_usages')
     .addColumn('ai_model_name', sql`ai_model_name`, (col) => col.notNull())
@@ -153,10 +167,16 @@ export async function down(db: Kysely<any>): Promise<void> {
     .addColumn('token_info', 'jsonb', (col) => col.notNull())
     .execute();
 
+  // Drop users.department_id column
   await db.schema.alterTable('users').dropColumn('department_id').execute();
 
+  // Drop ai_usage_tokens table
+  await db.schema.dropTable('ai_usage_tokens').execute();
+
+  // Drop departments table
   await db.schema.dropTable('departments').execute();
 
+  // Recreate ai_usage_user_groups table
   await db.schema
     .createTable('ai_usage_user_groups')
     .addColumn('id', 'uuid', (col) => col.primaryKey())
@@ -170,5 +190,18 @@ export async function down(db: Kysely<any>): Promise<void> {
     .addColumn('ai_usage_id', 'uuid', (col) =>
       col.references('ai_usages.id').onDelete('cascade').notNull(),
     )
+    .execute();
+
+  // Recreate indexes
+  await db.schema
+    .createIndex('ai_usage_user_groups_ai_usage_id_idx')
+    .on('ai_usage_user_groups')
+    .column('ai_usage_id')
+    .execute();
+
+  await db.schema
+    .createIndex('ai_usage_user_groups_user_group_id_idx')
+    .on('ai_usage_user_groups')
+    .column('user_group_id')
     .execute();
 }

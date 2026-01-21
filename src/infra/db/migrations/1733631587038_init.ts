@@ -539,6 +539,8 @@ export async function down(db: Kysely<any>): Promise<void> {
   await db.schema.dropTable('password_reset_tokens').execute();
   await db.schema.dropTable('sessions').execute();
   await db.schema.dropTable('audit_logs').execute();
+  await db.schema.dropTable('project_chat_logs').execute();
+  await db.schema.dropTable('project_chat_sessions').execute();
   await db.schema.dropTable('line_chat_logs').execute();
   await db.schema.dropTable('line_sessions').execute();
   await db.schema.dropTable('line_bots').execute();
@@ -547,6 +549,7 @@ export async function down(db: Kysely<any>): Promise<void> {
   await db.schema.dropTable('user_manage_projects').execute();
   await db.schema.dropTable('user_group_projects').execute();
   await db.schema.dropTable('projects').execute();
+  await db.schema.dropTable('user_group_managers').execute();
   await db.schema.dropTable('user_group_users').execute();
   await db.schema.dropTable('user_groups').execute();
   await db.schema.dropTable('user_verifications').execute();
@@ -554,6 +557,7 @@ export async function down(db: Kysely<any>): Promise<void> {
   await db.schema.dropTable('line_accounts').execute();
 
   // Drop enums/types (reverse order of creation)
+  await db.schema.dropType('message_status').execute();
   await db.schema.dropType('line_session_status').execute();
   await db.schema.dropType('action_type').execute();
   await db.schema.dropType('actor_type').execute();
