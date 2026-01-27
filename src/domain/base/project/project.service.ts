@@ -155,7 +155,7 @@ export class ProjectService {
           .leftJoin(
             'user_group_users',
             'user_group_users.user_group_id',
-            'user_group_users.user_group_id',
+            'user_group_projects.user_group_id',
           )
           .where('user_group_users.user_id', '=', filter!.userId!),
       )
