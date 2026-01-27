@@ -1,8 +1,7 @@
 import { AI_MODEL_NAME } from '@domain/base/ai-model/ai-model.constant';
 import z from 'zod';
 
-// TODO: Uncomment after ai update
-const _zod = {
+const zod = {
   ai_usage_id: z.string(),
   confidence: z.number(),
   token_usage: z.array(
@@ -17,12 +16,14 @@ const _zod = {
   ),
 };
 
-export const projectMdSuccessValidator = z.object({
-  project_id: z.string(),
-});
-// .extend(zod);
+export const projectMdSuccessValidator = z
+  .object({
+    project_id: z.string(),
+  })
+  .extend(zod);
 
-export const projectDocumentMdSuccessValidator = z.object({
-  project_document_id: z.string(),
-});
-// .extend(zod);
+export const projectDocumentMdSuccessValidator = z
+  .object({
+    project_document_id: z.string(),
+  })
+  .extend(zod);

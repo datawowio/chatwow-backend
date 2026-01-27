@@ -1,3 +1,4 @@
+import { AiModelName } from '@domain/base/ai-model/ai-model.type';
 import { Injectable } from '@nestjs/common';
 
 import { BaseAmqpHandler } from '@infra/global/amqp/amqp.abstract';
@@ -30,16 +31,16 @@ export class AiEventAmqp extends BaseAmqpHandler {
   async processProjectMdSuccess(data: ProjectMdSuccessRawInput) {
     return this.projectMdSuccessCommand.exec({
       projectId: data.project_id,
-      // aiUsageId: data.ai_usage_id,
-      // confidence: data.confidence,
-      // tokenUsage: data.token_usage.map((t) => ({
-      //   inputTokens: t.input_tokens,
-      //   outputTokens: t.output_tokens,
-      //   totalTokens: t.total_tokens,
-      //   cacheCreationInputTokens: t.cache_creation_input_tokens,
-      //   cacheReadInputTokens: t.cache_read_input_tokens,
-      //   modelName: t.model_name as AiModelName,
-      // })),
+      aiUsageId: data.ai_usage_id,
+      confidence: data.confidence,
+      tokenUsage: data.token_usage.map((t) => ({
+        inputTokens: t.input_tokens,
+        outputTokens: t.output_tokens,
+        totalTokens: t.total_tokens,
+        cacheCreationInputTokens: t.cache_creation_input_tokens,
+        cacheReadInputTokens: t.cache_read_input_tokens,
+        modelName: t.model_name as AiModelName,
+      })),
     });
   }
 
@@ -52,16 +53,16 @@ export class AiEventAmqp extends BaseAmqpHandler {
   ) {
     return this.projectDocumentMdSuccessCommand.exec({
       projectDocumentId: data.project_document_id,
-      // aiUsageId: data.ai_usage_id,
-      // confidence: data.confidence,
-      // tokenUsage: data.token_usage.map((t) => ({
-      //   inputTokens: t.input_tokens,
-      //   outputTokens: t.output_tokens,
-      //   totalTokens: t.total_tokens,
-      //   cacheCreationInputTokens: t.cache_creation_input_tokens,
-      //   cacheReadInputTokens: t.cache_read_input_tokens,
-      //   modelName: t.model_name as AiModelName,
-      // })),
+      aiUsageId: data.ai_usage_id,
+      confidence: data.confidence,
+      tokenUsage: data.token_usage.map((t) => ({
+        inputTokens: t.input_tokens,
+        outputTokens: t.output_tokens,
+        totalTokens: t.total_tokens,
+        cacheCreationInputTokens: t.cache_creation_input_tokens,
+        cacheReadInputTokens: t.cache_read_input_tokens,
+        modelName: t.model_name as AiModelName,
+      })),
     });
   }
 }
