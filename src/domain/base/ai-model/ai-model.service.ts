@@ -1,6 +1,6 @@
+import { AiModelName } from '@domain/base/ai-model/ai-model.type';
 import { Injectable } from '@nestjs/common';
 
-import { AiModelName } from '@infra/db/db';
 import { MainDb } from '@infra/db/db.main';
 import { queryCount } from '@infra/db/db.util';
 

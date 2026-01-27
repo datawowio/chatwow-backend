@@ -1,5 +1,4 @@
 import myDayjs from '@shared/common/common.dayjs';
-import { newBig } from '@shared/common/common.func';
 import { isDefined } from '@shared/common/common.validator';
 
 import { AiModel } from './ai-model.domain';
@@ -11,7 +10,8 @@ export function newAiModel(data: AiModelNewData): AiModel {
     aiModelName: data.aiModel,
     createdAt: myDayjs().toDate(),
     updatedAt: myDayjs().toDate(),
-    pricePerToken: data.pricePerToken,
+    provider: data.provider,
+    config: data.config,
   });
 }
 
@@ -21,12 +21,17 @@ export function newAiModels(data: AiModelNewData[]): AiModel[] {
 
 export function mockAiModel(data: Partial<AiModelPlain>): AiModel {
   return aiModelFromPlain({
-    aiModelName: isDefined(data.aiModelName) ? data.aiModelName : 'GPT_DW',
+    aiModelName: isDefined(data.aiModelName) ? data.aiModelName : 'gpt-4.1',
     createdAt: isDefined(data.createdAt) ? data.createdAt : myDayjs().toDate(),
     updatedAt: isDefined(data.updatedAt) ? data.updatedAt : myDayjs().toDate(),
-    pricePerToken: isDefined(data.pricePerToken)
-      ? data.pricePerToken
-      : newBig(10.0),
+    provider: isDefined(data.provider) ? data.provider : 'openai',
+    config: isDefined(data.config)
+      ? data.config
+      : {
+          inputRatePerMil: 0.0015,
+          cachedInputRatePerMil: 0.0005,
+          outputRatePerMil: 0.002,
+        },
   });
 }
 

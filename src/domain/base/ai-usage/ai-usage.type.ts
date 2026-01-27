@@ -1,4 +1,4 @@
-import type { AiModelName, AiUsageAction, AiUsages } from '@infra/db/db';
+import type { AiUsageAction, AiUsages } from '@infra/db/db';
 import type { DBModel } from '@infra/db/db.common';
 
 import type {
@@ -7,6 +7,7 @@ import type {
   WithPgState,
 } from '@shared/common/common.type';
 
+import { AiModelName } from '../ai-model/ai-model.type';
 import { AiUsageRefTable } from './ai-usage.constant';
 import type { AiUsage } from './ai-usage.domain';
 
@@ -33,7 +34,6 @@ export type AiUsageUpdateData = {
 };
 
 export type AiUsageStopRecordData = {
-  tokenUsed: number;
   confidence: number;
 };
 

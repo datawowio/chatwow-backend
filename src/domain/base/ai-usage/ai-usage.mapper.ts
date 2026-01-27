@@ -1,6 +1,3 @@
-import { JsonValue } from '@infra/db/db';
-
-import { newBig } from '@shared/common/common.func';
 import {
   toDate,
   toISO,
@@ -21,15 +18,11 @@ export function aiUsageFromPg(pg: AiUsagePg): AiUsage {
     createdAt: toDate(pg.created_at),
     aiRequestAt: toDate(pg.ai_request_at),
     aiReplyAt: toDate(pg.ai_reply_at),
-    tokenUsed: pg.token_used,
     confidence: pg.confidence,
     refTable: pg.ref_table as AiUsageRefTable,
     refId: pg.ref_id,
     replyTimeMs: pg.reply_time_ms,
     aiUsageAction: pg.ai_usage_action,
-    tokenInfo: pg.token_info as object,
-    tokenPrice: newBig(pg.token_price),
-    aiModelName: pg.ai_model_name,
   };
 
   return aiUsageFromPlain(plain);
@@ -47,15 +40,11 @@ export function aiUsageFromPlain(plainData: AiUsagePlain): AiUsage {
     createdAt: plainData.createdAt,
     aiRequestAt: plainData.aiRequestAt,
     aiReplyAt: plainData.aiReplyAt,
-    tokenUsed: plainData.tokenUsed,
     confidence: plainData.confidence,
     refTable: plainData.refTable,
     refId: plainData.refId,
     replyTimeMs: plainData.replyTimeMs,
     aiUsageAction: plainData.aiUsageAction,
-    tokenInfo: plainData.tokenInfo,
-    tokenPrice: plainData.tokenPrice,
-    aiModelName: plainData.aiModelName,
   };
 
   return new AiUsage(plain);
@@ -69,15 +58,11 @@ export function aiUsageFromJson(json: AiUsageJson): AiUsage {
     createdAt: toDate(json.createdAt),
     aiRequestAt: toDate(json.aiRequestAt),
     aiReplyAt: toDate(json.aiReplyAt),
-    tokenUsed: json.tokenUsed,
     confidence: json.confidence,
     refTable: json.refTable,
     refId: json.refId,
     replyTimeMs: json.replyTimeMs,
     aiUsageAction: json.aiUsageAction,
-    tokenInfo: json.tokenInfo,
-    tokenPrice: newBig(json.tokenPrice),
-    aiModelName: json.aiModelName,
   };
 
   return aiUsageFromPlain(plain);
@@ -103,15 +88,11 @@ export function aiUsageToPg(domain: AiUsage): AiUsagePg {
     created_at: toISO(domain.createdAt),
     ai_request_at: toISO(domain.aiRequestAt),
     ai_reply_at: toISO(domain.aiReplyAt),
-    token_used: domain.tokenUsed,
     confidence: domain.confidence,
     ref_table: domain.refTable,
     ref_id: domain.refId,
     reply_time_ms: domain.replyTimeMs,
     ai_usage_action: domain.aiUsageAction,
-    token_info: domain.tokenInfo as JsonValue,
-    token_price: domain.tokenPrice.toString(),
-    ai_model_name: domain.aiModelName,
   };
 }
 
@@ -123,15 +104,11 @@ export function aiUsageToPlain(domain: AiUsage): AiUsagePlain {
     createdAt: domain.createdAt,
     aiRequestAt: domain.aiRequestAt,
     aiReplyAt: domain.aiReplyAt,
-    tokenUsed: domain.tokenUsed,
     confidence: domain.confidence,
     refTable: domain.refTable,
     refId: domain.refId,
     replyTimeMs: domain.replyTimeMs,
     aiUsageAction: domain.aiUsageAction,
-    tokenInfo: domain.tokenInfo,
-    tokenPrice: domain.tokenPrice,
-    aiModelName: domain.aiModelName,
   };
 }
 
@@ -143,15 +120,11 @@ export function aiUsageToJson(domain: AiUsage): AiUsageJson {
     createdAt: toISO(domain.createdAt),
     aiRequestAt: toISO(domain.aiRequestAt),
     aiReplyAt: toISO(domain.aiReplyAt),
-    tokenUsed: domain.tokenUsed,
     confidence: domain.confidence,
     refTable: domain.refTable,
     refId: domain.refId,
     replyTimeMs: domain.replyTimeMs,
     aiUsageAction: domain.aiUsageAction,
-    tokenInfo: domain.tokenInfo,
-    tokenPrice: domain.tokenPrice.toString(),
-    aiModelName: domain.aiModelName,
   };
 }
 export function aiUsageToJsonState(
@@ -170,7 +143,6 @@ export function aiUsageToResponse(domain: AiUsage): AiUsageResponse {
     createdAt: toResponseDate(domain.createdAt),
     aiRequestAt: toResponseDate(domain.aiRequestAt),
     aiReplyAt: toResponseDate(domain.aiReplyAt),
-    tokenUsed: domain.tokenUsed,
     confidence: domain.confidence,
     refTable: domain.refTable,
     refId: domain.refId,
@@ -185,7 +157,6 @@ export function aiUsagePgToResponse(pg: AiUsagePg): AiUsageResponse {
     createdAt: toResponseDate(pg.created_at),
     aiRequestAt: toResponseDate(pg.ai_request_at),
     aiReplyAt: toResponseDate(pg.ai_reply_at),
-    tokenUsed: pg.token_used,
     confidence: pg.confidence,
     refTable: pg.ref_table,
     refId: pg.ref_id,

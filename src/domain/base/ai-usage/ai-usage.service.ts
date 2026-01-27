@@ -31,7 +31,6 @@ export class AiUsageService {
           createdAt: 'ai_usages.created_at',
           aiRequestAt: 'ai_usages.ai_request_at',
           aiReplyAt: 'ai_usages.ai_reply_at',
-          tokenUsed: 'ai_usages.token_used',
           confidence: 'ai_usages.confidence',
         }),
       )

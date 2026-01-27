@@ -19,6 +19,7 @@ export const userFilterZod = z.object({
     .optional(),
   userGroupIds: parmUuidsZod.optional(),
   search: z.string().optional(),
+  departmentIds: parmUuidsZod.optional(),
 });
 
 export const userSortZod = getSortZod([

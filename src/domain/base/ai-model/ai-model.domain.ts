@@ -1,38 +1,23 @@
-import Big from 'big.js';
+import { AiModelName } from '@domain/base/ai-model/ai-model.type';
 
-import { AiModelName } from '@infra/db/db';
-
-import myDayjs from '@shared/common/common.dayjs';
 import { DomainEntity } from '@shared/common/common.domain';
-import { isDefined } from '@shared/common/common.validator';
 
 import type {
+  AiModelConfig,
   AiModelPg,
   AiModelPlain,
-  AiModelUpdateData,
+  AiModelProvider,
 } from './ai-model.type';
 
 export class AiModel extends DomainEntity<AiModelPg> {
   readonly aiModelName: AiModelName;
   readonly createdAt: Date;
   readonly updatedAt: Date;
-  readonly pricePerToken: Big;
+  readonly provider: AiModelProvider;
+  readonly config: AiModelConfig;
 
   constructor(plain: AiModelPlain) {
     super();
-    Object.assign(this, plain);
-  }
-
-  edit(data: AiModelUpdateData) {
-    const plain: AiModelPlain = {
-      aiModelName: this.aiModelName,
-      createdAt: this.createdAt,
-      updatedAt: myDayjs().toDate(),
-      pricePerToken: isDefined(data.pricePerToken)
-        ? data.pricePerToken
-        : this.pricePerToken,
-    };
-
     Object.assign(this, plain);
   }
 }

@@ -9,8 +9,6 @@ export type ActionType = "CREATE" | "DELETE" | "UPDATE";
 
 export type ActorType = "SYSTEM" | "USER";
 
-export type AiModelName = "GPT_DW";
-
 export type AiUsageAction = "CHAT_LINE" | "CHAT_PROJECT" | "GENERATE_PROJECT_DOCUMENT_SUMMARY" | "GENERATE_PROJECT_SUMMARY";
 
 export type ChatSender = "BOT" | "USER";
@@ -50,14 +48,14 @@ export type UserRole = "ADMIN" | "MANAGER" | "USER";
 export type UserStatus = "ACTIVE" | "INACTIVE" | "PENDING_REGISTRATION";
 
 export interface AiModels {
-  ai_model_name: AiModelName;
+  ai_model_name: string;
+  config: Json;
   created_at: Generated<string>;
-  price_per_token: Numeric;
+  provider: string;
   updated_at: Generated<string>;
 }
 
 export interface AiUsages {
-  ai_model_name: AiModelName;
   ai_reply_at: string | null;
   ai_request_at: string;
   ai_usage_action: AiUsageAction;
@@ -69,19 +67,20 @@ export interface AiUsages {
   ref_id: string;
   ref_table: string;
   reply_time_ms: number | null;
-  token_info: Json;
-  token_price: Numeric;
-  token_used: number;
 }
 
-export interface AiUsageUserGroups {
+export interface AiUsageTokens {
+  ai_model_name: string;
   ai_usage_id: string;
-  chat_count: number;
+  cache_creation_input_tokens: Generated<number>;
+  cache_read_input_tokens: Generated<number>;
   created_at: Generated<string>;
   id: string;
-  token_price: Numeric;
-  token_used: number;
-  user_group_id: string | null;
+  initial_total_price: Numeric;
+  input_tokens: Generated<number>;
+  output_tokens: Generated<number>;
+  total_price: Numeric;
+  total_tokens: Generated<number>;
 }
 
 export interface AppConfigurations {
@@ -102,6 +101,13 @@ export interface AuditLogs {
   owner_id: string;
   owner_table: string;
   raw_data: Json;
+}
+
+export interface Departments {
+  created_at: Generated<string>;
+  department_name: string;
+  id: string;
+  updated_at: Generated<string>;
 }
 
 export interface LineAccounts {
@@ -286,6 +292,7 @@ export interface UserManageProjects {
 export interface Users {
   created_at: Generated<string>;
   created_by_id: string | null;
+  department_id: string | null;
   email: string;
   first_name: string;
   id: string;
@@ -310,10 +317,11 @@ export interface UserVerifications {
 
 export interface DB {
   ai_models: AiModels;
-  ai_usage_user_groups: AiUsageUserGroups;
+  ai_usage_tokens: AiUsageTokens;
   ai_usages: AiUsages;
   app_configurations: AppConfigurations;
   audit_logs: AuditLogs;
+  departments: Departments;
   line_accounts: LineAccounts;
   line_bots: LineBots;
   line_chat_logs: LineChatLogs;

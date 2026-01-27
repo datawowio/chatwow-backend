@@ -1,3 +1,4 @@
+import { AiModelName } from '@domain/base/ai-model/ai-model.type';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -36,8 +37,17 @@ export class AiApiService {
         isSuccess: true,
         data: {
           text: 'ตอบสำเร็จ',
-          tokenUsed: 10,
           confidence: 100,
+          tokenUsage: [
+            {
+              inputTokens: 200,
+              outputTokens: 120,
+              totalTokens: 520,
+              cacheCreationInputTokens: 100,
+              cacheReadInputTokens: 100,
+              modelName: 'gpt-4.1',
+            },
+          ],
         },
       };
     }
@@ -65,9 +75,17 @@ export class AiApiService {
           isSuccess: true,
           data: {
             text: d.data.text,
-            tokenUsed: d.data.token_used,
             // TODO: implement real after ds done
             confidence: 100,
+            tokenUsage:
+              d.data.token_usage?.map((tu) => ({
+                inputTokens: tu.input_tokens,
+                outputTokens: tu.output_tokens,
+                totalTokens: tu.total_tokens,
+                cacheCreationInputTokens: tu.cache_creation_input_tokens,
+                cacheReadInputTokens: tu.cache_read_input_tokens,
+                modelName: tu.model_name as AiModelName,
+              })) ?? [],
           },
         })),
         rx.catchError((e: AxiosError) =>

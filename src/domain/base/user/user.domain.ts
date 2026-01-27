@@ -22,6 +22,7 @@ export class User extends DomainEntity<UserPg> {
   readonly lastSignedInAt: Date | null;
   readonly createdById: string | null;
   readonly updatedById: string | null;
+  readonly departmentId: string | null;
 
   constructor(plain: UserPlain) {
     super();
@@ -54,6 +55,9 @@ export class User extends DomainEntity<UserPg> {
 
       firstName: isDefined(data.firstName) ? data.firstName : this.firstName,
       lastName: isDefined(data.lastName) ? data.lastName : this.lastName,
+      departmentId: isDefined(data.departmentId)
+        ? data.departmentId
+        : this.departmentId,
     };
 
     Object.assign(this, plain);

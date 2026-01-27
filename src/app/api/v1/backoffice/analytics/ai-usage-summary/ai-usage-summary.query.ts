@@ -1,7 +1,8 @@
 import { aiUsagesTableFilter } from '@domain/base/ai-usage/ai-usage.util';
+import { departmentPgToResponse } from '@domain/base/department/department.mapper';
 import { projectPgToResponse } from '@domain/base/project/project.mapper';
-import { userGroupPgToResponse } from '@domain/base/user-group/user-group.mapper';
 import { userPgToResponse } from '@domain/base/user/user.mapper';
+import { UserPg } from '@domain/base/user/user.type';
 import { Injectable } from '@nestjs/common';
 import { sql } from 'kysely';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
@@ -139,11 +140,11 @@ export class AiUsageSummaryQuery implements QueryInterface {
           project: rawData?.project
             ? { attributes: projectPgToResponse(rawData.project) }
             : undefined,
-          userGroup: rawData?.userGroup
-            ? { attributes: userGroupPgToResponse(rawData.userGroup) }
+          department: rawData?.department
+            ? { attributes: departmentPgToResponse(rawData.department) }
             : undefined,
           user: rawData?.user
-            ? { attributes: userPgToResponse(rawData.user) }
+            ? { attributes: userPgToResponse(rawData.user as UserPg) }
             : undefined,
         },
       };
@@ -196,6 +197,12 @@ export class AiUsageSummaryQuery implements QueryInterface {
 
     const baseQuery = this.db.read
       .selectFrom('ai_usages')
+      .leftJoin('users', 'users.id', 'ai_usages.created_by_id')
+      .leftJoin(
+        'ai_usage_tokens',
+        'ai_usage_tokens.ai_usage_id',
+        'ai_usages.id',
+      )
       .where(aiUsagesTableFilter)
       .$if(!!filter?.aiUsageActions?.length, (q) =>
         q.where('ai_usages.ai_usage_action', 'in', filter!.aiUsageActions!),
@@ -209,63 +216,31 @@ export class AiUsageSummaryQuery implements QueryInterface {
       .$if(!!filter?.projectIds?.length, (q) =>
         q.where('ai_usages.project_id', 'in', filter!.projectIds!),
       )
+      .$if(!!filter?.departmentIds?.length, (q) =>
+        q.where('users.department_id', 'in', filter!.departmentIds!),
+      )
       .$if(!!filter?.userIds?.length, (q) =>
         q.where('ai_usages.created_by_id', 'in', filter!.userIds!),
       );
 
     const filterQb = baseQuery
-      .innerJoin(
-        'ai_usage_user_groups',
-        'ai_usage_user_groups.ai_usage_id',
-        'ai_usages.id',
-      )
-      .$if(!!filter?.userGroupIds?.length, (q) =>
-        q.where(
-          'ai_usage_user_groups.user_group_id',
-          'in',
-          filter!.userGroupIds!,
-        ),
-      )
       .$call((q) => addPagination(q, query.group?.pagination))
       .select(mainColumn)
       .groupBy(mainColumn)
       .orderBy(({ fn }) => fn.min('ai_usages.ai_reply_at'), 'asc');
 
-    let initSelectQb = baseQuery.select(({ fn }) => [
-      fn.sum<string>('ai_usages.token_used').as('totalTokenUsed'),
-      fn.sum<string>('ai_usages.token_price').as('totalPrice'),
-      fn.avg<string>('ai_usages.reply_time_ms').as('avgReplyTimeMs'),
-      fn.count<string>('ai_usages.id').as('totalChatUsages'),
-      fn
-        .count<string>('ai_usages.id')
-        .filterWhere('ai_usages.confidence', '>=', 50)
-        .as('totalAnswerable'),
-      fn.avg<string>('ai_usages.confidence').as('avgConfidence'),
-    ]);
-
-    if (query.group?.by === 'userGroup') {
-      // if user group we need to reset select but still same schema
-      initSelectQb = initSelectQb
-        .clearSelect()
-        .innerJoin(
-          'ai_usage_user_groups',
-          'ai_usage_user_groups.ai_usage_id',
-          'ai_usages.id',
-        )
-        .select(({ fn }) => [
-          fn.sum('ai_usage_user_groups.token_used').as('totalTokenUsed'),
-          fn.sum('ai_usage_user_groups.token_price').as('totalPrice'),
-          fn.avg('ai_usages.reply_time_ms').as('avgReplyTimeMs'),
-          fn.sum('ai_usage_user_groups.chat_count').as('totalChatUsages'),
-          fn
-            .sum<string>('ai_usage_user_groups.chat_count')
-            .filterWhere('ai_usages.confidence', '>=', 50)
-            .as('totalAnswerable'),
-          fn.avg('ai_usages.confidence').as('avgConfidence'),
-        ]) as typeof qb;
-    }
-
-    const qb = initSelectQb
+    const qb = baseQuery
+      .select(({ fn }) => [
+        fn.sum<string>('ai_usage_tokens.total_tokens').as('totalTokenUsed'),
+        fn.sum<string>('ai_usage_tokens.total_price').as('totalPrice'),
+        fn.avg<string>('ai_usages.reply_time_ms').as('avgReplyTimeMs'),
+        fn.count<string>('ai_usages.id').as('totalChatUsages'),
+        fn
+          .count<string>('ai_usages.id')
+          .filterWhere('ai_usages.confidence', '>=', 50)
+          .as('totalAnswerable'),
+        fn.avg<string>('ai_usages.confidence').as('avgConfidence'),
+      ])
       .$if(!!query.period, (q) =>
         q
           .select(({ fn, ref }) =>
@@ -287,27 +262,18 @@ export class AiUsageSummaryQuery implements QueryInterface {
           avgConfidence: 'avgConfidence',
         }),
       )
-      .$if(query.group?.by === 'userGroup', (q) =>
+      .$if(query.group?.by === 'department', (q) =>
         q
-          .innerJoin(
-            'ai_usage_user_groups',
-            'ai_usage_user_groups.ai_usage_id',
-            'ai_usages.id',
-          )
           .select((eb) =>
             jsonObjectFrom(
               eb
-                .selectFrom('user_groups')
-                .selectAll('user_groups')
-                .whereRef(
-                  'user_groups.id',
-                  '=',
-                  'ai_usage_user_groups.user_group_id',
-                ),
-            ).as('userGroup'),
+                .selectFrom('departments')
+                .selectAll('departments')
+                .whereRef('departments.id', '=', 'users.department_id'),
+            ).as('department'),
           )
-          .groupBy('ai_usage_user_groups.user_group_id')
-          .orderBy('ai_usage_user_groups.user_group_id', 'asc'),
+          .groupBy('users.department_id')
+          .orderBy('users.department_id', 'asc'),
       )
       .$if(query.group?.by === 'project', (q) =>
         q
@@ -350,10 +316,10 @@ export class AiUsageSummaryQuery implements QueryInterface {
 
   getMainColumn(query: AiUsageSummaryDto) {
     return match(query.group?.by)
-      .returnType<Ref<'ai_usages' | 'ai_usage_user_groups'>>()
+      .returnType<Ref<'ai_usages' | 'users'>>()
       .with('project', () => 'ai_usages.project_id')
       .with('user', () => 'ai_usages.created_by_id')
-      .with('userGroup', () => 'ai_usage_user_groups.user_group_id')
+      .with('department', () => 'users.department_id')
       .with(undefined, () => 'ai_usages.id')
       .exhaustive();
   }

@@ -27,8 +27,8 @@ export class QueueDispatchService {
     });
 
     this.domainEventQueue.jobProcessAiUsage({
-      owner: 'project',
       aiUsage,
+      aiUsageTokens: [],
     });
     this.aiEventQueue.jobProjectMdGenerate(project, aiUsage.id);
   }
@@ -43,14 +43,14 @@ export class QueueDispatchService {
         aiUsageAction: 'GENERATE_PROJECT_DOCUMENT_SUMMARY',
         projectId: projectDocument.projectId,
         refId: projectDocument.id,
-        refTable: AI_USAGE_REF_TABLE.PROJECT,
+        refTable: AI_USAGE_REF_TABLE.PROJECT_DOCUMENT,
         aiModelName: aiConfig.configData.model,
       },
     });
 
     this.domainEventQueue.jobProcessAiUsage({
-      owner: 'project',
       aiUsage,
+      aiUsageTokens: [],
     });
     this.aiEventQueue.jobProjectDocumentMdGenerate(projectDocument, aiUsage.id);
   }

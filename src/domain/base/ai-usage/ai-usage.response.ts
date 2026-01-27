@@ -21,9 +21,6 @@ export class AiUsageResponse {
   @ApiProperty({ example: 0 })
   replyTimeMs: number | null;
 
-  @ApiProperty({ example: 100 })
-  tokenUsed: number;
-
   @ApiProperty({ example: 99 })
   confidence: number;
 

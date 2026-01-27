@@ -25,6 +25,7 @@ export type UserNewData = {
     password?: string;
     userStatus?: UserStatus;
     lineAccountId?: string;
+    departmentId?: string;
   };
 };
 
@@ -39,5 +40,6 @@ export type UserUpdateData = {
     userStatus?: UserStatus;
     lineAccountId?: string;
     lastSignedInAt?: Date | null;
+    departmentId?: string | null;
   };
 };

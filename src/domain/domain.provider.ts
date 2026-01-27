@@ -1,8 +1,9 @@
 import { AiModelModule } from './base/ai-model/ai-model.module';
-import { AiUsageUserGroupModule } from './base/ai-usage-user-group/ai-usage-user-group.module';
+import { AiUsageTokenModule } from './base/ai-usage-token/ai-usage-token.module';
 import { AiUsageModule } from './base/ai-usage/ai-usage.module';
 import { AppConfigurationModule } from './base/app-configuration/app-configuration.module';
 import { AuditLogModule } from './base/audit-log/audit-log.module';
+import { DepartmentModule } from './base/department/department.module';
 import { LineAccountModule } from './base/line-account/line-account.module';
 import { LineBotModule } from './base/line-bot/line-bot.module';
 import { LineChatLogModule } from './base/line-chat-log/line-chat-log.module';
@@ -26,16 +27,18 @@ import { UserVerificationModule } from './base/user-verification/user-verificati
 import { UserModule } from './base/user/user.module';
 import { AiApiModule } from './logic/ai-api/api-api.module';
 import { AiFileModule } from './logic/ai-file/ai-file.module';
+import { AiPricingModule } from './logic/ai-pricing/ai-pricing.module';
 import { PgModule } from './logic/pg/pg.module';
 import { QueueModule } from './queue/queue.module';
 
 export const DOMAIN_PROVIDER = [
   //
   AiModelModule,
+  AiUsageTokenModule,
   AiUsageModule,
-  AiUsageUserGroupModule,
   AppConfigurationModule,
   AuditLogModule,
+  DepartmentModule,
   LineAccountModule,
   LineChatLogModule,
   LineSessionModule,
@@ -62,4 +65,5 @@ export const DOMAIN_PROVIDER = [
   PgModule,
   AiApiModule,
   AiFileModule,
+  AiPricingModule,
 ];

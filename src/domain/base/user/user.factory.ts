@@ -25,6 +25,7 @@ export function newUser({ actorId, data }: UserNewData): User {
     userStatus: isDefined(data.userStatus) ? data.userStatus : 'ACTIVE',
     lineAccountId: data.lineAccountId || null,
     lastSignedInAt: null,
+    departmentId: data.departmentId || null,
   });
 }
 
@@ -55,6 +56,7 @@ export function mockUser(data: Partial<UserPlain>) {
     lastName: valueOr(data.lastName, faker.person.lastName()),
     createdById: valueOr(data.createdById, null),
     updatedById: firstValueOr([data.updatedById, data.createdById], null),
+    departmentId: valueOr(data.departmentId, null),
   });
 }
 

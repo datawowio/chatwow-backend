@@ -1,74 +1,30 @@
-import { AiUsageUserGroup } from '@domain/base/ai-usage-user-group/ai-usage-user-group.domain';
-import { newAiUsageUserGroup } from '@domain/base/ai-usage-user-group/ai-usage-user-group.factory';
-import { AiUsageUserGroupService } from '@domain/base/ai-usage-user-group/ai-usage-user-group.service';
-import { AiUsage } from '@domain/base/ai-usage/ai-usage.domain';
+import { AiUsageTokenService } from '@domain/base/ai-usage-token/ai-usage-token.service';
 import { AiUsageService } from '@domain/base/ai-usage/ai-usage.service';
+import { AiPricingService } from '@domain/logic/ai-pricing/ai-pricing.service';
 import { Injectable } from '@nestjs/common';
-import { match } from 'ts-pattern';
 
-import { MainDb } from '@infra/db/db.main';
 import { TransactionService } from '@infra/db/transaction/transaction.service';
 
 import { ProcessAiUsageJobData } from './process-ai-usage.type';
-
-type Entity = {
-  aiUsage: AiUsage;
-  aiUsageUserGroups: AiUsageUserGroup[];
-};
 
 @Injectable()
 export class ProcessAiUsageCommand {
   constructor(
     private aiUsageService: AiUsageService,
-    private aiUsageUserGroupService: AiUsageUserGroupService,
+    private aiUsageTokenService: AiUsageTokenService,
+    private aiPricingService: AiPricingService,
     private transactionService: TransactionService,
-    private db: MainDb,
   ) {}
 
-  async exec(data: ProcessAiUsageJobData) {
-    const entity = await match(data.owner)
-      .with('project', () => this.processProject(data.aiUsage))
-      .with('userGroup', () => this.processUserGroup(data.aiUsage))
-      .exhaustive();
-
+  async exec(entity: ProcessAiUsageJobData) {
+    await this.aiPricingService.setUsageTokenPrice(entity.aiUsageTokens);
     await this.save(entity);
   }
 
-  async save({ aiUsage, aiUsageUserGroups }: Entity) {
+  async save(entity: ProcessAiUsageJobData) {
     await this.transactionService.transaction(async () => {
-      await this.aiUsageService.save(aiUsage);
-      await this.aiUsageUserGroupService.saveBulk(aiUsageUserGroups);
+      await this.aiUsageService.save(entity.aiUsage);
+      await this.aiUsageTokenService.saveBulk(entity.aiUsageTokens);
     });
-  }
-
-  async processProject(aiUsage: AiUsage): Promise<Entity> {
-    return {
-      aiUsage,
-      aiUsageUserGroups: [],
-    };
-  }
-
-  async processUserGroup(aiUsage: AiUsage): Promise<Entity> {
-    const res = await this.db.read
-      .selectFrom('user_group_users')
-      .select('user_group_id as userGroupId')
-      .distinct()
-      .where('user_id', '=', aiUsage.createdById)
-      .execute();
-
-    const groupLength = res.length;
-
-    return {
-      aiUsage,
-      aiUsageUserGroups: res.map((r) =>
-        newAiUsageUserGroup({
-          aiUsageId: aiUsage.id,
-          chatCount: 1 / groupLength,
-          tokenUsed: aiUsage.tokenUsed / groupLength,
-          tokenPrice: aiUsage.tokenPrice.div(groupLength),
-          userGroupId: r.userGroupId,
-        }),
-      ),
-    };
   }
 }
