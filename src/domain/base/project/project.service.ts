@@ -11,7 +11,11 @@ import { isDefined } from '@shared/common/common.validator';
 import { Project } from './project.domain';
 import { projectFromPgWithState, projectToPg } from './project.mapper';
 import { ProjectSaveOpts } from './project.type';
-import { addProjectActorFilter, projectsTableFilter } from './project.util';
+import {
+  addProjectActorFilter,
+  addProjectManagerFilter,
+  projectsTableFilter,
+} from './project.util';
 import { ProjectFilterOptions, ProjectQueryOptions } from './project.zod';
 
 @Injectable()
@@ -51,14 +55,22 @@ export class ProjectService {
     return totalCount;
   }
 
-  async findOne(id: string, actor?: UserClaims): Promise<Project | null> {
+  async findOne(
+    id: string,
+    opts?: { manager?: UserClaims; actor?: UserClaims },
+  ): Promise<Project | null> {
     const projectPg = await this.db.read
       .selectFrom('projects')
       .selectAll('projects')
       .where(projectsTableFilter)
       .where('id', '=', id)
       .limit(1)
-      .$if(isDefined(actor), (q) => addProjectActorFilter(q, actor!))
+      .$if(isDefined(opts?.manager), (q) =>
+        addProjectManagerFilter(q, opts!.manager!),
+      )
+      .$if(isDefined(opts?.actor), (q) =>
+        addProjectActorFilter(q, opts!.actor!),
+      )
       .executeTakeFirst();
 
     if (!projectPg) {
@@ -126,7 +138,7 @@ export class ProjectService {
     return this.db.read
       .selectFrom('projects')
       .where(projectsTableFilter)
-      .$if(isDefined(actor), (q) => addProjectActorFilter(q, actor!))
+      .$if(isDefined(actor), (q) => addProjectManagerFilter(q, actor!))
       .$if(isDefined(filter?.projectName), (q) =>
         q.where('projects.project_name', '=', filter!.projectName!),
       )

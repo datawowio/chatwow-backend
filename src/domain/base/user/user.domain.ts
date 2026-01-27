@@ -75,7 +75,7 @@ export class User extends DomainEntity<UserPg> {
     return isMatchedHash(rawPassword, this.password);
   }
 
-  isAllowLoginAccess() {
+  isAdminAccess() {
     const allowedRole: UserRole[] = ['ADMIN', 'MANAGER'];
     return allowedRole.includes(this.role);
   }

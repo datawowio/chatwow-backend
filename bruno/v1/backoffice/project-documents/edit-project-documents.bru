@@ -1,0 +1,25 @@
+meta {
+  name: edit-project-documents
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{url}}/v1/backoffice/project-documents/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+body:json {
+  {
+    "projectDocument": {
+      "documentStatus": "ACTIVE",
+      "documentDetails": "string",
+      "aiSummaryMd": "string"
+    }
+  }
+}

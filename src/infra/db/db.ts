@@ -41,6 +41,8 @@ export type Numeric = ColumnType<string, number | string, number | string>;
 
 export type ProjectStatus = "ACTIVE" | "INACTIVE" | "PROCESSING";
 
+export type SessionStatus = "ACTIVE" | "DEPRECATED";
+
 export type UserRole = "ADMIN" | "MANAGER" | "USER";
 
 export type UserStatus = "ACTIVE" | "INACTIVE" | "PENDING_REGISTRATION";
@@ -165,6 +167,14 @@ export interface PasswordResetTokens {
   user_id: string;
 }
 
+export interface ProjectChatBookmarks {
+  bookmark_text: string;
+  created_at: Generated<string>;
+  created_by_id: string;
+  id: string;
+  project_id: string;
+}
+
 export interface ProjectChatLogs {
   chat_sender: ChatSender;
   created_at: Generated<string>;
@@ -174,11 +184,20 @@ export interface ProjectChatLogs {
   project_chat_session_id: string;
 }
 
+export interface ProjectChatQuestionRecommendations {
+  created_at: Generated<string>;
+  id: string;
+  project_id: string;
+  question_text: string;
+}
+
 export interface ProjectChatSessions {
   created_at: Generated<string>;
   id: string;
+  init_chat_log_id: string | null;
   latest_chat_log_id: string | null;
   project_id: string;
+  session_status: Generated<SessionStatus>;
   user_id: string;
 }
 
@@ -309,7 +328,9 @@ export interface DB {
   line_sessions: LineSessions;
   message_tasks: MessageTasks;
   password_reset_tokens: PasswordResetTokens;
+  project_chat_bookmarks: ProjectChatBookmarks;
   project_chat_logs: ProjectChatLogs;
+  project_chat_question_recommendations: ProjectChatQuestionRecommendations;
   project_chat_sessions: ProjectChatSessions;
   project_documents: ProjectDocuments;
   projects: Projects;

@@ -1,3 +1,5 @@
+import { SessionStatus } from '@infra/db/db';
+
 import { DomainEntity } from '@shared/common/common.domain';
 import { valueOr } from '@shared/common/common.func';
 
@@ -13,6 +15,8 @@ export class ProjectChatSession extends DomainEntity<ProjectChatSessionPg> {
   readonly userId: string;
   readonly projectId: string;
   readonly latestChatLogId: string | null;
+  readonly initChatLogId: string | null;
+  readonly sessionStatus: SessionStatus;
 
   constructor(plain: ProjectChatSessionPlain) {
     super();
@@ -26,7 +30,11 @@ export class ProjectChatSession extends DomainEntity<ProjectChatSessionPg> {
       userId: this.userId,
       projectId: this.projectId,
 
+      sessionStatus: valueOr(data.sessionStatus, this.sessionStatus),
       latestChatLogId: valueOr(data.latestChatLogId, this.latestChatLogId),
+      initChatLogId: this.initChatLogId
+        ? this.initChatLogId
+        : valueOr(data.initChatLogId, this.initChatLogId),
     };
 
     Object.assign(this, plain);

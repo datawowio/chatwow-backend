@@ -1,0 +1,31 @@
+meta {
+  name: get-chat-sessions
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{url}}/v1/chat-portal/chat-sessions/:id
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~includes: 
+}
+
+params:path {
+  id: 019bbfde-e0f5-764b-8dc1-c88e9d2865e1
+}
+
+body:json {
+  {
+    "text": "hello",
+    "previousChatId": null
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

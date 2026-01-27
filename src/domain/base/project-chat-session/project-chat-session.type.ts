@@ -1,4 +1,4 @@
-import type { ProjectChatSessions } from '@infra/db/db';
+import type { ProjectChatSessions, SessionStatus } from '@infra/db/db';
 import type { DBModel } from '@infra/db/db.common';
 
 import type {
@@ -20,9 +20,12 @@ export type ProjectChatSessionJsonState = WithPgState<
 export type ProjectChatSessionNewData = {
   userId: string;
   projectId: string;
+  initChatLogId?: string;
   latestChatLogId?: string;
 };
 
 export type ProjectChatSessionUpdateData = {
   latestChatLogId?: string;
+  initChatLogId?: string;
+  sessionStatus?: SessionStatus;
 };

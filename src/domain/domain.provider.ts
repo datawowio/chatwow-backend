@@ -10,7 +10,9 @@ import { LineChatLogModule } from './base/line-chat-log/line-chat-log.module';
 import { LineSessionModule } from './base/line-session/line-session.module';
 import { MessageTaskModule } from './base/message-task/message-task.module';
 import { PasswordResetTokenModule } from './base/password-reset-token/password-reset-token.module';
+import { ProjectChatBookmarkModule } from './base/project-chat-bookmark/project-chat-bookmark.module';
 import { ProjectChatLogModule } from './base/project-chat-log/project-chat-log.module';
+import { ProjectChatQuestionRecommendationModule } from './base/project-chat-question-recommendation/project-chat-question-recommendation.module';
 import { ProjectChatSessionModule } from './base/project-chat-session/project-chat-session.module';
 import { ProjectDocumentModule } from './base/project-document/project-document.module';
 import { ProjectModule } from './base/project/project.module';
@@ -56,6 +58,8 @@ export const DOMAIN_PROVIDER = [
   LineBotModule,
   MessageTaskModule,
   UserGroupManagerModule,
+  ProjectChatBookmarkModule,
+  ProjectChatQuestionRecommendationModule,
 
   QueueModule,
   PgModule,

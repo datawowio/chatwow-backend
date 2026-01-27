@@ -1,0 +1,172 @@
+import { Project } from '@domain/base/project/project.domain';
+import { projectFromPgWithState } from '@domain/base/project/project.mapper';
+import { projectsTableFilter } from '@domain/base/project/project.util';
+import { UserGroupUserService } from '@domain/base/user-group-user/user-group-user.service';
+import { UserGroup } from '@domain/base/user-group/user-group.domain';
+import {
+  userGroupFromPgWithState,
+  userGroupToResponse,
+} from '@domain/base/user-group/user-group.mapper';
+import { userGroupsTableFilter } from '@domain/base/user-group/user-group.utils';
+import { UserManageProjectService } from '@domain/base/user-manage-project/user-manage-project.service';
+import { User } from '@domain/base/user/user.domain';
+import { userToResponse } from '@domain/base/user/user.mapper';
+import { UserService } from '@domain/base/user/user.service';
+import { Injectable } from '@nestjs/common';
+
+import { MainDb } from '@infra/db/db.main';
+import { TransactionService } from '@infra/db/transaction/transaction.service';
+import { UserClaims } from '@infra/middleware/jwt/jwt.common';
+
+import { CommandInterface } from '@shared/common/common.type';
+import { ApiException } from '@shared/http/http.exception';
+import { toHttpSuccess } from '@shared/http/http.mapper';
+
+import { EditUserDto, EditUserResponse } from './edit-user.dto';
+
+type Entity = {
+  user: User;
+  userGroups?: UserGroup[];
+  manageProjects?: Project[];
+};
+
+@Injectable()
+export class EditUserCommand implements CommandInterface {
+  constructor(
+    private db: MainDb,
+    private transactionService: TransactionService,
+    private userService: UserService,
+    private userGroupUserService: UserGroupUserService,
+    private userManageProjectService: UserManageProjectService,
+  ) {}
+
+  async exec(
+    claims: UserClaims,
+    id: string,
+    body: EditUserDto,
+  ): Promise<EditUserResponse> {
+    const entity = await this.find(id);
+    const clonedUser = entity.user.clone();
+
+    if (body.user) {
+      entity.user.edit({
+        actorId: claims.userId,
+        data: body.user,
+      });
+    }
+
+    // TODO: perform role change action
+    const _roleAction = this.getUserRoleAction(entity.user, clonedUser);
+
+    if (body.userGroupIds) {
+      entity.userGroups = await this.getUserGroups(body.userGroupIds);
+    }
+
+    if (body.manageProjectIds) {
+      entity.manageProjects = await this.getProjects(body.manageProjectIds);
+    }
+
+    await this.save(entity);
+
+    return toHttpSuccess({
+      data: {
+        user: {
+          attributes: userToResponse(entity.user),
+          relations: {
+            userGroups:
+              entity.userGroups &&
+              entity.userGroups.map((g) => ({
+                attributes: userGroupToResponse(g),
+              })),
+          },
+        },
+      },
+    });
+  }
+
+  async save(entity: Entity): Promise<void> {
+    const user = entity.user;
+    const userGroups = entity.userGroups;
+    const manageProjects = entity.manageProjects;
+
+    await this.transactionService.transaction(async () => {
+      await this.userService.save(user);
+
+      if (userGroups) {
+        await this.userGroupUserService.saveUserRelations(
+          user.id,
+          userGroups.map((g) => g.id),
+        );
+      }
+
+      if (manageProjects) {
+        await this.userManageProjectService.saveUserRelations(
+          user.id,
+          manageProjects.map((p) => p.id),
+        );
+      }
+    });
+  }
+
+  async find(id: string): Promise<Entity> {
+    const user = await this.userService.findOne(id);
+    if (!user) {
+      throw new ApiException(404, 'userNotFound');
+    }
+
+    return {
+      user,
+      userGroups: [],
+    };
+  }
+
+  async getUserGroups(ids: string[]): Promise<UserGroup[]> {
+    if (!ids.length) {
+      return [];
+    }
+
+    const rawGroups = await this.db.read
+      .selectFrom('user_groups')
+      .selectAll()
+      .where('id', 'in', ids)
+      .where(userGroupsTableFilter)
+      .execute();
+
+    if (rawGroups.length !== ids.length) {
+      throw new ApiException(400, 'invalidGroupId');
+    }
+
+    return rawGroups.map((g) => userGroupFromPgWithState(g));
+  }
+
+  async getProjects(ids?: string[]) {
+    if (!ids?.length) {
+      return [];
+    }
+
+    const rawProjects = await this.db.read
+      .selectFrom('projects')
+      .selectAll()
+      .where('id', 'in', ids)
+      .where(projectsTableFilter)
+      .execute();
+
+    if (rawProjects.length !== ids.length) {
+      throw new ApiException(400, 'invalidProjectId');
+    }
+
+    return rawProjects.map((p) => projectFromPgWithState(p));
+  }
+
+  getUserRoleAction(user: User, oldVersionUser: User) {
+    if (!oldVersionUser.isAdminAccess() && user.isAdminAccess()) {
+      return 'PROMOTED';
+    }
+
+    if (oldVersionUser.isAdminAccess() && !user.isAdminAccess()) {
+      return 'DEMOTED';
+    }
+
+    return 'NONE';
+  }
+}

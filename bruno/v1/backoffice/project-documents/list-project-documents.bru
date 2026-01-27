@@ -1,0 +1,17 @@
+meta {
+  name: list-project-documents
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/v1/backoffice/project-documents?includes=storedFile&sort=id
+  body: none
+  auth: inherit
+}
+
+params:query {
+  includes: storedFile
+  sort: id
+  ~filter[storedFileExtensions]: pdf
+}

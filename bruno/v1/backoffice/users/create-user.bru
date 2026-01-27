@@ -1,0 +1,23 @@
+meta {
+  name: create-user
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{url}}/v1/backoffice/users
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "user": {
+      "firstName": "test",
+      "lastName": "bob",
+      "email": "test@example.com",
+      "role": "ADMIN"
+    },
+    "userGroupIds": ["019a9761-169b-77d4-8712-23c2c2a8928a"]
+  }
+}

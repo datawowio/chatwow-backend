@@ -39,7 +39,7 @@ export class SignInCommand implements CommandInterface {
   ): Promise<{ plainToken: string; response: SignInResponse }> {
     const user = await this.find(body);
 
-    signIn({ user, password: body.password });
+    signIn({ user, password: body.password, signInMode: body.mode });
     const { session, token } = this.sessionService.newSession(user.id);
 
     await this.save({

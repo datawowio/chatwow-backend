@@ -1,0 +1,15 @@
+meta {
+  name: user-summary
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{url}}/v1/backoffice/users/me
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~includes: manageProjects,userGroups,lineAccount
+}

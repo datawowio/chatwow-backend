@@ -51,6 +51,11 @@ Enum "project_status" {
   "PROCESSING"
 }
 
+Enum "session_status" {
+  "ACTIVE"
+  "DEPRECATED"
+}
+
 Enum "user_role" {
   "ADMIN"
   "MANAGER"
@@ -240,6 +245,8 @@ Table "project_chat_sessions" {
   "user_id" uuid [not null]
   "project_id" uuid [not null]
   "latest_chat_log_id" uuid
+  "init_chat_log_id" uuid
+  "session_status" session_status [not null, default: 'ACTIVE']
 }
 
 Table "project_chat_logs" {
@@ -343,6 +350,29 @@ Table "app_configurations" {
   "config_data" jsonb [not null]
 }
 
+Table "project_chat_bookmarks" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "bookmark_text" text [not null]
+  "created_by_id" uuid [not null]
+  "project_id" uuid [not null]
+
+  Indexes {
+    project_id [type: btree, name: "project_chat_bookmarks_project_id_idx"]
+  }
+}
+
+Table "project_chat_question_recommendations" {
+  "id" uuid [pk, not null]
+  "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  "question_text" text [not null]
+  "project_id" uuid [not null]
+
+  Indexes {
+    project_id [type: btree, name: "project_chat_question_recommendations_project_id_idx"]
+  }
+}
+
 Table "departments" {
   "id" uuid [pk, not null]
   "created_at" timestamptz [not null, default: `CURRENT_TIMESTAMP`]
@@ -378,7 +408,13 @@ Ref "line_sessions_project_id_fkey":"projects"."id" < "line_sessions"."project_i
 
 Ref "password_reset_tokens_user_id_fkey":"users"."id" < "password_reset_tokens"."user_id" [delete: cascade]
 
+Ref "project_chat_bookmarks_created_by_id_fkey":"users"."id" < "project_chat_bookmarks"."created_by_id"
+
+Ref "project_chat_bookmarks_project_id_fkey":"projects"."id" < "project_chat_bookmarks"."project_id"
+
 Ref "project_chat_logs_project_chat_session_id_fkey":"project_chat_sessions"."id" < "project_chat_logs"."project_chat_session_id" [delete: cascade]
+
+Ref "project_chat_question_recommendations_project_id_fkey":"projects"."id" < "project_chat_question_recommendations"."project_id"
 
 Ref "project_chat_sessions_project_id_fkey":"projects"."id" < "project_chat_sessions"."project_id" [delete: cascade]
 

@@ -66,6 +66,30 @@ export class InitialsCliSeed extends CommandRunner {
       userId: superAdmin.id,
     });
 
+    const general = mockUser({
+      email: 'general@example.com',
+      password: 'password',
+      role: 'USER',
+      firstName: 'general',
+      lastName: 'general',
+      userStatus: 'ACTIVE',
+    });
+    const generalVerification = newUserVerification({
+      userId: general.id,
+    });
+
+    const manager = mockUser({
+      email: 'manager@example.com',
+      password: 'password',
+      role: 'MANAGER',
+      firstName: 'manager',
+      lastName: 'manager',
+      userStatus: 'ACTIVE',
+    });
+    const managerVerification = newUserVerification({
+      userId: manager.id,
+    });
+
     const groupA = newUserGroup({
       actorId: superAdmin.id,
       data: {
@@ -103,17 +127,19 @@ export class InitialsCliSeed extends CommandRunner {
     });
 
     // save db
-    await this.userService.save(superAdmin);
-    await this.userVerificationService.save(superAdminVerification);
+    await this.userService.saveBulk([superAdmin, general, manager]);
+    await this.userVerificationService.saveBulk([
+      superAdminVerification,
+      generalVerification,
+      managerVerification,
+    ]);
     await this.userGroupService.save(groupA);
     await this.projectService.save(projectA, { disableEvent: true });
-    await this.userGroupUserService.saveUserRelations(superAdmin.id, [
-      groupA.id,
-    ]);
+    await this.userGroupUserService.saveUserRelations(general.id, [groupA.id]);
     await this.userGroupProjectService.saveUserGroupRelations(groupA.id, [
       projectA.id,
     ]);
-    await this.userManageProjectService.saveUserRelations(superAdmin.id, [
+    await this.userManageProjectService.saveUserRelations(manager.id, [
       projectA.id,
     ]);
     await this.projectDocumentService.saveBulk(

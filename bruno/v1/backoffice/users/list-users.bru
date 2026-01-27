@@ -1,0 +1,17 @@
+meta {
+  name: list-users
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{url}}/v1/backoffice/users?includes=manageProjects,userGroups,lineAccount&sort=-firstName&filter[search]=sup
+  body: none
+  auth: inherit
+}
+
+params:query {
+  includes: manageProjects,userGroups,lineAccount
+  sort: -firstName
+  filter[search]: sup
+}

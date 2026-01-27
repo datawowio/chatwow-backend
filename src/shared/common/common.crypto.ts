@@ -1,4 +1,5 @@
 import { User } from '@domain/base/user/user.domain';
+import { ISignInModeWithAll } from '@domain/logic/auth/auth.constant';
 import bcrypt from 'bcryptjs';
 import {
   createCipheriv,
@@ -76,10 +77,11 @@ export function isMatchedHash(raw: string, hashed: string) {
   return isMatch;
 }
 
-export function encodeUserJwt(user: User) {
+export function encodeUserJwt(user: User, mode: ISignInModeWithAll) {
   const encoded: UserJwtEncoded = {
     userId: user.id,
     role: user.role,
+    mode,
   };
 
   return encodeJwt(encoded, jwtConfig.salt, {
@@ -154,7 +156,13 @@ export function encodeCursor(obj: unknown): string {
 }
 
 // --- Decode cursor ---
-export function decodeCursor<T = CursorObj<string, any>>(cursor: string): T {
+export function decodeCursor<T = CursorObj<string, any>>(
+  cursor?: string,
+): T | null {
+  if (!cursor) {
+    return null;
+  }
+
   const b64 =
     cursor.replace(/-/g, '+').replace(/_/g, '/') +
     '==='.slice((cursor.length + 3) % 4);

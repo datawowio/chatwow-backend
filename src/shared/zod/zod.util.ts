@@ -2,8 +2,14 @@ import { createZodDto } from 'nestjs-zod';
 import type { ZodError } from 'zod';
 import { z } from 'zod';
 
+import { isNumericString } from '@shared/common/common.validator';
+
 import { setNestedKey } from '../common/common.func';
-import { toOptionalNumber, toSet } from '../common/common.transformer';
+import {
+  toNumber,
+  toOptionalNumber,
+  toSet,
+} from '../common/common.transformer';
 import type { ParsedSort, SortDir } from '../common/common.type';
 
 export const zodDto = createZodDto;
@@ -12,6 +18,17 @@ export const paginationZod = z
   .object({
     page: z.string().optional().transform(toOptionalNumber),
     perPage: z.string().optional().transform(toOptionalNumber),
+  })
+  .optional();
+
+export const paginationCursorZod = z
+  .object({
+    cursor: z.string().optional(),
+    perPage: z
+      .string()
+      .refine(isNumericString)
+      .default('10')
+      .transform(toNumber),
   })
   .optional();
 
