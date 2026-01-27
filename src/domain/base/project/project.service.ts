@@ -194,7 +194,7 @@ export class ProjectService {
           .leftJoin(
             'user_group_users',
             'user_group_users.user_group_id',
-            'user_group_users.user_group_id',
+            'user_group_projects.user_group_id',
           )
           .leftJoin('users', 'users.id', 'user_group_users.user_id')
           .where('users.line_account_id', '=', filter!.lineAccountId!),
