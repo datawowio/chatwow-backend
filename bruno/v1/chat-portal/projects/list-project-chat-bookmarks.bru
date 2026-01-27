@@ -1,0 +1,29 @@
+meta {
+  name: list-project-chat-bookmarks
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{url}}/v1/chat-portal/projects/project-chat-bookmarks
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~sort: id
+  ~filter[projectIds]: 
+  ~countFilter[search]: 
+  ~pagination[page]: 1
+  ~pagination[perPage]: 10
+  ~includes: project
+}
+
+headers {
+  idempotency-key: 019bbb7e-24c3-7dd8-a6ed-0fc42b4e6f6a
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

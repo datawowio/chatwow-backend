@@ -1,0 +1,24 @@
+meta {
+  name: create-chat-session
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/v1/chat-portal/projects/:id/chat-sessions
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 019bbb7c-f2f8-74ae-9a91-9519b16e8f1d
+}
+
+headers {
+  idempotency-key: 019bbb7e-24c3-7dd8-a6ed-0fc42b4e6f6a
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

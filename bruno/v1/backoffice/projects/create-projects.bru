@@ -1,0 +1,24 @@
+meta {
+  name: create-projects
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{url}}/v1/backoffice/projects
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "project": {
+      "projectName": "test proj",
+      "projectDescription": "this is a test"
+    },
+    "userGroupIds": [
+      "019afc13-afc3-717f-94d5-f0c655e37a80"
+    ],
+    "manageUserIds": ["019afc13-af73-7107-b3c2-24865200ba51"]
+  }
+}

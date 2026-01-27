@@ -1,0 +1,24 @@
+meta {
+  name: edit-user-groups
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{url}}/v1/backoffice/user-groups/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 019aa48a-db39-75ab-9292-e15531427ca2
+}
+
+body:json {
+  {
+    "userGroup": {
+      "groupName": "updated group",
+      "description": "updated"
+    }
+  }
+}

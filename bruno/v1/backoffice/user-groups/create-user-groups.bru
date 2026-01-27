@@ -1,0 +1,22 @@
+meta {
+  name: create-user-groups
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{url}}/v1/backoffice/user-groups
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "userGroup": {
+      "groupName": "test new group",
+      "description": "this test new group"
+    },
+    "userIds": ["019b9c60-1467-728d-bb55-a973c7ddd0c9"],
+    "projectIds": ["019b9c60-14c2-7490-8f99-38fbafd05979"]
+  }
+}

@@ -1,0 +1,22 @@
+meta {
+  name: update-profile
+  type: http
+  seq: 9
+}
+
+patch {
+  url: {{url}}/v1/auth/profile
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "user": {
+      "passwordData": {
+        "password": "password",
+        "oldPassword": "passwords"
+      }
+    }
+  }
+}

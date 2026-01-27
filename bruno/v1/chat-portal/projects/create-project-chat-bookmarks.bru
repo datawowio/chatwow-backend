@@ -1,0 +1,30 @@
+meta {
+  name: create-project-chat-bookmarks
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{url}}/v1/chat-portal/projects/:projectId/project-chat-bookmarks
+  body: json
+  auth: inherit
+}
+
+params:path {
+  projectId: 019bbfc1-25c0-7261-a46c-288dbb858005
+}
+
+headers {
+  idempotency-key: 019bbb7e-24c3-7dd8-a6ed-0fc42b4e6f6a
+}
+
+body:json {
+  {
+    "bookmarkText": "สวัสดี"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

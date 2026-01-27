@@ -1,0 +1,36 @@
+meta {
+  name: edit-projects
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{url}}/v1/backoffice/projects/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+body:json {
+  {
+    "project": {
+      "projectName": "testo",
+      "projectDescription": "testo desc"
+    },
+    "projectDocuments": [
+      {
+        "documentDetails": "temp",
+        "storedFile": {
+          "id": "019aa043-fa0e-769e-aa2d-792554a69aa9",
+          "filename": "hello.csv"
+        }
+      }
+    ],
+    "userGroupIds": [
+      "019a9f63-275b-775a-80ce-1edaec4f06dd"
+    ]
+  }
+}

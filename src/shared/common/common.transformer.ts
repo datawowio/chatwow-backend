@@ -66,6 +66,10 @@ export function toSplitCommaArray(v?: string | unknown) {
     return [];
   }
 
+  if (Array.isArray(v)) {
+    return v;
+  }
+
   if (typeof v !== 'string') {
     return [];
   }
@@ -76,6 +80,10 @@ export function toSplitCommaArray(v?: string | unknown) {
 export function toSplitCommaArrayOrThrow(v: unknown) {
   if (!v) {
     return [];
+  }
+
+  if (Array.isArray(v)) {
+    return v;
   }
 
   if (typeof v !== 'string') {

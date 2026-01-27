@@ -8,8 +8,12 @@ export function overrideQueryWithCursor(
     filter?: Record<string, unknown>;
     sort?: ParsedSort<string>;
   },
-  cursor: CursorObj<string, Record<string, unknown> | undefined>,
+  cursor: CursorObj<string, Record<string, unknown> | undefined> | null,
 ) {
+  if (!cursor) {
+    return;
+  }
+
   query.filter = {
     ...query.filter,
     ...cursor.filter,

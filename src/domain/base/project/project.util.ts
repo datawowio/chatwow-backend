@@ -6,7 +6,7 @@ export function projectsTableFilter(eb: EB<'projects'>) {
   return eb.and([]);
 }
 
-export function addProjectActorFilter<T extends SelectAnyQB<'projects'>>(
+export function addProjectManagerFilter<T extends SelectAnyQB<'projects'>>(
   q: T,
   actor: UserClaims,
 ): T {
@@ -25,5 +25,29 @@ export function addProjectActorFilter<T extends SelectAnyQB<'projects'>>(
         eb('user_manage_projects.user_id', '=', actor.userId),
         // eb('projects.created_by_id', '=', actor.userId),
       ]),
+    ) as T;
+}
+
+export function addProjectActorFilter<T extends SelectAnyQB<'projects'>>(
+  q: T,
+  actor: UserClaims,
+): T {
+  if (actor.role === 'ADMIN') {
+    return q;
+  }
+
+  return q
+    .leftJoin(
+      'user_group_projects',
+      'user_group_projects.project_id',
+      'projects.id',
+    )
+    .leftJoin(
+      'user_group_users',
+      'user_group_users.user_group_id',
+      'user_group_projects.user_group_id',
+    )
+    .where((eb) =>
+      eb.or([eb('user_group_users.user_id', '=', actor.userId)]),
     ) as T;
 }

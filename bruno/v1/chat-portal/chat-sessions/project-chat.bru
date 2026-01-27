@@ -1,0 +1,27 @@
+meta {
+  name: project-chat
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/v1/chat-portal/chat-sessions/:id/chat
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 019bbb7e-4c11-7378-b993-f2cb9f14a5fb
+}
+
+body:json {
+  {
+    "text": "hello",
+    "previousChatId": null
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

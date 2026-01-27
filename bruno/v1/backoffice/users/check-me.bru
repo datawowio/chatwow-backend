@@ -1,0 +1,17 @@
+meta {
+  name: check-me
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{url}}/v1/backoffice/users/me/check
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "password": "nice"
+  }
+}

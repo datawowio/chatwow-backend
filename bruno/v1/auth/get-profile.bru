@@ -1,0 +1,15 @@
+meta {
+  name: get-profile
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/v1/auth/profile?includes=manageProjects,userGroups,lineAccount
+  body: none
+  auth: inherit
+}
+
+params:query {
+  includes: manageProjects,userGroups,lineAccount
+}

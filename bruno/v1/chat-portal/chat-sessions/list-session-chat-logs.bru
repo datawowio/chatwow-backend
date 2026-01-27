@@ -1,0 +1,32 @@
+meta {
+  name: list-session-chat-logs
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{url}}/v1/chat-portal/chat-sessions/:id/chat-log/cursor?pagination[perPage]=1
+  body: none
+  auth: inherit
+}
+
+params:query {
+  pagination[perPage]: 1
+  ~pagination[cursor]: 
+}
+
+params:path {
+  id: 019bbfde-e0f5-764b-8dc1-c88e9d2865e1
+}
+
+body:json {
+  {
+    "text": "hello",
+    "previousChatId": null
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
